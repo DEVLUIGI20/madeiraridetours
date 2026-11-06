@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { LanguageContext } from '../context/languageContext';
+import { LanguageContext } from '../context/LanguageContext';
 
 /**
  * Custom hook to access internationalization context.

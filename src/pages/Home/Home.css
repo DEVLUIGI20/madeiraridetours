@@ -352,30 +352,90 @@
 
   .hero-card {
     height: calc(100svh - 82px);
-    min-height: 520px;
+    min-height: 480px;
     border-radius: 22px;
   }
 
   .hero-slide-pane {
-    padding: 32px 18px 24px;
+    padding: 28px 18px 24px;
   }
 
   .hero-title {
-    font-size: clamp(2.1rem, 9.5vw, 3.2rem);
-    margin-bottom: 14px;
+    font-size: clamp(1.8rem, 8vw, 2.8rem);
+    margin-bottom: 12px;
   }
 
   .hero-subtitle {
-    margin-bottom: 24px;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    max-width: 100%;
   }
 
   .hero-bottom-bar {
-    bottom: 24px;
+    bottom: 20px;
     left: 18px;
+  }
+
+  .hero-arrow-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .adventures-section {
+    margin: 32px auto 0;
+    padding: 0 16px;
+  }
+
+  .services-section {
+    margin: 32px auto 60px;
+    padding: 0 16px;
+  }
+
+  .section-header {
+    margin-bottom: 24px;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .features-bar {
+    padding: 20px 18px;
+    gap: 16px;
+  }
+
+  .feature-item {
+    gap: 12px;
+  }
+}
+
+/* Extra small: 320px iPhone SE */
+@media (max-width: 400px) {
+  .hero-wrapper {
+    padding: 0 8px 10px;
+  }
+
+  .hero-card {
+    min-height: 440px;
+    border-radius: 18px;
+  }
+
+  .hero-title {
+    font-size: clamp(1.6rem, 7.5vw, 2.2rem);
+  }
+
+  .hero-subtitle {
+    font-size: 0.85rem;
   }
 
   .hero-arrow-btn {
     width: 40px;
     height: 40px;
+  }
+
+  .adventures-section,
+  .services-section {
+    padding: 0 12px;
   }
 }

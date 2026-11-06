@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { SUPPORTED_LANGUAGES, TRANSLATIONS } from '../constants/translations';
-import { LanguageContext } from './languageContext';
+import { LanguageContext } from './LanguageContext';
 
 const STORAGE_KEY = 'mrt_preferred_language';
 
