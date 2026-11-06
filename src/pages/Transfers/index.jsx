@@ -1,13 +1,8 @@
 import { useLanguage } from '../../hooks/useLanguage';
 import TourCard from '../../components/common/TourCard';
-import { WHATSAPP_PHONE } from '../../constants/transfers';
-import { ROUTES } from '../../constants';
+import { getLocalizedTransferServices } from '../../constants/transfers';
+import { ROUTES, makeWhatsAppUrl } from '../../constants';
 import './Transfers.css';
-
-// Helper WhatsApp link
-function makeWhatsAppUrl(text) {
-  return `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(text)}`;
-}
 
 function WhatsAppIcon() {
   return (
@@ -19,141 +14,7 @@ function WhatsAppIcon() {
 
 export default function Transfers() {
   const { t } = useLanguage();
-
-  // All transfer services structured into the TourCard format
-  const transferServices = [
-    {
-      id: 'sunrise',
-      duration: '4h',
-      durationLabel: 'Sunrise',
-      title: 'Sunrise at Pico do Areeiro',
-      highlights: [
-        'Funchal → Pico do Areeiro (1818 m)',
-        'Early-morning pickup in Funchal',
-        'Watch sunrise above the clouds',
-        'Stops at panoramic viewpoints',
-        'Prices include the round trip',
-      ],
-      images: [],
-      price4: 90,
-      price6: 120,
-      bookLink: makeWhatsAppUrl('Olá! Gostaria de reservar o transfer Sunrise at Pico do Areeiro (1818m).'),
-    },
-    {
-      id: 'sunset',
-      duration: '4h',
-      durationLabel: 'Sunset',
-      title: 'Sunset at Pico do Areeiro',
-      highlights: [
-        'Funchal → Pico do Areeiro (1818 m)',
-        'Late-afternoon pickup in Funchal',
-        'Watch sunset above the clouds',
-        'Stops at panoramic viewpoints',
-        'Round trip included',
-      ],
-      images: [],
-      price4: 90,
-      price6: 120,
-      bookLink: makeWhatsAppUrl('Olá! Gostaria de reservar o transfer Sunset at Pico do Areeiro (1818m).'),
-    },
-    {
-      id: 'pr1-trail',
-      duration: '5h',
-      durationLabel: 'PR1 Trail',
-      title: 'Pico Ruivo Transfer (PR1)',
-      highlights: [
-        'Pico do Areeiro ↔ Achada do Teixeira',
-        'Pico do Areeiro → Achada do Teixeira',
-        'Achada do Teixeira → Pico do Areeiro',
-        'Drop-off at start & pickup at end',
-        'Round trip included',
-      ],
-      images: [],
-      price4: 90,
-      price6: 120,
-      bookLink: makeWhatsAppUrl('Olá! Gostaria de reservar o transfer PR1 Pico Ruivo (Pico do Areeiro ↔ Achada do Teixeira).'),
-    },
-    {
-      id: 'pr6-25-fontes',
-      duration: '4h',
-      durationLabel: 'Half day',
-      title: 'PR6 – Levada das 25 Fontes',
-      highlights: [
-        'Rabaçal laurel forest access',
-        'Waterfalls and natural lagoon',
-        'About 3h walking trail',
-        'Dedicated driver pickup & return',
-      ],
-      images: [],
-      price4: 80,
-      price6: 100,
-      bookLink: makeWhatsAppUrl('Olá! Gostaria de reservar o transfer para a PR6 – Levada das 25 Fontes (Rabaçal).'),
-    },
-    {
-      id: 'pr62-alecrim',
-      duration: '4h',
-      durationLabel: 'Half day',
-      title: 'PR6.2 – Levada do Alecrim',
-      highlights: [
-        'Rabaçal — flat and easy path',
-        'Along levada to Lagoa do Vento',
-        'About 3h walking trail',
-        'Round trip transfer included',
-      ],
-      images: [],
-      price4: 80,
-      price6: 100,
-      bookLink: makeWhatsAppUrl('Olá! Gostaria de reservar o transfer para a PR6.2 – Levada do Alecrim (Rabaçal).'),
-    },
-    {
-      id: 'pr8-sao-lourenco',
-      duration: '4h',
-      durationLabel: 'Half day',
-      title: 'PR8 – Ponta de São Lourenço',
-      highlights: [
-        'Eastern peninsula coastal trail',
-        'Unique cliffs & ocean views',
-        'About 2h30 walking trail',
-        'Scheduled drop-off & pickup',
-      ],
-      images: [],
-      price4: 70,
-      price6: 90,
-      bookLink: makeWhatsAppUrl('Olá! Gostaria de reservar o transfer para a PR8 – Ponta de São Lourenço.'),
-    },
-    {
-      id: 'pr9-caldeirao-verde',
-      duration: '5h',
-      durationLabel: 'Full day',
-      title: 'PR9 – Caldeirão Verde',
-      highlights: [
-        'Queimadas forest park access',
-        'Tunnels, streams & 100m waterfall',
-        'About 4h30 walking trail',
-        'Round trip transfer included',
-      ],
-      images: [],
-      price4: 80,
-      price6: 100,
-      bookLink: makeWhatsAppUrl('Olá! Gostaria de reservar o transfer para a PR9 – Levada do Caldeirão Verde.'),
-    },
-    {
-      id: 'pr18-levada-rei',
-      duration: '4h',
-      durationLabel: 'Half day',
-      title: 'PR18 – Levada do Rei',
-      highlights: [
-        'Santana laurel-forest trail',
-        'Views over the lush north coast',
-        'About 3h walking trail',
-        'Drop-off and finish pickup',
-      ],
-      images: [],
-      price4: 80,
-      price6: 100,
-      bookLink: makeWhatsAppUrl('Olá! Gostaria de reservar o transfer para a PR18 – Levada do Rei (Santana).'),
-    },
-  ];
+  const transferServices = getLocalizedTransferServices(t);
 
   return (
     <div className="transfers-page-view">

@@ -51,19 +51,32 @@ html {
 @media (max-width: 768px) {
   html {
     font-size: 14px;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 }
 
 body {
   min-height: 100vh;
+  min-height: -webkit-fill-available;
   overflow-x: hidden;
   background-color: var(--color-bg);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  width: 100%;
+}
+
+/* Multi-screen container wrapper for Ultrawide displays */
+.container-constrained {
+  width: 100%;
+  max-width: 1360px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 a {
@@ -76,9 +89,16 @@ button {
   cursor: pointer;
   border: none;
   background: none;
+  touch-action: manipulation;
+}
+
+/* Mobile-friendly tap highlight */
+* {
+  -webkit-tap-highlight-color: transparent;
 }
 
 img {
   max-width: 100%;
+  height: auto;
   display: block;
 }

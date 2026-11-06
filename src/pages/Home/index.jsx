@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { ROUTES } from '../../constants';
+import { getLocalizedTours } from '../../constants/tours';
 import { useLanguage } from '../../hooks/useLanguage';
 import Button from '../../components/common/Button';
 import TourCard from '../../components/common/TourCard';
@@ -43,76 +44,8 @@ export default function Home() {
     },
   ];
 
-  // Build tour data using translations
-  const featuredTours = [
-    {
-      id: 'cabo-girao',
-      duration: '4h',
-      durationLabel: t('adventures.halfDay') || 'Half day',
-      title: t('adventures.tour1Title'),
-      highlights: [
-        t('adventures.tour1H1'),
-        t('adventures.tour1H2'),
-        t('adventures.tour1H3'),
-        t('adventures.tour1H4'),
-      ],
-      images: [], // User will add images
-      price4: 120,
-      price6: 150,
-      bookLink: ROUTES.BOOKING,
-    },
-    {
-      id: 'toboggan',
-      duration: '4h',
-      durationLabel: t('adventures.halfDay') || 'Half day',
-      title: t('adventures.tour2Title'),
-      highlights: [
-        t('adventures.tour2H1'),
-        t('adventures.tour2H2'),
-        t('adventures.tour2H3'),
-        t('adventures.tour2H4'),
-      ],
-      images: [],
-      price4: 80,
-      price6: 100,
-      bookLink: ROUTES.BOOKING,
-    },
-    {
-      id: 'pico-areeiro',
-      duration: '8h',
-      durationLabel: t('adventures.fullDay') || 'Full day',
-      title: t('adventures.tour3Title'),
-      highlights: [
-        t('adventures.tour3H1'),
-        t('adventures.tour3H2'),
-        t('adventures.tour3H3'),
-        t('adventures.tour3H4'),
-        t('adventures.tour3H5'),
-        t('adventures.tour3H6'),
-      ],
-      images: [],
-      price4: 180,
-      price6: 200,
-      bookLink: ROUTES.BOOKING,
-    },
-    {
-      id: 'wild-north',
-      duration: '8h',
-      durationLabel: t('adventures.fullDay') || 'Full day',
-      title: t('adventures.tour4Title'),
-      highlights: [
-        t('adventures.tour4H1'),
-        t('adventures.tour4H2'),
-        t('adventures.tour4H3'),
-        t('adventures.tour4H4'),
-        t('adventures.tour4H5'),
-      ],
-      images: [],
-      price4: 180,
-      price6: 200,
-      bookLink: ROUTES.BOOKING,
-    },
-  ];
+  // Build tour data using centralized catalog and translations
+  const featuredTours = getLocalizedTours(t);
 
   const handlePrevSlide = () => {
     setCurrentSlideIndex((prev) => (prev === 0 ? heroSlides.length - 1 : prev - 1));

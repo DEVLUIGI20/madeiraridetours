@@ -52,14 +52,14 @@ export default function Footer() {
         <div className="footer-col">
           <h3>{t('footer.contactsTitle')}</h3>
           <ul>
-            <li>📞 +351 916 326 716</li>
-            <li>✉️ geral@madeiraridetours.com</li>
+            <li>ðŸ“ž +351 916 326 716</li>
+            <li>âœ‰ï¸ info@madeiraridetours.com</li>
           </ul>
         </div>
       </div>
 
       <div className="footer-bottom">
-        <p>© {CURRENT_YEAR} Madeira Ride Tours. {t('footer.rights')}</p>
+        <p>Â© {CURRENT_YEAR} Madeira Ride Tours. {t('footer.rights')}</p>
         <p>Madeira Island, Portugal</p>
       </div>
     </footer>

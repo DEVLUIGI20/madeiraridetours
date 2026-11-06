@@ -25,6 +25,16 @@ export const NAV_LINKS = [
 export const APP_CONFIG = {
   NAME: 'Madeira Ride Tours',
   TAGLINE: 'A place where nature and adventure unite',
-  PHONE: '+351 900 000 000',
+  PHONE: '+351 916 326 716',
+  PHONE_RAW: '351916326716',
+  WHATSAPP_PHONE: '351916326716',
   EMAIL: 'info@madeiraridetours.com',
+};
+
+/**
+ * Build pre-filled WhatsApp link for MadeiraRideTours
+ */
+export const makeWhatsAppUrl = (text = '') => {
+  const base = `https://wa.me/${APP_CONFIG.WHATSAPP_PHONE}`;
+  return text ? `${base}?text=${encodeURIComponent(text)}` : base;
 };
