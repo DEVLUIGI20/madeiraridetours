@@ -10,9 +10,11 @@
   transition: box-shadow 300ms ease, transform 300ms ease;
 }
 
-.tour-card:hover {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
-  transform: translateY(-3px);
+@media (hover: hover) {
+  .tour-card:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+    transform: translateY(-3px);
+  }
 }
 
 /* ── Main Photo / Slideshow ─────────────────────── */
