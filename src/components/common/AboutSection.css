@@ -1,0 +1,153 @@
+/* ── About Us Section ───────────────────────────────────── */
+.about-section {
+  width: 100%;
+  max-width: 1240px;
+  margin: 64px auto 80px;
+  padding: 0 20px;
+  box-sizing: border-box;
+  scroll-margin-top: 36px;
+}
+
+.about-container {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  align-items: center;
+  gap: clamp(32px, 5vw, 64px);
+}
+
+/* ── Left Column: Narrative ── */
+.about-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.about-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  background-color: #fef9c3;
+  border: 1px solid #fef08a;
+  color: #a16207;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.about-tag svg {
+  color: #ca8a04;
+}
+
+.about-title {
+  font-size: clamp(1.75rem, 2.7vw, 2.45rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #0f172a;
+  line-height: 1.2;
+  margin: 0 0 20px;
+}
+
+.about-title em {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  color: #334155;
+}
+
+.about-paragraphs {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.about-paragraphs p {
+  font-size: 0.94rem;
+  color: #475569;
+  line-height: 1.62;
+  margin: 0;
+}
+
+/* Bottom Tagline with Gold Left Border */
+.about-tagline-box {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.about-tagline-bar {
+  width: 3.5px;
+  background-color: #eab308;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.about-tagline-text {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+}
+
+/* ── Right Column: Scenic Photo ── */
+.about-media {
+  width: 100%;
+}
+
+.about-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 16px 42px -10px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.about-image {
+  width: 100%;
+  height: 100%;
+  min-height: 380px;
+  max-height: 460px;
+  object-fit: cover;
+  display: block;
+  transition: transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.about-image-wrapper:hover .about-image {
+  transform: scale(1.03);
+}
+
+/* ── Responsive Queries ── */
+@media (max-width: 960px) {
+  .about-container {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .about-image {
+    min-height: 280px;
+    max-height: 380px;
+  }
+}
+
+@media (max-width: 640px) {
+  .about-section {
+    margin: 48px auto 60px;
+    padding: 0 16px;
+  }
+
+  .about-paragraphs p {
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  .about-tagline-text {
+    font-size: 0.86rem;
+  }
+}
+

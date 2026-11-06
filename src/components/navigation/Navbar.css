@@ -1,0 +1,199 @@
+.navbar-header {
+  width: 100%;
+  position: relative;
+  z-index: 50;
+  background: var(--color-bg);
+}
+
+/* 3-Column Grid ensures the center column is mathematically centered on screen */
+.navbar-container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+/* Left: Brand Logo */
+.navbar-left {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.navbar-logo-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 2px solid #eab308;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  transition: transform var(--transition-normal);
+  flex-shrink: 0;
+}
+
+.navbar-logo-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Direct logo img (circular) */
+.navbar-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  overflow: hidden;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 2px solid #eab308;
+  flex-shrink: 0;
+  transition: transform var(--transition-normal);
+}
+
+.navbar-brand:hover .navbar-logo {
+  transform: scale(1.05);
+}
+
+.navbar-brand:hover .navbar-logo-circle {
+  transform: scale(1.05);
+}
+
+.navbar-brand-text {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.navbar-brand-asterisk {
+  color: #eab308;
+  margin-left: 2px;
+}
+
+/* Center: Desktop Navigation Links (Centered!) */
+.navbar-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-link {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  position: relative;
+  padding: 6px 0;
+  white-space: nowrap;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #111827;
+  font-weight: 600;
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #111827;
+  border-radius: 2px;
+}
+
+/* Right: Language Selector */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Mobile Sub-Navigation Bar */
+.navbar-mobile-nav {
+  display: none;
+}
+
+/* Responsive breakpoint for mobile */
+@media (max-width: 960px) {
+  .navbar-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+  }
+
+  .navbar-center {
+    display: none;
+  }
+
+  .navbar-brand-text {
+    font-size: 1.1rem;
+  }
+
+  .navbar-logo-circle {
+    width: 38px;
+    height: 38px;
+  }
+
+  /* Sleek horizontal scrolling bar on mobile */
+  .navbar-mobile-nav {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 16px 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-top: 1px solid rgba(226, 232, 240, 0.6);
+  }
+
+  .navbar-mobile-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .navbar-mobile-nav a {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #475569;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    background: #f1f5f9;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  .navbar-mobile-nav a.active {
+    background: #111827;
+    color: #ffffff;
+  }
+}

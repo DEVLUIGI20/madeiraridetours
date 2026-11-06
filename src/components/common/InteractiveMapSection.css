@@ -1,0 +1,583 @@
+/* ── Interactive Map Section ─────────────────────────────── */
+.interactive-map-section {
+  width: 100%;
+  max-width: 1240px;
+  margin: 48px auto 64px;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.interactive-map-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Section Header ─────────────────────────────────────── */
+.map-section-header {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.map-section-tag {
+  display: inline-block;
+  padding: 5px 14px;
+  background-color: var(--color-accent-light);
+  color: #b45309;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+
+.map-section-title {
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-text-main);
+  margin: 0 0 10px;
+  line-height: 1.15;
+}
+
+.map-section-title em {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.map-section-subtitle {
+  color: #4b5563;
+  font-size: 0.96rem;
+  line-height: 1.5;
+  margin: 0 0 6px;
+}
+
+.map-section-hint {
+  color: #94a3b8;
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+/* ── Map Card Wrapper (Viewport) ────────────────────────── */
+.map-card-wrapper {
+  position: relative;
+  width: 100%;
+  background: radial-gradient(circle at 50% 50%, #1a497c 0%, #0c2547 100%);
+  border-radius: 22px;
+  overflow: visible; /* must be visible so the balloon (positioned outside canvas) is not clipped */
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 20px 50px -12px rgba(12, 37, 71, 0.45), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  user-select: none;
+  cursor: default;
+}
+
+.map-card-wrapper.grabbing {
+  cursor: grabbing;
+}
+
+/* Zoom Controls in Top Right */
+.map-zoom-controls {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 4px;
+  border-radius: 14px;
+  box-shadow: 
+    0 10px 28px -4px rgba(12, 37, 71, 0.35),
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.85);
+}
+
+.map-zoom-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 180ms ease;
+  line-height: 1;
+  padding: 0;
+}
+
+.map-zoom-btn:hover {
+  background: #f1f5f9;
+  color: #0284c7;
+  transform: scale(1.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.map-zoom-btn:active {
+  transform: scale(0.94);
+  background: #e2e8f0;
+}
+
+.map-zoom-divider {
+  width: 20px;
+  height: 1px;
+  background: rgba(15, 23, 42, 0.08);
+  margin: 2px 0;
+}
+
+.map-zoom-btn--reset {
+  color: #475569;
+}
+
+.map-zoom-btn--reset:hover {
+  color: #0f172a;
+}
+
+/* Clip container: clips map image and pins but NOT the balloon */
+.map-canvas-clip {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 22px;
+}
+
+/* ── Canvas with Image and Hotspots ─────────────────────── */
+.map-canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-origin: center center;
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.map-bg-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* ── Pins on the Map ────────────────────────────────────── */
+.map-pin-anchor {
+  position: absolute;
+  transform: translate(-50%, -90%);
+  z-index: 10;
+  cursor: pointer;
+}
+
+.map-pin-anchor.active {
+  z-index: 50;
+}
+
+/* Sculpted Teardrop Map Pin Button */
+.map-marker-pin {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  transform-origin: center 88%;
+  transition: transform 160ms ease-out, filter 160ms ease-out;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.45));
+}
+
+.map-marker-pin:hover,
+.map-marker-pin.is-active,
+.map-pin-anchor.active .map-marker-pin {
+  transform: scale(1.15);
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.65));
+}
+
+.marker-svg {
+  display: block;
+  overflow: visible;
+}
+
+/* Ambient glow halo for active marker */
+.marker-glow {
+  position: absolute;
+  top: 13px;
+  left: 12px;
+  transform: translate(-50%, -50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: markerGlowPulse 2.2s infinite ease-out;
+}
+
+.marker-glow--lugar {
+  background: radial-gradient(circle, rgba(250, 204, 21, 0.65) 0%, rgba(250, 204, 21, 0) 70%);
+}
+
+.marker-glow--levada {
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.7) 0%, rgba(52, 211, 153, 0) 70%);
+}
+
+@keyframes markerGlowPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.7);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+/* ── ULTRA-PREMIUM LUXURY INFO BALLOON / TOOLTIP ────────── */
+/*
+ * Balloon is rendered OUTSIDE the scaled .map-canvas, inside .map-card-wrapper.
+ * `left` and `top` are set via inline style (wrapper-relative px coords from JS).
+ * `transform: translateX(-50%) translateY(-100%)` centres it horizontally and
+ * positions it above the pin tip.
+ *
+ * NOTE: The entrance animation is a PURE opacity fade (balloonFadeIn).
+ * There is ZERO vertical or horizontal translation in the animation to ensure
+ * the balloon NEVER jumps or moves up and down.
+ */
+.map-info-balloon {
+  position: absolute;
+  transform: translateX(-50%) translateY(-100%);
+  margin-top: -10px;
+  width: 242px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 13px 14px 12px;
+  box-shadow: 
+    0 20px 42px -6px rgba(15, 23, 42, 0.38),
+    0 6px 16px -2px rgba(15, 23, 42, 0.14),
+    0 0 0 1px rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+  z-index: 60;
+  animation: balloonFadeIn 160ms ease-out;
+  pointer-events: auto;
+  cursor: default;
+  text-align: left;
+}
+
+/* Triangle Pointer Arrow — points downward to pin */
+.map-info-balloon::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 7px 0 7px;
+  border-style: solid;
+  border-color: #ffffff transparent transparent transparent;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.12));
+}
+
+/* ── Auto-alignment: pin near right edge → shift balloon left */
+.map-info-balloon.align-right {
+  transform: translateX(-88%) translateY(-100%);
+}
+
+.map-info-balloon.align-right::after {
+  left: auto;
+  right: 22px;
+  transform: none;
+}
+
+/* ── Auto-alignment: pin near left edge → shift balloon right */
+.map-info-balloon.align-left {
+  transform: translateX(-12%) translateY(-100%);
+}
+
+.map-info-balloon.align-left::after {
+  left: 22px;
+  right: auto;
+  transform: none;
+}
+
+/* ── Auto-alignment: pin near top edge → show balloon below pin */
+.map-info-balloon.align-bottom {
+  transform: translateX(-50%) translateY(0);
+  margin-top: 34px;
+}
+
+.map-info-balloon.align-bottom::after {
+  top: auto;
+  bottom: 100%;
+  border-width: 0 7px 8px 7px;
+  border-color: transparent transparent #ffffff transparent;
+  filter: drop-shadow(0 -2px 2px rgba(0, 0, 0, 0.08));
+}
+
+.map-info-balloon.align-bottom.align-right {
+  transform: translateX(-88%) translateY(0);
+}
+
+.map-info-balloon.align-bottom.align-left {
+  transform: translateX(-12%) translateY(0);
+}
+
+@keyframes balloonFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Inside the Balloon */
+.balloon-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 7px;
+}
+
+.balloon-badge {
+  font-size: 0.67rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.balloon-badge--lugar {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.balloon-badge--levada {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.badge-pr-pill {
+  background: #047857;
+  color: #ffffff;
+  font-size: 0.58rem;
+  font-weight: 900;
+  padding: 1px 4px;
+  border-radius: 3px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.balloon-region {
+  font-size: 0.69rem;
+  color: #64748b;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 2px;
+}
+
+.balloon-close-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 150ms ease;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.balloon-close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  transform: scale(1.08);
+}
+
+.balloon-title {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+
+.balloon-spec-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.69rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 7px;
+  white-space: nowrap;
+}
+
+.spec-bullet {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #0284c7;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.balloon-desc {
+  font-size: 0.74rem;
+  color: #475569;
+  line-height: 1.44;
+  margin: 0 0 10px;
+}
+
+.balloon-footer {
+  display: flex;
+  align-items: center;
+  padding-top: 7px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.balloon-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 7px 12px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #0f172a;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+  transition: all 180ms ease;
+  letter-spacing: 0.01em;
+}
+
+.balloon-cta-btn:hover {
+  background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+  color: #000000;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.45);
+}
+
+.balloon-cta-btn svg {
+  transition: transform 150ms ease;
+}
+
+.balloon-cta-btn:hover svg {
+  transform: translateX(2px);
+}
+
+/* ── Bottom Legend & Filter Bar ─────────────────────────── */
+.map-legend-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.map-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 180ms ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.map-legend-item:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+
+.map-legend-item.active {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.28);
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.legend-dot--yellow {
+  background: #f59e0b;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+}
+
+.legend-dot--green {
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+}
+
+.legend-all-icon {
+  font-size: 0.85rem;
+}
+
+/* ── Responsive Queries ─────────────────────────────────── */
+@media (max-width: 680px) {
+  .map-info-balloon {
+    width: 205px;
+    padding: 10px 12px 10px;
+    border-radius: 14px;
+  }
+
+  .balloon-title {
+    font-size: 0.88rem;
+  }
+
+  .balloon-desc {
+    font-size: 0.71rem;
+    line-height: 1.38;
+    margin-bottom: 8px;
+  }
+
+  .map-marker-pin svg {
+    width: 21px;
+    height: 25px;
+  }
+}

@@ -1,0 +1,7 @@
+/* Tours Page Styles */
+.tours-page {
+  width: 100%;
+  min-height: calc(100vh - 80px);
+  padding: 20px 0 60px;
+  background-color: var(--color-bg, #fcfcfc);
+}

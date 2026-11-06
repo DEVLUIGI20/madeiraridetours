@@ -1,0 +1,146 @@
+/* ========================================================
+   TRANSFERS PAGE - CLEAN TOURS GRID DESIGN (NO PHOTOS)
+   ======================================================== */
+
+.transfers-page-view {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  padding: 48px 0 80px;
+}
+
+.transfers-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* 4-col desktop, 2-col tablet, 1-col mobile matching the screenshot */
+.transfers-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 50px;
+}
+
+@media (max-width: 1100px) {
+  .transfers-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .transfers-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* Support WhatsApp Banner */
+.transfers-support-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 26px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 30px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+@media (max-width: 768px) {
+  .transfers-support-box {
+    flex-direction: column;
+    text-align: center;
+    padding: 24px 20px;
+  }
+}
+
+.support-box-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+@media (max-width: 768px) {
+  .support-box-left {
+    flex-direction: column;
+  }
+}
+
+.support-box-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.4rem;
+}
+
+.support-box-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.support-box-desc {
+  color: #64748b;
+  font-size: 0.92rem;
+}
+
+.support-box-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.btn-whatsapp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #22c55e;
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.btn-whatsapp-pill:hover {
+  background-color: #16a34a;
+  transform: translateY(-2px);
+  color: #ffffff;
+}
+
+.btn-whatsapp-pill svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-booking-pill {
+  display: inline-flex;
+  align-items: center;
+  background-color: #0f172a;
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.btn-booking-pill:hover {
+  background-color: #1e293b;
+  transform: translateY(-2px);
+  color: #ffffff;
+}
