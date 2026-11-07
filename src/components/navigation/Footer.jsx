@@ -30,18 +30,11 @@ export default function Footer() {
           <p className="m-footer-tagline">Explore · Discover · Experience</p>
         </div>
 
-        <div className="m-footer-divider" />
 
         {/* Column 2: Quick Links (2 sub-columns) */}
         <div className="m-footer-col m-footer-links-col">
           <h4 className="m-footer-heading">Quick Links</h4>
           <div className="m-footer-links-grid">
-            <ul className="m-links-subcol">
-              <li><Link to={ROUTES.HOME}>Home</Link></li>
-              <li><Link to={ROUTES.TOURS}>Tours</Link></li>
-              <li><Link to={ROUTES.TRANSFERS}>Transfers</Link></li>
-              <li><Link to={ROUTES.CUSTOM_TOUR || '/custom-tour'}>Custom Tour</Link></li>
-            </ul>
             <ul className="m-links-subcol">
               <li><Link to={ROUTES.ABOUT || '/about'}>About</Link></li>
               <li><Link to={ROUTES.CONTACT}>Contact</Link></li>
@@ -51,7 +44,6 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="m-footer-divider" />
 
         {/* Column 3: Our Services */}
         <div className="m-footer-col m-footer-services-col">
@@ -91,7 +83,6 @@ export default function Footer() {
           </ul>
         </div>
 
-        <div className="m-footer-divider" />
 
         {/* Column 4: Stay Connected & Socials */}
         <div className="m-footer-col m-footer-subscribe-col">
@@ -143,19 +134,6 @@ export default function Footer() {
               </svg>
             </a>
 
-            {/* YouTube */}
-            <a
-              href="https://youtube.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="YouTube"
-              className="m-social-btn"
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-              </svg>
-            </a>
-
             {/* WhatsApp */}
             <a
               href="https://wa.me/351916326716"
@@ -171,7 +149,6 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="m-footer-divider" />
 
         {/* Column 5: Madeira Mountain Contour Artwork */}
         <div className="m-footer-col m-footer-artwork-col">
@@ -222,7 +199,7 @@ export default function Footer() {
             &copy; {CURRENT_YEAR} MadeiraRideTours. All rights reserved.
           </p>
           <p className="m-bottom-powered">
-            Made with <span className="m-heart">❤</span> | Powered by MadeiraRideTours
+            Powered by AuroraTech
           </p>
         </div>
       </div>

@@ -11,9 +11,7 @@ export default function Navbar() {
     { label: 'Home', path: ROUTES.HOME },
     { label: 'Tours', path: ROUTES.TOURS },
     { label: 'Transfers', path: ROUTES.TRANSFERS },
-    { label: 'Custom Tour', path: '/custom-tour' },
-    { label: 'About', path: '/about' },
-    { label: 'Contact', path: ROUTES.CONTACT },
+    { label: 'Custom Tour', path: '/custom-tour' }
   ];
 
   return (
@@ -23,9 +21,7 @@ export default function Navbar() {
         <div className="navbar-left">
           <Link to={ROUTES.HOME} className="navbar-brand">
             <span className="navbar-brand-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
-              </svg>
+              <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
             </span>
             <span className="navbar-brand-name">MadeiraRideTours</span>
           </Link>
@@ -51,7 +47,7 @@ export default function Navbar() {
         <div className="navbar-right">
           <LanguageSelector />
           <Link to={ROUTES.BOOKING} className="navbar-book-btn">
-            {t('nav.bookNow', 'Book Now')} →
+            {t('Book Now')} →
           </Link>
         </div>
       </div>
