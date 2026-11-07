@@ -1,0 +1,176 @@
+/**
+ * Centralized Tour and Activity Catalog.
+ * Designed to make adding/editing tours effortless.
+ *
+ * To add a new tour: simply copy an existing object and adjust properties!
+ * Image is optional: if omitted or null, a clean placeholder is automatically rendered.
+ */
+
+export const TOUR_CATEGORIES = [
+  { id: 'all', label: 'All Tours' },
+  { id: 'nature', label: 'Nature' },
+  { id: 'levada', label: 'Levada Walks' },
+  { id: 'adventure', label: 'Adventure' },
+  { id: 'sightseeing', label: 'Sightseeing' },
+  { id: 'luxury', label: 'Luxury' },
+];
+
+export const TOURS_DATA = [
+  {
+    id: 'pico-do-arieiro',
+    title: 'Pico do Arieiro',
+    subtitle: 'Experience the highest peaks of Madeira',
+    category: 'adventure',
+    duration: '4h',
+    price: 35,
+    rating: 5.0,
+    reviewsCount: 417,
+    featured: true,
+    image: null, // Clean placeholder by default
+    overview: 'Discover the stunning views at Pico do Arieiro, one of the highest peaks in Madeira. This tour takes you through breathtaking landscapes, above the clouds.',
+    highlights: [
+      'Visit Pico do Arieiro (1818m)',
+      'Spectacular views above the clouds',
+      'Comfortable private transfer',
+      'Small groups & flexible pacing',
+    ],
+    itinerary: [
+      { time: '06:00', title: 'Pickup at Accommodation', desc: 'Direct pickup from your hotel or rental in Funchal.' },
+      { time: '07:00', title: 'Arrival at Pico do Arieiro', desc: 'Watch the sunrise and capture memorable photographs.' },
+      { time: '08:30', title: 'Miradouro do Juncal', desc: 'Scenic walk along the ridge viewpoint.' },
+      { time: '10:00', title: 'Return Journey', desc: 'Comfortable drop-off back at your stay.' },
+    ],
+    includes: [
+      'Hotel pickup & drop-off in Funchal area',
+      'Air-conditioned modern van',
+      'Certified local driver/guide',
+      'Full passenger liability insurance',
+    ],
+  },
+  {
+    id: 'west-tour',
+    title: 'The West Tour',
+    subtitle: 'Explore Porto Moniz, Fanal & Cabo Girão',
+    category: 'sightseeing',
+    duration: '8h',
+    price: 45,
+    rating: 5.0,
+    reviewsCount: 642,
+    featured: true,
+    image: null,
+    overview: 'Experience the wild nature and scenic west coast of Madeira. From towering cliffs at Cabo Girão to the ancient laurel trees in Fanal and volcanic pools in Porto Moniz.',
+    highlights: [
+      'Cabo Girão Skywalk (580m)',
+      'Fanal Ancient St. Thomas Forest',
+      'Porto Moniz Volcanic Rock Pools',
+      'Paul da Serra High Plateau',
+    ],
+    itinerary: [
+      { time: '08:30', title: 'Pickup in Funchal', desc: 'Depart towards the south-west coast.' },
+      { time: '09:15', title: 'Cabo Girão Skywalk', desc: 'Glass platform viewpoint above the ocean.' },
+      { time: '11:00', title: 'Fanal Ancient Forest', desc: 'Mystical ancient ocotea foetens trees.' },
+      { time: '12:30', title: 'Porto Moniz Pools & Lunch', desc: 'Swim in natural volcanic sea pools.' },
+      { time: '16:30', title: 'Return to Funchal', desc: 'Scenic drive back via São Vicente valley.' },
+    ],
+    includes: ['Hotel pickup & drop-off', 'Local driver/guide', 'Insurance', 'Bottled water'],
+  },
+  {
+    id: 'levada-walk-25-fontes',
+    title: 'Levada Walk — 25 Fontes',
+    subtitle: 'Lush waterfalls and emerald lagoons',
+    category: 'levada',
+    duration: '4h',
+    price: 40,
+    rating: 5.0,
+    reviewsCount: 830,
+    featured: true,
+    image: null,
+    overview: 'Walk through the pristine Rabaçal valley along Madeira historical irrigation canals, reaching the famous 25 natural springs waterfall wall.',
+    highlights: [
+      'UNESCO Laurissilva Forest trail',
+      '25 Springs natural waterfall wall',
+      'Risco Waterfall viewpoint',
+      'Dedicated trailhead drop-off & pickup',
+    ],
+    itinerary: [
+      { time: '08:30', title: 'Pickup in Funchal', desc: 'Scenic mountain transfer to Rabaçal.' },
+      { time: '09:30', title: 'Begin Levada Walk', desc: 'Self-guided or guided trail hike (~3.5h).' },
+      { time: '13:30', title: 'Pickup at Trail End', desc: 'Meet your driver for a comfortable return.' },
+    ],
+    includes: ['Round-trip transfer', 'Trail maps & safety briefing', 'Flexible pickup times'],
+  },
+  {
+    id: 'santana-north-coast',
+    title: 'Santana & North Coast',
+    subtitle: 'Traditional triangular houses and rugged coastline',
+    category: 'nature',
+    duration: '8h',
+    price: 55,
+    rating: 5.0,
+    reviewsCount: 376,
+    featured: false,
+    image: null,
+    overview: 'A full day journey into the traditional heritage and verdant valleys of northeast Madeira.',
+    highlights: [
+      'Pico do Areeiro scenic drive',
+      'Ribeiro Frio trout hatchery & balcões',
+      'Santana typical thatched cottages',
+      'Ponta de São Lourenço viewpoint',
+    ],
+    itinerary: [
+      { time: '08:30', title: 'Pickup in Funchal', desc: 'Travel through mountain passes.' },
+      { time: '10:00', title: 'Ribeiro Frio', desc: 'Short walk to Balcões viewpoint.' },
+      { time: '12:00', title: 'Santana Village', desc: 'Visit heritage houses and lunch.' },
+      { time: '15:00', title: 'Ponta de São Lourenço', desc: 'Panoramic coastal cliffs.' },
+    ],
+    includes: ['Full-day private van', 'Local guide driver', 'Pick-up & drop-off'],
+  },
+  {
+    id: 'private-custom-tour',
+    title: 'Private Tour & Charter',
+    subtitle: 'Create your own personalized island itinerary',
+    category: 'luxury',
+    duration: '8h',
+    price: 120,
+    rating: 5.0,
+    reviewsCount: 198,
+    featured: false,
+    image: null,
+    overview: 'Your vehicle, your private driver, your pace. Choose which viewpoints, secret restaurants, and hidden trails you want to experience.',
+    highlights: [
+      '100% customizable itinerary',
+      'Private modern Mercedes vehicle',
+      'Local insider tips from your driver',
+      'No rigid schedules or crowds',
+    ],
+    itinerary: [
+      { time: 'Flexible', title: 'Custom Schedule', desc: 'Tailored precisely around your wishes.' },
+    ],
+    includes: ['Private dedicated van & fuel', 'Certified local chauffeur', 'Personalized route planning'],
+  },
+  {
+    id: 'ponta-de-sao-lourenco',
+    title: 'Ponta de São Lourenço Trail',
+    subtitle: 'Volcanic peninsula with dramatic ocean cliffs',
+    category: 'adventure',
+    duration: '4h',
+    price: 35,
+    rating: 4.9,
+    reviewsCount: 289,
+    featured: false,
+    image: null,
+    overview: 'Walk Madeira easternmost volcanic dragon tail with mesmerizing crystal turquoise waters on both sides.',
+    highlights: [
+      'Unique semi-arid volcanic landscape',
+      'Pristine Atlantic waters',
+      'Scheduled drop-off & pickup',
+    ],
+    itinerary: [
+      { time: '08:30', title: 'Pickup in Funchal', desc: 'Transfer to Baía d Abra trailhead.' },
+      { time: '09:15', title: 'Trail Walk', desc: 'About 2.5 to 3 hours hike.' },
+      { time: '12:30', title: 'Return Transfer', desc: 'Pickup and return.' },
+    ],
+    includes: ['Round-trip transfer', 'Driver assistance', 'Luggage space'],
+  },
+];
+

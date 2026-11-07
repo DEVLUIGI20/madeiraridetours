@@ -82,6 +82,23 @@
   text-align: left;
   outline: none;
   transition: background-color 180ms ease;
+  touch-action: manipulation;
+}
+
+@media (max-width: 680px) {
+  .faq-section {
+    margin: 40px auto 60px;
+    padding: 0 16px;
+  }
+
+  .faq-question-btn {
+    padding: 16px 16px;
+    min-height: 52px;
+  }
+
+  .faq-question-text {
+    font-size: 0.94rem;
+  }
 }
 
 .faq-item.is-open .faq-question-btn {

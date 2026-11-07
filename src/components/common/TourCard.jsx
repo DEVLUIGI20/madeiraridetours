@@ -1,167 +1,72 @@
-import { useState, useEffect, useRef } from 'react';
-import { useLanguage } from '../../hooks/useLanguage';
+import { Link } from 'react-router-dom';
+import ImagePlaceholder from './ImagePlaceholder';
 import './TourCard.css';
 
 /**
- * TourCard — displays a single tour with an auto-playing photo slideshow,
- * badge, title, highlights, pricing and a Book button.
- *
- * Props:
- *  - tour: { id, duration, durationLabel, title, highlights[], images[], price4, price6, bookLink }
- *
- * Slideshow behaviour:
- *  - If images[] has 1+ entries, photos cycle automatically every 3.5 s.
- *  - Pauses on hover; left/right arrow buttons allow manual navigation.
- *  - If images[] is empty, shows an animated placeholder.
+ * Modern TourCard matching the Mockup:
+ * - Top image slot (placeholder or user image)
+ * - Heart / Favorite badge
+ * - Title, duration, rating and "from €XX" price tag
+ * - Direct link to Tour details or Instant booking
  */
 export default function TourCard({ tour }) {
-  const { t } = useLanguage();
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const timerRef = useRef(null);
-
   const {
-    duration,
-    durationLabel,
+    id,
     title,
-    highlights = [],
-    images = [],
-    price4,
-    price6,
-    bookLink = '#',
+    duration,
+    price,
+    rating = 5.0,
+    reviewsCount = 100,
+    image = null,
   } = tour;
 
-  const hasImages = images.length > 0;
-  const multipleImages = images.length > 1;
-
-  // Auto-advance slideshow every 3.5 s
-  useEffect(() => {
-    if (!multipleImages || isPaused) return;
-
-    timerRef.current = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % images.length);
-    }, 3500);
-
-    return () => clearInterval(timerRef.current);
-  }, [multipleImages, isPaused, images.length]);
-
-  const handlePrev = () => {
-    setActiveIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  };
-
-  const handleNext = () => {
-    setActiveIndex((prev) => (prev + 1) % images.length);
-  };
-
   return (
-    <article className="tour-card">
-      {/* ── Photo Slideshow ───────────────────────── */}
-      <div
-        className="tour-card__photo-wrap"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-      >
-        {hasImages ? (
-          <>
-            {/* Slide stack — only active image is visible */}
-            <div className="tour-card__slides">
-              {images.map((src, i) => (
-                <img
-                  key={i}
-                  src={src}
-                  alt={`${title} — foto ${i + 1}`}
-                  className={`tour-card__slide ${i === activeIndex ? 'active' : ''}`}
-                  loading="lazy"
-                />
-              ))}
-            </div>
-
-            {/* Arrow buttons — only shown when multiple images */}
-            {multipleImages && (
-              <>
-                <button
-                  type="button"
-                  className="tour-card__arrow tour-card__arrow--prev"
-                  onClick={handlePrev}
-                  aria-label={t('tourCard.prevPhoto')}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="15 18 9 12 15 6" />
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  className="tour-card__arrow tour-card__arrow--next"
-                  onClick={handleNext}
-                  aria-label={t('tourCard.nextPhoto')}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="9 18 15 12 9 6" />
-                  </svg>
-                </button>
-
-                {/* Dot indicators */}
-                <div className="tour-card__dots">
-                  {images.map((_, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      className={`tour-card__dot ${i === activeIndex ? 'active' : ''}`}
-                      onClick={() => setActiveIndex(i)}
-                      aria-label={`Foto ${i + 1}`}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </>
-        ) : (
-          <div className="tour-card__photo-placeholder" aria-hidden="true" />
-        )}
-
-        {/* Duration Badge */}
-        <span className="tour-card__badge">
-          {duration} · {durationLabel}
-        </span>
+    <article className="tour-card-mockup">
+      {/* Top Image or Placeholder with Heart Icon */}
+      <div className="tour-card-mockup__media">
+        <ImagePlaceholder
+          src={image}
+          alt={title}
+          aspectRatio="16/10"
+          className="tour-card-mockup__img"
+        />
+        <button
+          type="button"
+          className="tour-card-mockup__fav"
+          aria-label="Add to favorites"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+            />
+          </svg>
+        </button>
       </div>
 
-      {/* ── Card Body ─────────────────────────────── */}
-      <div className="tour-card__body">
-        <h3 className="tour-card__title">{title}</h3>
+      {/* Card Info */}
+      <div className="tour-card-mockup__body">
+        <h3 className="tour-card-mockup__title">
+          <Link to={`/tours/${id}`}>{title}</Link>
+        </h3>
 
-        {/* Highlights checklist */}
-        {highlights.length > 0 && (
-          <ul className="tour-card__highlights">
-            {highlights.map((item, i) => (
-              <li key={i} className="tour-card__highlight-item">
-                <span className="tour-card__check" aria-hidden="true">✓</span>
-                {item}
-              </li>
-            ))}
-          </ul>
-        )}
+        <div className="tour-card-mockup__meta">
+          <span className="tour-card-mockup__duration">{duration}</span>
+          <span className="tour-card-mockup__separator">•</span>
+          <span className="tour-card-mockup__price">from <strong>€{price}</strong></span>
+        </div>
 
-        {/* Pricing + Book Button */}
-        <div className="tour-card__footer">
-          <div className="tour-card__pricing">
-            <div className="tour-card__price-row">
-              <span className="tour-card__price-label">4 {t('tourCard.people')}</span>
-              <span className="tour-card__price-amount">{price4}€</span>
-            </div>
-            <div className="tour-card__price-row">
-              <span className="tour-card__price-label">6–8 {t('tourCard.people')}</span>
-              <span className="tour-card__price-amount">{price6}€</span>
-            </div>
+        <div className="tour-card-mockup__footer">
+          <div className="tour-card-mockup__rating">
+            <span className="tour-card-mockup__star" aria-hidden="true">★</span>
+            <strong>{rating.toFixed(1)}</strong>
+            <span className="tour-card-mockup__reviews">({reviewsCount})</span>
           </div>
 
-          <a
-            href={bookLink}
-            className="tour-card__book-btn"
-            target={bookLink.startsWith('http') ? '_blank' : undefined}
-            rel={bookLink.startsWith('http') ? 'noopener noreferrer' : undefined}
-          >
-            {t('tourCard.book')}
-          </a>
+          <Link to={`/booking?service=${id}`} className="tour-card-mockup__btn">
+            Book
+          </Link>
         </div>
       </div>
     </article>

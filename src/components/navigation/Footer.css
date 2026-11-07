@@ -1,112 +1,384 @@
-.site-footer {
+/* ==========================================================================
+   Mockup Redesign: Footer Styles matching uploaded reference
+   Dark Navy #071328, vertical divider lines, clean columns & mountain artwork
+   ========================================================================== */
+
+.mockup-footer {
   margin-top: auto;
-  background-color: #0f172a;
+  background: #071328;
   color: #94a3b8;
-  padding: 60px 24px 32px;
-  border-top: 1px solid #1e293b;
+  font-family: inherit;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 48px 0 0;
+  width: 100%;
 }
 
-.footer-container {
-  max-width: 1240px;
+.mockup-footer-container {
+  max-width: 1380px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.5fr;
-  gap: 36px;
-}
-
-.footer-brand {
+  padding: 0 24px 44px;
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 20px;
 }
 
-.footer-brand-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #ffffff;
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-
-.footer-logo-circle {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 2px solid #eab308;
-  background: #000;
-}
-
-.footer-logo {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #eab308;
+/* Vertical dividers between columns */
+.m-footer-divider {
+  width: 1px;
+  background: rgba(255, 255, 255, 0.12);
   flex-shrink: 0;
 }
 
-.footer-logo-circle img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* Individual columns */
+.m-footer-col {
+  display: flex;
+  flex-direction: column;
 }
 
-.footer-desc {
-  font-size: 0.95rem;
-  line-height: 1.6;
-  max-width: 320px;
+/* Column 1: Brand */
+.m-footer-brand {
+  min-width: 200px;
+  max-width: 230px;
+  justify-content: center;
+}
+
+.m-footer-logo-link {
+  display: inline-block;
+  text-decoration: none;
+  font-size: 1.45rem;
+  line-height: 1.2;
+  margin-bottom: 8px;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.m-logo-bold {
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.m-logo-light {
+  font-weight: 300;
+  color: #ffffff;
+  margin-left: 2px;
+}
+
+.m-footer-tagline {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+/* Column Headings */
+.m-footer-heading {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 14px;
+  letter-spacing: -0.01em;
+}
+
+/* Column 2: Quick Links (2-column subgrid) */
+.m-footer-links-col {
+  flex: 1 1 auto;
+  max-width: 290px;
+}
+
+.m-footer-links-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 16px;
+}
+
+.m-links-subcol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.m-links-subcol a {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.84rem;
+  transition: color 0.15s ease;
+  display: inline-block;
+}
+
+.m-links-subcol a:hover {
+  color: #ffffff;
+}
+
+/* Column 3: Our Services */
+.m-footer-services-col {
+  min-width: 170px;
+}
+
+.m-services-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.m-service-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.84rem;
+  transition: color 0.15s ease;
+}
+
+.m-service-item:hover {
+  color: #ffffff;
+}
+
+.m-service-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: #94a3b8;
+  transition: color 0.15s ease;
+}
+
+.m-service-item:hover .m-service-icon {
+  color: #6366f1;
+}
+
+/* Column 4: Stay Connected */
+.m-footer-subscribe-col {
+  flex: 1.3 1 auto;
+  max-width: 340px;
+}
+
+.m-footer-subtext {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+
+.m-subscribe-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.m-subscribe-input {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #ffffff;
+  border-radius: 9999px;
+  padding: 9px 16px;
+  font-size: 0.82rem;
+  color: #0f172a;
+  outline: none;
+  transition: box-shadow 0.15s ease;
+}
+
+.m-subscribe-input::placeholder {
   color: #94a3b8;
 }
 
-.footer-col h3 {
-  color: #ffffff;
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 18px;
+.m-subscribe-input:focus {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.35);
 }
 
-.footer-col ul {
-  list-style: none;
+.m-subscribe-btn {
+  background: #4f46e5;
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 9px 18px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.m-subscribe-btn:hover {
+  background: #4338ca;
+  transform: translateY(-1px);
+}
+
+.m-subscribe-success {
+  font-size: 0.78rem;
+  color: #34d399;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.m-social-links {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 12px;
 }
 
-.footer-col a {
-  color: #94a3b8;
-  font-size: 0.9rem;
-  transition: color var(--transition-fast);
-}
-
-.footer-col a:hover {
-  color: #ffffff;
-}
-
-.footer-bottom {
-  max-width: 1560px;
-  margin: 48px auto 0;
-  padding-top: 24px;
-  border-top: 1px solid #1e293b;
-  display: flex;
-  justify-content: space-between;
+.m-social-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
   align-items: center;
-  font-size: 0.85rem;
+  justify-content: center;
+  color: #94a3b8;
+  border-radius: 50%;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.m-social-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.m-social-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Column 5: Madeira Mountain Graphic Artwork */
+.m-footer-artwork-col {
+  min-width: 240px;
+  max-width: 290px;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.m-mountain-graphic {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.m-mountain-svg {
+  width: 100%;
+  max-width: 250px;
+  height: auto;
+  opacity: 0.85;
+}
+
+.m-madeira-tag {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-top: -6px;
+}
+
+.m-madeira-script {
+  font-family: 'Brush Script MT', 'Segoe Script', cursive, sans-serif;
+  font-size: 2.1rem;
+  font-weight: normal;
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.m-madeira-subtitle {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+  text-transform: lowercase;
+}
+
+/* ==========================================================================
+   Footer Bottom Bar
+   ========================================================================== */
+
+.mockup-footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 18px 0;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.m-footer-bottom-container {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
   color: #64748b;
   flex-wrap: wrap;
   gap: 12px;
 }
 
-@media (max-width: 900px) {
-  .footer-container {
+.m-bottom-copy,
+.m-bottom-powered {
+  margin: 0;
+}
+
+.m-heart {
+  color: #ef4444;
+  display: inline-block;
+  margin: 0 2px;
+}
+
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+
+@media (max-width: 1100px) {
+  .mockup-footer-container {
+    flex-wrap: wrap;
+    gap: 28px;
+  }
+
+  .m-footer-divider {
+    display: none;
+  }
+
+  .m-footer-col {
+    min-width: 200px;
+  }
+
+  .m-footer-artwork-col {
+    align-items: flex-start;
+  }
+
+  .m-mountain-graphic {
+    align-items: flex-start;
+  }
+
+  .m-madeira-tag {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .mockup-footer-container {
+    flex-direction: column;
+    gap: 32px;
+    padding-bottom: 32px;
+  }
+
+  .m-footer-links-grid {
     grid-template-columns: 1fr 1fr;
   }
-}
 
-@media (max-width: 600px) {
-  .footer-container {
-    grid-template-columns: 1fr;
+  .m-subscribe-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .m-subscribe-btn {
+    width: 100%;
+  }
+
+  .m-footer-bottom-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
   }
 }
-

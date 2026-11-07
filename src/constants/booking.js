@@ -12,8 +12,9 @@ export const BOOKING_STATUS = {
 };
 
 export const PAYMENT_METHOD = {
-  WHATSAPP_MANUAL: 'whatsapp_manual',
   STRIPE_CARD: 'stripe_card',
+  PAYPAL: 'paypal',
+  WHATSAPP_MANUAL: 'whatsapp_manual',
 };
 
 export const SERVICE_TYPE = {
@@ -39,4 +40,3 @@ export function generateBookingRef() {
   const rand = Math.random().toString(16).slice(2, 6).toUpperCase();
   return `MRT-${today}-${rand}`;
 }
-

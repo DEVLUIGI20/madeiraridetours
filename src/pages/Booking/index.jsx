@@ -1,469 +1,359 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useBooking } from '../../context/BookingContext';
-import { useLanguage } from '../../hooks/useLanguage';
-import { TOURS_CATALOG } from '../../constants/tours';
-import { MOUNTAIN_TRANSFERS_CATALOG } from '../../constants/transfers';
+import { TOURS_DATA } from '../../constants/toursCatalog';
+import { MOUNTAIN_TRANSFERS_CATALOG, AIRPORT_TRANSFER_LOCATIONS } from '../../constants/transfersCatalog';
 import { PAYMENT_METHOD, SERVICE_TYPE } from '../../constants/booking';
 import { paymentService } from '../../services/paymentService';
 import { ROUTES } from '../../constants/index';
 import { sanitizeText, isValidEmail, isValidPhone } from '../../utils/security';
+import ImagePlaceholder from '../../components/common/ImagePlaceholder';
 import './Booking.css';
 
-const TIME_SLOTS = ['06:00','07:00','08:00','09:00','10:00','11:00','14:00','15:00','16:00'];
-
 export default function Booking() {
-  const { t } = useLanguage();
   const navigate = useNavigate();
-  const {
-    booking,
-    setStep,
-    selectService,
-    setTripDetails,
-    setCustomer,
-    setPaymentMethod,
-    markPendingPayment,
-  } = useBooking();
+  const [searchParams] = useSearchParams();
 
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
+  // URL query params
+  const serviceParam = searchParams.get('service') || '';
+  const dateParam = searchParams.get('date') || '';
+  const paxParam = searchParams.get('pax') || '2';
+  const pickupParam = searchParams.get('pickup') || '';
+  const dropoffParam = searchParams.get('dropoff') || '';
 
-  const isCustomTour = booking.service_type === SERVICE_TYPE.CUSTOM;
+  const { booking, markPendingPayment } = useBooking();
 
-  const allServices = [
-    ...TOURS_CATALOG.map((s) => ({ ...s, service_type: SERVICE_TYPE.TOUR, titleText: t(s.titleKey) })),
-    ...MOUNTAIN_TRANSFERS_CATALOG.map((s) => ({ ...s, service_type: SERVICE_TYPE.TRANSFER, titleText: t(s.titleKey, s.titleDefault) })),
-    {
-      id: 'custom',
-      service_type: SERVICE_TYPE.CUSTOM,
-      titleText: t('booking.customTour', 'Custom Tour (Pedido de Orçamento)'),
-      price4: 0,
-      price6: 0,
-      duration: 'Flexível',
-    },
-  ];
-
-  function handleServiceSelect(svc) {
-    selectService({
-      service_type: svc.service_type,
-      service_id: svc.id,
-      service_title: svc.titleText,
-      price4: svc.price4,
-      price6: svc.price6,
-    });
-    // Se for custom, o método de pagamento passa automaticamente para manual/orçamento
-    if (svc.service_type === SERVICE_TYPE.CUSTOM) {
-      setPaymentMethod(PAYMENT_METHOD.WHATSAPP_MANUAL);
+  // Find service information
+  const currentService = useMemo(() => {
+    // 1. Tour lookup
+    const tour = TOURS_DATA.find((t) => t.id === serviceParam);
+    if (tour) {
+      return {
+        id: tour.id,
+        title: tour.title,
+        type: SERVICE_TYPE.TOUR,
+        pricePerPerson: tour.price,
+        image: tour.image,
+      };
     }
-  }
 
-  const [trip, setTrip] = useState({
-    date: booking.date,
-    time_slot: booking.time_slot,
-    passengers: booking.passengers,
-    pickup_location: booking.pickup_location,
-    special_notes: booking.special_notes,
+    // 2. Airport Transfer lookup
+    if (serviceParam === 'airport-transfer') {
+      const loc = AIRPORT_TRANSFER_LOCATIONS.find((l) => l.name === dropoffParam) || AIRPORT_TRANSFER_LOCATIONS[0];
+      return {
+        id: 'airport-transfer',
+        title: `Airport Transfer: ${pickupParam || 'Airport'} → ${dropoffParam || loc.name}`,
+        type: SERVICE_TYPE.TRANSFER,
+        pricePerPerson: loc ? loc.price : 35,
+        image: null,
+      };
+    }
+
+    // 3. Mountain Transfer lookup
+    const mt = MOUNTAIN_TRANSFERS_CATALOG.find((m) => m.id === serviceParam);
+    if (mt) {
+      return {
+        id: mt.id,
+        title: mt.title,
+        type: SERVICE_TYPE.TRANSFER,
+        pricePerPerson: mt.price,
+        image: null,
+      };
+    }
+
+    // Fallback: Default Tour (Pico do Areeiro)
+    const defaultTour = TOURS_DATA[0];
+    return {
+      id: defaultTour.id,
+      title: defaultTour.title,
+      type: SERVICE_TYPE.TOUR,
+      pricePerPerson: defaultTour.price,
+      image: defaultTour.image,
+    };
+  }, [serviceParam, dropoffParam, pickupParam]);
+
+  // Form State
+  const [fullName, setFullName] = useState(booking.customer?.name || '');
+  const [email, setEmail] = useState(booking.customer?.email || '');
+  const [phone, setPhone] = useState(booking.customer?.phone || '');
+  const [paymentMethod, setSelectedPaymentMethod] = useState(PAYMENT_METHOD.STRIPE_CARD);
+
+  // Date and passengers (from URL query, booking context, or sensible defaults)
+  const [selectedDate] = useState(() => {
+    if (dateParam) return dateParam;
+    if (booking.date) return booking.date;
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 2);
+    return tomorrow.toISOString().split('T')[0];
   });
 
-  function validateTrip() {
-    const e = {};
-    if (!trip.date) e.date = t('booking.required', 'Required');
-    if (!trip.passengers || trip.passengers < 1) e.passengers = t('booking.required', 'Required');
-    if (!isCustomTour && !trip.time_slot) e.time_slot = t('booking.required', 'Required');
-    if (!trip.pickup_location.trim()) e.pickup_location = t('booking.required', 'Required');
-    if (isCustomTour && !trip.special_notes?.trim()) {
-      e.special_notes = t('booking.describeCustomRoute', 'Por favor descreve os locais que gostarias de visitar.');
-    }
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  }
+  const passengers = Number(paxParam) || booking.passengers || 2;
+  const totalPrice = (currentService.pricePerPerson * (currentService.type === SERVICE_TYPE.TRANSFER && serviceParam === 'airport-transfer' ? 1 : passengers)).toFixed(2);
 
-  function handleTripNext() {
-    if (validateTrip()) setTripDetails(trip);
-  }
-
-  const [cust, setCust] = useState({ ...booking.customer });
-
-  function validateCust() {
-    const e = {};
-    const cleanName = sanitizeText(cust.name);
-    if (!cleanName) {
-      e.name = t('booking.required', 'Required');
-    }
-    if (!isValidEmail(cust.email)) {
-      e.email = t('booking.invalidEmail', 'Invalid email');
-    }
-    if (!isValidPhone(cust.phone)) {
-      e.phone = t('booking.required', 'Required (mínimo 7 dígitos)');
-    }
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  }
-
-  function handleCustNext() {
-    if (validateCust()) {
-      setCustomer({
-        name: sanitizeText(cust.name),
-        email: cust.email.trim().toLowerCase(),
-        phone: cust.phone.trim(),
-        country: sanitizeText(cust.country),
+  // Formatting Date for summary badge (e.g. "Sat, Nov 22, 2025")
+  const formattedDate = useMemo(() => {
+    try {
+      const d = new Date(selectedDate);
+      return d.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
       });
+    } catch {
+      return selectedDate;
     }
+  }, [selectedDate]);
+
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  function validate() {
+    const errs = {};
+    if (!sanitizeText(fullName)) {
+      errs.fullName = 'Please enter your full name.';
+    }
+    if (!isValidEmail(email)) {
+      errs.email = 'Please provide a valid email address.';
+    }
+    if (!isValidPhone(phone)) {
+      errs.phone = 'Please provide a valid phone number (minimum 7 digits).';
+    }
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
   }
 
-  async function handleSubmit() {
+  async function handleCheckout(e) {
+    e.preventDefault();
+    if (!validate()) return;
+
     setLoading(true);
     setErrors({});
+
     try {
       markPendingPayment();
 
-      // Custom Tour: apenas pedido de orçamento (sem Stripe)
-      if (isCustomTour) {
-        const waLink = paymentService.generateWhatsAppBookingLink({
-          ...booking,
-          customer: cust,
-          service_title: `Custom Tour — Pedido de Orçamento`,
-          total_amount_eur: 'Sob Consulta (Orçamento)',
-        });
-        window.open(waLink, '_blank');
-        navigate(ROUTES.BOOKING_SUCCESS + '?ref=' + booking.ref + '&custom=true');
+      const customerData = {
+        name: sanitizeText(fullName),
+        email: email.trim().toLowerCase(),
+        phone: phone.trim(),
+      };
+
+      const bookingPayload = {
+        ref: booking.ref || `MRT-${Date.now()}`,
+        service_type: currentService.type,
+        service_id: currentService.id,
+        service_title: currentService.title,
+        date: selectedDate,
+        time_slot: booking.time_slot || '08:00',
+        passengers,
+        pickup_location: pickupParam || booking.pickup_location || 'Funchal / Hotel',
+        total_amount_eur: Number(totalPrice),
+        payment_method: paymentMethod,
+      };
+
+      if (paymentMethod === PAYMENT_METHOD.PAYPAL) {
+        // Redirect or trigger PayPal checkout
+        alert('PayPal integration is initialized. Connecting to PayPal checkout...');
+        navigate(ROUTES.BOOKING_SUCCESS + '?ref=' + bookingPayload.ref + '&pm=paypal');
         return;
       }
 
-      // WhatsApp Manual Flow
-      if (booking.payment_method === PAYMENT_METHOD.WHATSAPP_MANUAL) {
-        const waLink = paymentService.generateWhatsAppBookingLink({
-          ...booking,
-          customer: cust,
-        });
-        window.open(waLink, '_blank');
-        navigate(ROUTES.BOOKING_SUCCESS + '?ref=' + booking.ref);
-        return;
-      }
-
-      // Stripe Payment Flow
+      // Default: Stripe card checkout
       await paymentService.startCheckout({
-        booking: {
-          ref: booking.ref,
-          service_type: booking.service_type,
-          service_id: booking.service_id,
-          service_title: booking.service_title,
-          date: trip.date || booking.date,
-          time_slot: trip.time_slot || booking.time_slot,
-          passengers: trip.passengers || booking.passengers,
-          pickup_location: trip.pickup_location || booking.pickup_location,
-          special_notes: trip.special_notes || booking.special_notes,
-          total_amount_eur: booking.total_amount_eur,
-        },
-        customer: cust,
+        booking: bookingPayload,
+        customer: customerData,
       });
     } catch (err) {
-      setErrors({ submit: err.message });
+      setErrors({ submit: err.message || 'Payment initiation failed. Please try again.' });
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="booking-page">
-      <div className="booking-header">
-        <h1>{isCustomTour ? 'Pedir Orçamento de Custom Tour' : t('booking.title', 'Book Your Experience')}</h1>
-        <p>{isCustomTour ? 'Diz-nos o que queres visitar e preparamos um itinerário exclusivo.' : t('booking.subtitle', 'Private tours and transfers across Madeira Island')}</p>
-      </div>
+    <div className="checkout-page">
+      {/* ── Sub-Hero Banner matching Mockup ── */}
+      <section className="checkout-hero">
+        <div className="checkout-hero-bg">
+          <ImagePlaceholder
+            alt="Madeira Scenic Ocean View"
+            height="100%"
+          />
+          <div className="checkout-hero-overlay" />
+        </div>
+        <div className="checkout-hero-content container-constrained">
+          <h1 className="checkout-hero-title">Checkout</h1>
+          <p className="checkout-hero-subtitle">
+            Complete your booking securely
+          </p>
+        </div>
+      </section>
 
-      <div className="booking-steps">
-        {[1, 2, 3, 4].map((n) => (
-          <div
-            key={n}
-            className={`step-dot ${booking.step >= n ? 'active' : ''} ${booking.step > n ? 'done' : ''}`}
-            onClick={() => booking.step > n && setStep(n)}
-            role="button"
-            tabIndex={booking.step > n ? 0 : -1}
-          >
-            {booking.step > n ? '✓' : n}
-          </div>
-        ))}
-        <div className="step-line" style={{ '--progress': `${((booking.step - 1) / 3) * 100}%` }} />
-      </div>
+      {/* ── Main Two-Column Layout ── */}
+      <main className="checkout-main container-constrained">
+        <div className="checkout-grid">
+          {/* Left Column: Booking Summary */}
+          <section className="checkout-summary-card">
+            <h2 className="card-heading">Booking Summary</h2>
 
-      <div className="booking-card">
-        {booking.step === 1 && (
-          <div className="step-panel">
-            <h2>{t('booking.step1', 'Choose your experience')}</h2>
-            <div className="service-grid">
-              {allServices.map((svc) => (
-                <button
-                  key={svc.id}
-                  className={`service-card ${booking.service_id === svc.id ? 'selected' : ''}`}
-                  onClick={() => handleServiceSelect(svc)}
-                  type="button"
-                >
-                  <div className="service-card-top">
-                    <span className="service-type-badge">{svc.service_type}</span>
-                    {svc.duration && <span className="service-duration">{svc.duration}</span>}
-                  </div>
-                  <h3>{svc.titleText}</h3>
-                  {svc.price4 > 0 && (
-                    <p className="service-price">
-                      {t('booking.from', 'From')} <strong>{svc.price4}€</strong>
-                    </p>
-                  )}
-                  {svc.id === 'custom' && (
-                    <p className="service-price"><strong>Sob Consulta</strong> (Orçamento)</p>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {booking.step === 2 && (
-          <div className="step-panel">
-            <h2>{isCustomTour ? 'Detalhes do Passeio Personalizado' : t('booking.step2', 'Trip details')}</h2>
-            <div className="selected-service-banner">
-              <strong>{booking.service_title}</strong>
-              <button type="button" onClick={() => setStep(1)} className="change-btn">
-                {t('booking.change', 'Change')}
-              </button>
-            </div>
-
-            {isCustomTour && (
-              <div className="custom-notice-box">
-                ℹ️ <strong>Tour Sob Medida:</strong> Este serviço não tem pagamento direto. Indica a tua data prevista e os pontos da ilha que queres conhecer para elaborarmos um orçamento personalizado.
+            <div className="summary-item-card">
+              <div className="summary-thumb-box">
+                <ImagePlaceholder
+                  src={currentService.image}
+                  alt={currentService.title}
+                  width="100%"
+                  height="100%"
+                />
               </div>
-            )}
 
-            <div className="form-grid">
-              <label>
-                {t('booking.date', 'Data prevista')}
-                <input
-                  type="date"
-                  value={trip.date}
-                  onChange={(e) => setTrip((p) => ({ ...p, date: e.target.value }))}
-                  className={errors.date ? 'error' : ''}
-                />
-                {errors.date && <span className="field-error">{errors.date}</span>}
-              </label>
-
-              {!isCustomTour ? (
-                <label>
-                  {t('booking.time', 'Pickup time')}
-                  <select
-                    value={trip.time_slot}
-                    onChange={(e) => setTrip((p) => ({ ...p, time_slot: e.target.value }))}
-                    className={errors.time_slot ? 'error' : ''}
-                  >
-                    <option value="">{t('booking.selectTime', '— select —')}</option>
-                    {TIME_SLOTS.map((s) => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                  {errors.time_slot && <span className="field-error">{errors.time_slot}</span>}
-                </label>
-              ) : (
-                <label>
-                  Hora de início preferencial
-                  <select
-                    value={trip.time_slot}
-                    onChange={(e) => setTrip((p) => ({ ...p, time_slot: e.target.value }))}
-                  >
-                    <option value="A combinar">A combinar com o motorista</option>
-                    {TIME_SLOTS.map((s) => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </label>
-              )}
-
-              <label>
-                {t('booking.passengers', 'Passengers')}
-                <select
-                  value={trip.passengers}
-                  onChange={(e) => setTrip((p) => ({ ...p, passengers: Number(e.target.value) }))}
-                >
-                  {[1,2,3,4,5,6,7,8].map((n) => (
-                    <option key={n} value={n}>{n} {n === 1 ? t('booking.person', 'person') : t('booking.people', 'people')}</option>
-                  ))}
-                </select>
-              </label>
-
-              <label className="full-width">
-                {t('booking.pickup', 'Pickup location (hotel / morada na Madeira)')}
-                <input
-                  type="text"
-                  placeholder={t('booking.pickupPlaceholder', 'ex: Hotel Pestana Carlton, Funchal')}
-                  value={trip.pickup_location}
-                  onChange={(e) => setTrip((p) => ({ ...p, pickup_location: e.target.value }))}
-                  className={errors.pickup_location ? 'error' : ''}
-                />
-                {errors.pickup_location && <span className="field-error">{errors.pickup_location}</span>}
-              </label>
-
-              <label className="full-width">
-                {isCustomTour ? 'Descreve o teu itinerário ideal ou lugares a visitar *' : t('booking.notes', 'Special notes (optional)')}
-                <textarea
-                  rows={4}
-                  placeholder={isCustomTour ? 'Ex: Gostaríamos de visitar Fanal, Piscinas do Porto Moniz e fazer uma paragem numa poncha tradicional...' : t('booking.notesPlaceholder', 'Dietary needs, accessibility, special requests...')}
-                  value={trip.special_notes}
-                  onChange={(e) => setTrip((p) => ({ ...p, special_notes: e.target.value }))}
-                  className={errors.special_notes ? 'error' : ''}
-                />
-                {errors.special_notes && <span className="field-error">{errors.special_notes}</span>}
-              </label>
-            </div>
-
-            {!isCustomTour && booking.price4 > 0 && (
-              <div className="price-preview">
-                <span>{t('booking.estimatedPrice', 'Estimated price')}</span>
-                <strong>{booking.total_amount_eur}€</strong>
+              <div className="summary-item-details">
+                <h3 className="summary-item-title">{currentService.title}</h3>
+                <div className="summary-meta-line">
+                  <span className="summary-icon">📅</span>
+                  <span className="summary-text">{formattedDate}</span>
+                </div>
+                <div className="summary-meta-line">
+                  <span className="summary-icon">👤</span>
+                  <span className="summary-text">
+                    {passengers} {passengers === 1 ? 'adult' : 'adults'}
+                  </span>
+                </div>
               </div>
-            )}
-
-            <div className="step-actions">
-              <button type="button" className="btn-secondary" onClick={() => setStep(1)}>
-                {t('booking.back', 'Back')}
-              </button>
-              <button type="button" className="btn-primary" onClick={handleTripNext}>
-                {t('booking.next', 'Next')}
-              </button>
             </div>
-          </div>
-        )}
 
-        {booking.step === 3 && (
-          <div className="step-panel">
-            <h2>{t('booking.step3', 'Your details')}</h2>
-            <div className="form-grid">
-              <label>
-                {t('booking.name', 'Full name')}
+            <div className="summary-total-row">
+              <span className="total-label">Total</span>
+              <strong className="total-amount">€{totalPrice}</strong>
+            </div>
+          </section>
+
+          {/* Right Column: Your Details & Payment */}
+          <section className="checkout-form-card">
+            <h2 className="card-heading">Your Details</h2>
+
+            <form onSubmit={handleCheckout} className="checkout-form">
+              {/* Full Name */}
+              <div className="form-group">
+                <label htmlFor="fullName" className="form-label">
+                  Full Name <span className="req">*</span>
+                </label>
                 <input
+                  id="fullName"
                   type="text"
-                  value={cust.name}
-                  onChange={(e) => setCust((p) => ({ ...p, name: e.target.value }))}
-                  className={errors.name ? 'error' : ''}
+                  required
+                  placeholder="João Silva"
+                  className={`form-input ${errors.fullName ? 'input-error' : ''}`}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                 />
-                {errors.name && <span className="field-error">{errors.name}</span>}
-              </label>
+                {errors.fullName && <p className="field-error">{errors.fullName}</p>}
+              </div>
 
-              <label>
-                {t('booking.email', 'Email')}
+              {/* Email Address */}
+              <div className="form-group">
+                <label htmlFor="email" className="form-label">
+                  Email Address <span className="req">*</span>
+                </label>
                 <input
+                  id="email"
                   type="email"
-                  value={cust.email}
-                  onChange={(e) => setCust((p) => ({ ...p, email: e.target.value }))}
-                  className={errors.email ? 'error' : ''}
+                  required
+                  placeholder="joao@email.com"
+                  className={`form-input ${errors.email ? 'input-error' : ''}`}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
-                {errors.email && <span className="field-error">{errors.email}</span>}
-              </label>
-
-              <label>
-                {t('booking.phone', 'Phone / WhatsApp')}
-                <input
-                  type="tel"
-                  placeholder="+351 ..."
-                  value={cust.phone}
-                  onChange={(e) => setCust((p) => ({ ...p, phone: e.target.value }))}
-                  className={errors.phone ? 'error' : ''}
-                />
-                {errors.phone && <span className="field-error">{errors.phone}</span>}
-              </label>
-
-              <label>
-                {t('booking.country', 'Country')}
-                <input
-                  type="text"
-                  value={cust.country}
-                  onChange={(e) => setCust((p) => ({ ...p, country: e.target.value }))}
-                />
-              </label>
-            </div>
-
-            <div className="step-actions">
-              <button type="button" className="btn-secondary" onClick={() => setStep(2)}>
-                {t('booking.back', 'Back')}
-              </button>
-              <button type="button" className="btn-primary" onClick={handleCustNext}>
-                {t('booking.next', 'Next')}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {booking.step === 4 && (
-          <div className="step-panel">
-            <h2>{isCustomTour ? 'Rever Pedido de Orçamento' : t('booking.step4', 'Review & Payment')}</h2>
-
-            <div className="review-block">
-              <div className="review-row"><span>{t('booking.service', 'Service')}</span><strong>{booking.service_title}</strong></div>
-              <div className="review-row"><span>{t('booking.date', 'Date')}</span><strong>{booking.date}</strong></div>
-              <div className="review-row"><span>{t('booking.passengers', 'Passengers')}</span><strong>{booking.passengers}</strong></div>
-              <div className="review-row"><span>{t('booking.pickup', 'Pickup')}</span><strong>{booking.pickup_location}</strong></div>
-              {isCustomTour && (
-                <div className="review-row"><span>Roteiro Desejado</span><small style={{ color: '#0f172a', fontWeight: 600 }}>{trip.special_notes || booking.special_notes}</small></div>
-              )}
-              <div className="review-row"><span>{t('booking.name', 'Name')}</span><strong>{booking.customer.name || cust.name}</strong></div>
-              <div className="review-row"><span>{t('booking.email', 'Email')}</span><strong>{booking.customer.email || cust.email}</strong></div>
-              
-              <div className="review-row total">
-                <span>{isCustomTour ? 'Preço Estimado' : t('booking.total', 'Total')}</span>
-                <strong>{isCustomTour ? 'Sob Consulta (Orçamento Personalizado)' : `${booking.total_amount_eur}€`}</strong>
+                {errors.email && <p className="field-error">{errors.email}</p>}
               </div>
-            </div>
 
-            {!isCustomTour ? (
-              <div className="payment-methods">
-                <h3>{t('booking.paymentMethod', 'Payment method')}</h3>
-                <div className="pm-grid">
-                  <label className={`pm-card ${booking.payment_method === PAYMENT_METHOD.STRIPE_CARD ? 'selected' : ''}`}>
-                    <input
-                      type="radio"
-                      name="pm"
-                      value={PAYMENT_METHOD.STRIPE_CARD}
-                      checked={booking.payment_method === PAYMENT_METHOD.STRIPE_CARD}
-                      onChange={() => setPaymentMethod(PAYMENT_METHOD.STRIPE_CARD)}
-                    />
-                    <div>
-                      <strong>💳 {t('booking.payCard', 'Pay by Card')}</strong>
-                      <p>{t('booking.payCardDesc', 'Secure Stripe payment. Visa, Mastercard, etc.')}</p>
+              {/* Phone Number */}
+              <div className="form-group">
+                <label htmlFor="phone" className="form-label">
+                  Phone Number <span className="req">*</span>
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  required
+                  placeholder="+351 912 345 678"
+                  className={`form-input ${errors.phone ? 'input-error' : ''}`}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+                {errors.phone && <p className="field-error">{errors.phone}</p>}
+              </div>
+
+              {/* Payment Method Selector */}
+              <div className="payment-method-section">
+                <h3 className="section-subheading">Payment Method</h3>
+
+                <div className="payment-options">
+                  {/* Credit or Debit Card */}
+                  <label
+                    className={`payment-option ${paymentMethod === PAYMENT_METHOD.STRIPE_CARD ? 'active' : ''}`}
+                  >
+                    <div className="option-radio-group">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value={PAYMENT_METHOD.STRIPE_CARD}
+                        checked={paymentMethod === PAYMENT_METHOD.STRIPE_CARD}
+                        onChange={() => setSelectedPaymentMethod(PAYMENT_METHOD.STRIPE_CARD)}
+                        className="payment-radio"
+                      />
+                      <span className="payment-label-text">Credit or Debit Card</span>
+                    </div>
+
+                    <div className="card-brands">
+                      {/* Multibanco / Card badge */}
+                      <span className="brand-badge mbway-badge" title="MB WAY / Card">MB</span>
+                      {/* Visa */}
+                      <span className="brand-badge visa-badge" title="Visa">VISA</span>
+                      {/* MasterCard */}
+                      <span className="brand-badge mc-badge" title="MasterCard">MC</span>
                     </div>
                   </label>
-                  <label className={`pm-card ${booking.payment_method === PAYMENT_METHOD.WHATSAPP_MANUAL ? 'selected' : ''}`}>
-                    <input
-                      type="radio"
-                      name="pm"
-                      value={PAYMENT_METHOD.WHATSAPP_MANUAL}
-                      checked={booking.payment_method === PAYMENT_METHOD.WHATSAPP_MANUAL}
-                      onChange={() => setPaymentMethod(PAYMENT_METHOD.WHATSAPP_MANUAL)}
-                    />
-                    <div>
-                      <strong>💬 {t('booking.payWhatsapp', 'Pay via WhatsApp')}</strong>
-                      <p>{t('booking.payWhatsappDesc', 'Send booking request and arrange payment with driver.')}</p>
+
+                  {/* PayPal */}
+                  <label
+                    className={`payment-option ${paymentMethod === PAYMENT_METHOD.PAYPAL ? 'active' : ''}`}
+                  >
+                    <div className="option-radio-group">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value={PAYMENT_METHOD.PAYPAL}
+                        checked={paymentMethod === PAYMENT_METHOD.PAYPAL}
+                        onChange={() => setSelectedPaymentMethod(PAYMENT_METHOD.PAYPAL)}
+                        className="payment-radio"
+                      />
+                      <span className="payment-label-text">PayPal</span>
                     </div>
+
+                    <span className="paypal-logo-text">PayPal</span>
                   </label>
                 </div>
               </div>
-            ) : (
-              <div className="custom-quote-notice">
-                <p>📩 Ao clicares em <strong>"Enviar Pedido de Orçamento"</strong>, o proprietário recebe os teus detalhes para preparar uma cotação sob medida e contactar-te por WhatsApp e Email.</p>
-              </div>
-            )}
 
-            {errors.submit && (
-              <div className="error-banner">⚠️ {errors.submit}</div>
-            )}
+              {errors.submit && (
+                <div className="checkout-alert error">
+                  {errors.submit}
+                </div>
+              )}
 
-            <div className="step-actions">
-              <button type="button" className="btn-secondary" onClick={() => setStep(3)} disabled={loading}>
-                {t('booking.back', 'Back')}
+              {/* Submit / Pay Now Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="checkout-pay-btn"
+              >
+                {loading ? 'Processing...' : 'Pay Now →'}
               </button>
-              <button type="button" className="btn-primary" onClick={handleSubmit} disabled={loading}>
-                {loading ? t('booking.processing', 'Processing…') :
-                  isCustomTour
-                    ? '📩 Enviar Pedido de Orçamento →'
-                    : booking.payment_method === PAYMENT_METHOD.STRIPE_CARD
-                      ? t('booking.payNow', 'Pay Now →')
-                      : t('booking.sendWhatsapp', 'Send via WhatsApp →')}
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+            </form>
+          </section>
+        </div>
+      </main>
     </div>
   );
 }

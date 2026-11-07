@@ -13,6 +13,7 @@
   background: #ffffff;
   border: 1px solid var(--color-border);
   padding: 8px 14px;
+  min-height: 42px;
   border-radius: var(--radius-pill);
   font-size: 0.92rem;
   font-weight: 700;
@@ -21,6 +22,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   transition: all var(--transition-normal);
   min-width: 64px;
+  touch-action: manipulation;
 }
 
 .lang-selector-btn:hover {
@@ -81,7 +83,8 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 8px 12px;
+  padding: 10px 14px;
+  min-height: 44px;
   border-radius: 9px;
   font-size: 0.9rem;
   font-weight: 600;
@@ -91,6 +94,7 @@
   cursor: pointer;
   text-align: left;
   transition: all var(--transition-fast);
+  touch-action: manipulation;
 }
 
 .lang-option:hover {

@@ -1,7 +1,121 @@
-/* Tours Page Styles */
-.tours-page {
+.tours-page-mockup {
   width: 100%;
-  min-height: calc(100vh - 80px);
-  padding: 20px 0 60px;
-  background-color: var(--color-bg, #fcfcfc);
+  padding-bottom: 80px;
+}
+
+/* Tours Sub-Hero */
+.tours-hero-banner {
+  position: relative;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  margin-bottom: 40px;
+}
+
+.tours-hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.tours-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(30, 41, 59, 0.6) 100%);
+  z-index: 2;
+}
+
+.tours-hero-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  padding: 40px 20px;
+}
+
+.tours-hero-title {
+  font-size: clamp(2.2rem, 4vw, 3rem);
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+}
+
+.tours-hero-subtitle {
+  font-size: 1.05rem;
+  color: #cbd5e1;
+  margin: 0;
+  max-width: 540px;
+}
+
+/* Category Filter Bar */
+.tours-controls-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.tours-categories-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.category-pill {
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  background: #ffffff;
+  border: 1.5px solid var(--color-border);
+  color: #475569;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.category-pill:hover {
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.category-pill.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(67, 56, 202, 0.2);
+}
+
+.tours-sort-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sort-label {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.sort-select {
+  padding: 7px 12px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #0f172a;
+  outline: none;
+  cursor: pointer;
+}
+
+.tours-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
+  font-size: 1rem;
 }

@@ -1,199 +1,166 @@
-import { useState, useEffect, useRef } from 'react';
-import { ROUTES } from '../../constants';
-import { getLocalizedTours } from '../../constants/tours';
-import { useLanguage } from '../../hooks/useLanguage';
-import Button from '../../components/common/Button';
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { TOURS_DATA } from '../../constants/toursCatalog';
 import TourCard from '../../components/common/TourCard';
-import AirportTransferSection from '../../components/common/AirportTransferSection';
-import AboutSection from '../../components/common/AboutSection';
-import heroImg1 from '../../assets/images/madeira-hero.jpg';
-import heroImg2 from '../../assets/images/madeira-hero-2.jpg';
-import heroImg3 from '../../assets/images/madeira-hero-3.jpg';
+import ImagePlaceholder from '../../components/common/ImagePlaceholder';
 import './Home.css';
 
 export default function Home() {
-  const { t } = useLanguage();
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const touchStartXRef = useRef(null);
+  const navigate = useNavigate();
+  const [fromLoc, setFromLoc] = useState('Funchal');
+  const [destLoc, setDestLoc] = useState('');
+  const [date, setDate] = useState('');
+  const [passengers, setPassengers] = useState(1);
 
-  const heroSlides = [
-    {
-      id: 1,
-      title: t('hero.slide1Title'),
-      subtitle: t('hero.slide1Subtitle'),
-      image: heroImg1,
-      ctaText: t('hero.slide1Cta'),
-      ctaLink: ROUTES.BOOKING,
-    },
-    {
-      id: 2,
-      title: t('hero.slide2Title'),
-      subtitle: t('hero.slide2Subtitle'),
-      image: heroImg2,
-      ctaText: t('hero.slide2Cta'),
-      ctaLink: ROUTES.TRANSFERS,
-    },
-    {
-      id: 3,
-      title: t('hero.slide3Title'),
-      subtitle: t('hero.slide3Subtitle'),
-      image: heroImg3,
-      ctaText: t('hero.slide3Cta'),
-      ctaLink: ROUTES.TOURS,
-    },
-  ];
+  const featuredTours = TOURS_DATA.filter((t) => t.featured);
 
-  // Build tour data using centralized catalog and translations
-  const featuredTours = getLocalizedTours(t);
-
-  const handlePrevSlide = () => {
-    setCurrentSlideIndex((prev) => (prev === 0 ? heroSlides.length - 1 : prev - 1));
-  };
-
-  const handleNextSlide = () => {
-    setCurrentSlideIndex((prev) => (prev === heroSlides.length - 1 ? 0 : prev + 1));
-  };
-
-  // Auto-play slideshow: transitions smoothly every 5 seconds
-  useEffect(() => {
-    if (isPaused) return;
-
-    const timer = setInterval(() => {
-      setCurrentSlideIndex((prev) => (prev === heroSlides.length - 1 ? 0 : prev + 1));
-    }, 5000);
-
-    return () => clearInterval(timer);
-  }, [isPaused, heroSlides.length]);
-
-  // Touch gesture support for mobile swipe
-  const handleTouchStart = (e) => {
-    touchStartXRef.current = e.touches[0].clientX;
-  };
-
-  const handleTouchEnd = (e) => {
-    if (touchStartXRef.current === null) return;
-    const diff = touchStartXRef.current - e.changedTouches[0].clientX;
-    if (diff > 50) {
-      handleNextSlide();
-    } else if (diff < -50) {
-      handlePrevSlide();
-    }
-    touchStartXRef.current = null;
+  const handleSearch = (e) => {
+    e.preventDefault();
+    navigate(`/booking?from=${encodeURIComponent(fromLoc)}&dest=${encodeURIComponent(destLoc)}&date=${date}&pax=${passengers}`);
   };
 
   return (
-    <div className="home-page">
-      {/* Hero Outer Wrapper: Fills nearly the entire viewport */}
-      <section className="hero-wrapper" aria-label="Hero Highlights">
-        <div
-          className="hero-card"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-        >
-          {/* Horizontal Sliding Track: Slides from side to side */}
-          <div
-            className="hero-slider-track"
-            style={{ transform: `translateX(-${currentSlideIndex * 100}%)` }}
-          >
-            {heroSlides.map((slide) => (
-              <div className="hero-slide-pane" key={slide.id}>
-                {/* Background image layer */}
-                <div
-                  className="hero-bg-layer"
-                  style={{ backgroundImage: `url(${slide.image})` }}
-                />
+    <div className="home-mockup">
+      {/* ── 1. Hero Section with Background Canvas & Floating Search Bar ── */}
+      <section className="home-hero">
+        <div className="home-hero__bg">
+          {/* Neutral gray/slate gradient placeholder ready for scenic banner */}
+          <ImagePlaceholder
+            alt="Madeira Panoramic Banner"
+            className="home-hero__img"
+            height="100%"
+          />
+          <div className="home-hero__overlay" />
+        </div>
 
-                {/* Dark / Vignette overlay */}
-                <div className="hero-overlay" />
+        <div className="home-hero__content container-constrained">
+          <span className="home-hero__tag">EXPLORE MADEIRA</span>
+          <h1 className="home-hero__title">
+            Unforgettable Tours<br />& Transfers
+          </h1>
+          <p className="home-hero__subtitle">
+            Discover the best of Madeira with our guided tours, private transfers and custom experiences.
+          </p>
 
-                {/* Main Content Area */}
-                <div className="hero-content">
-                  <h1 className="hero-title">
-                    {slide.title.split('\n').map((line, idx) => (
-                      <span key={idx}>
-                        {line}
-                        {idx === 0 && <br />}
-                      </span>
-                    ))}
-                  </h1>
-                  <p className="hero-subtitle">{slide.subtitle}</p>
-                  <div className="hero-cta">
-                    <Button to={slide.ctaLink} variant="primary">
-                      {slide.ctaText}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
+          {/* Floating Search Bar */}
+          <form onSubmit={handleSearch} className="home-search-bar">
+            <div className="search-field">
+              <span className="search-field__label">From</span>
+              <select
+                value={fromLoc}
+                onChange={(e) => setFromLoc(e.target.value)}
+                className="search-field__input"
+              >
+                <option value="Funchal">Funchal</option>
+                <option value="FNC Airport">FNC Airport</option>
+                <option value="Caniço">Caniço</option>
+                <option value="Santa Cruz">Santa Cruz</option>
+                <option value="Calheta">Calheta</option>
+              </select>
+            </div>
+
+            <div className="search-field">
+              <span className="search-field__label">Destination</span>
+              <input
+                type="text"
+                placeholder="Select destination"
+                value={destLoc}
+                onChange={(e) => setDestLoc(e.target.value)}
+                className="search-field__input"
+              />
+            </div>
+
+            <div className="search-field">
+              <span className="search-field__label">Date</span>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="search-field__input"
+              />
+            </div>
+
+            <div className="search-field">
+              <span className="search-field__label">Passengers</span>
+              <select
+                value={passengers}
+                onChange={(e) => setPassengers(Number(e.target.value))}
+                className="search-field__input"
+              >
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                  <option key={n} value={n}>
+                    {n} {n === 1 ? 'person' : 'people'}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button type="submit" className="home-search-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              <span>Search Tours</span>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      {/* ── 2. Trust & Value Props Bar (4 Columns matching Mockup) ── */}
+      <section className="home-props container-constrained">
+        <div className="props-grid">
+          <div className="prop-item">
+            <div className="prop-icon">🔒</div>
+            <div>
+              <h4>Secure Payments</h4>
+              <p>Powered by Stripe</p>
+            </div>
           </div>
 
-          {/* Bottom Bar: Slider Controls & Indicator Dots */}
-          <div className="hero-bottom-bar">
-            <div className="hero-slider-controls">
-              <button
-                type="button"
-                className="hero-arrow-btn"
-                onClick={handlePrevSlide}
-                aria-label="Slide anterior"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="19" y1="12" x2="5" y2="12" />
-                  <polyline points="12 19 5 12 12 5" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                className="hero-arrow-btn"
-                onClick={handleNextSlide}
-                aria-label="Próximo slide"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </button>
+          <div className="prop-item">
+            <div className="prop-icon">🎧</div>
+            <div>
+              <h4>24/7 Support</h4>
+              <p>We are here to help</p>
+            </div>
+          </div>
 
-              {/* Slide Dots */}
-              <div className="hero-dots">
-                {heroSlides.map((_, dotIdx) => (
-                  <button
-                    key={dotIdx}
-                    type="button"
-                    className={`hero-dot ${dotIdx === currentSlideIndex ? 'active' : ''}`}
-                    onClick={() => setCurrentSlideIndex(dotIdx)}
-                    aria-label={`Slide ${dotIdx + 1}`}
-                  />
-                ))}
-              </div>
+          <div className="prop-item">
+            <div className="prop-icon">⭐</div>
+            <div>
+              <h4>Top Rated Tours</h4>
+              <p>5.0 from 1,000+ reviews</p>
+            </div>
+          </div>
+
+          <div className="prop-item">
+            <div className="prop-icon">🚐</div>
+            <div>
+              <h4>Comfortable Transfers</h4>
+              <p>Travel in style & safety</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Airport Transfers Section (Calculator & Highlights) ── */}
-      <AirportTransferSection />
-
-      {/* ── Adventures in Madeira Section ── */}
-      <section id="adventures" className="adventures-section">
-        <div className="adventures-header">
-          <h2 className="adventures-title">
-            {t('adventures.sectionTitle')}{' '}
-            <em>{t('adventures.sectionTitleItalic')}</em>
-          </h2>
+      {/* ── 3. Our Top Experiences Section ── */}
+      <section className="home-experiences container-constrained">
+        <div className="home-section-header">
+          <div>
+            <span className="section-pretitle">POPULAR TOURS</span>
+            <h2 className="section-title">Our Top Experiences</h2>
+          </div>
+          <Link to="/tours" className="section-view-all">
+            View All Tours →
+          </Link>
         </div>
 
-        <div className="tours-grid">
+        <div className="tours-grid-mockup">
           {featuredTours.map((tour) => (
             <TourCard key={tour.id} tour={tour} />
           ))}
         </div>
       </section>
-
-      {/* ── About Us Section ── */}
-      <AboutSection />
     </div>
   );
 }

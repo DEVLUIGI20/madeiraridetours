@@ -1,0 +1,267 @@
+.tour-detail-page {
+  width: 100%;
+  padding-bottom: 90px;
+}
+
+.tour-detail-hero {
+  position: relative;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  margin-bottom: 40px;
+}
+
+.tour-detail-hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.tour-detail-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.65) 100%);
+  z-index: 2;
+}
+
+.tour-detail-hero-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  padding: 40px 20px;
+}
+
+.tour-back-link {
+  display: inline-block;
+  color: #93c5fd;
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  text-decoration: none;
+}
+
+.tour-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.tour-detail-title {
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 6px;
+}
+
+.tour-detail-subtitle {
+  font-size: 1.1rem;
+  color: #cbd5e1;
+  margin: 0 0 12px;
+}
+
+.tour-detail-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+.star-icon {
+  color: #f59e0b;
+}
+
+.tour-header-price-badge {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-card);
+  padding: 14px 22px;
+  text-align: right;
+  color: #ffffff;
+}
+
+.price-from {
+  display: block;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.price-val {
+  font-size: 2.2rem;
+  color: #ffffff;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.price-unit {
+  display: block;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+}
+
+/* Body Layout */
+.tour-detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 40px;
+  align-items: start;
+}
+
+.tour-nav-tabs {
+  display: flex;
+  gap: 12px;
+  border-bottom: 2px solid var(--color-border);
+  margin-bottom: 28px;
+}
+
+.tour-tab-btn {
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #64748b;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tour-tab-btn.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.overview-text {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: #334155;
+  margin-bottom: 28px;
+}
+
+.section-mini-heading {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 28px 0 16px;
+}
+
+.highlights-list,
+.includes-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.highlights-list li,
+.includes-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  color: #334155;
+}
+
+.check-bullet {
+  color: #16a34a;
+  font-weight: 800;
+}
+
+.gallery-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+/* Sidebar Box */
+.booking-sidebar-card {
+  background: #ffffff;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+  padding: 24px;
+}
+
+.booking-sidebar-card h3 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 18px;
+}
+
+.sidebar-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidebar-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.sidebar-input {
+  border: 1.5px solid var(--color-border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: #0f172a;
+  background: #f8fafc;
+}
+
+.sidebar-price-breakdown {
+  padding: 14px 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.breakdown-row.total strong {
+  font-size: 1.25rem;
+  color: #0f172a;
+}
+
+.sidebar-cta-btn {
+  background: var(--color-primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 0.96rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sidebar-cta-btn:hover {
+  background: var(--color-primary-hover);
+}
+
+@media (max-width: 900px) {
+  .tour-detail-layout {
+    grid-template-columns: 1fr;
+  }
+  .gallery-slots-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+

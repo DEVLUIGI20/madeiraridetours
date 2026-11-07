@@ -1,92 +1,70 @@
-import { NavLink, Link, useLocation } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { ROUTES } from '../../constants';
 import { useLanguage } from '../../hooks/useLanguage';
 import LanguageSelector from '../common/LanguageSelector';
 import './Navbar.css';
 
-/**
- * Reusable Navbar component.
- * Features a circular logo badge on the left, centered multilingual navigation in the middle,
- * and the automatic Language Selector on the right.
- */
 export default function Navbar() {
   const { t } = useLanguage();
-  const location = useLocation();
 
-  const navItems = [
-    { label: t('nav.ourTours'), path: ROUTES.TOURS },
-    { label: t('nav.transfers'), path: ROUTES.TRANSFERS },
-    { label: t('nav.aboutUs'), path: '/#about' },
-    { label: t('nav.booking'), path: ROUTES.BOOKING },
-    { label: t('nav.faq'), path: ROUTES.FAQ },
+  const navLinks = [
+    { label: 'Home', path: ROUTES.HOME },
+    { label: 'Tours', path: ROUTES.TOURS },
+    { label: 'Transfers', path: ROUTES.TRANSFERS },
+    { label: 'Custom Tour', path: '/custom-tour' },
+    { label: 'About', path: '/about' },
+    { label: 'Contact', path: ROUTES.CONTACT },
   ];
-
-  const handleNavClick = (e, path) => {
-    if (path.includes('#')) {
-      const [targetPath, hash] = path.split('#');
-      const isHome = location.pathname === '/' || location.pathname === '';
-      const isTargetHome = targetPath === '/' || targetPath === '';
-
-      if (isHome && isTargetHome) {
-        e.preventDefault();
-        const element = document.getElementById(hash);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-        window.history.pushState(null, '', `#${hash}`);
-      }
-    }
-  };
 
   return (
     <header className="navbar-header">
       <div className="navbar-container">
-        {/* Left Column: Brand Logo (Round badge / ball) */}
+        {/* Brand Logo with Mountain Icon matching Mockup */}
         <div className="navbar-left">
           <Link to={ROUTES.HOME} className="navbar-brand">
-            <span className="navbar-brand-text">
-              Madeira Ride Tours
+            <span className="navbar-brand-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
+              </svg>
             </span>
+            <span className="navbar-brand-name">MadeiraRideTours</span>
           </Link>
         </div>
 
-        {/* Center Column: Navigation Links (Centred!) */}
+        {/* Center Desktop Navigation */}
         <nav className="navbar-center" aria-label="Main Navigation">
           <ul className="navbar-nav">
-            {navItems.map((link) => (
-              <li key={link.path}>
+            {navLinks.map((item) => (
+              <li key={item.path}>
                 <NavLink
-                  to={link.path}
-                  onClick={(e) => handleNavClick(e, link.path)}
-                  className={({ isActive }) =>
-                    isActive && !link.path.includes('#') ? 'nav-link active' : 'nav-link'
-                  }
+                  to={item.path}
+                  className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
                 >
-                  {link.label}
+                  {item.label}
                 </NavLink>
               </li>
             ))}
           </ul>
         </nav>
 
-        {/* Right Column: Language Selector with automatic browser detection */}
+        {/* Right Section: Language Selector + Book Now Pill Button */}
         <div className="navbar-right">
           <LanguageSelector />
+          <Link to={ROUTES.BOOKING} className="navbar-book-btn">
+            {t('nav.bookNow', 'Book Now')} →
+          </Link>
         </div>
       </div>
 
-      {/* Mobile Sub-Navigation Bar for small screens */}
+      {/* Mobile Horizontal Bar */}
       <nav className="navbar-mobile-nav" aria-label="Mobile Navigation">
-        {navItems.map((link) => (
+        {navLinks.map((item) => (
           <NavLink
-            key={link.path}
-            to={link.path}
-            onClick={(e) => handleNavClick(e, link.path)}
-            className={({ isActive }) =>
-              isActive && !link.path.includes('#') ? 'nav-link active' : 'nav-link'
-            }
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) => (isActive ? 'nav-mobile-link active' : 'nav-mobile-link')}
           >
-            {link.label}
+            {item.label}
           </NavLink>
         ))}
       </nav>
