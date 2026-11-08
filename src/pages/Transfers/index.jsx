@@ -84,7 +84,7 @@ export default function Transfers() {
         <div className="transfers-adventure-layout">
           {/* Left Form Card: Book Your Adventure */}
           <aside className="transfer-booking-card" id="transfer-booking-form">
-            <span className="booking-card-tag">EXCURSION & TRANSFER</span>
+            <span className="booking-card-tag">EXCURSION</span>
             <h2>Book Your Adventure</h2>
 
             {selectedAdventure ? (
@@ -143,7 +143,7 @@ export default function Transfers() {
                     <span className="transfer-form-label">
                       {selectedAdventure.isHalfDay ? 'Departure Time (Choose Shift)' : 'Departure Time'}
                     </span>
-                    
+
                     {selectedAdventure.isHalfDay ? (
                       <div className="shift-options-grid">
                         {selectedAdventure.timeSlots.map((slot) => {
@@ -206,7 +206,7 @@ export default function Transfers() {
                         className="view-full-itinerary-btn"
                         onClick={() => setModalAdventure(selectedAdventure)}
                       >
-                        View Stops & Map →
+                        View Stops→
                       </button>
                     </div>
                   </div>
@@ -239,9 +239,6 @@ export default function Transfers() {
           {/* Right: Adventures Grid (Clean, Balanced & Compact Cards) */}
           <main className="adventures-showcase-container">
             <div className="adventures-section-header">
-              <h2 className="adventures-title">
-                Adventures <em>in Madeira</em>
-              </h2>
               <p className="adventures-subtitle">
                 Select an adventure below or click "View Itinerary" to inspect all scenic stops and timings.
               </p>
@@ -303,11 +300,11 @@ export default function Transfers() {
                       <div className="adventure-footer mini">
                         <div className="adventure-pricing">
                           <div className="price-line">
-                            <span className="pax">1–4 pax</span>
+                            <span className="pax">1–4 Passengers</span>
                             <strong className="amt">{adv.price4}€</strong>
                           </div>
                           <div className="price-line">
-                            <span className="pax">5–8 pax</span>
+                            <span className="pax">5–8 Passengers</span>
                             <strong className="amt">{adv.price8}€</strong>
                           </div>
                         </div>
@@ -381,7 +378,7 @@ export default function Transfers() {
             <div className="modal-footer">
               <div className="modal-price-col">
                 <span className="from-label">Private Tour:</span>
-                <strong>{modalAdventure.price4}€</strong> (1–4 pax) / <strong>{modalAdventure.price8}€</strong> (5–8 pax)
+                <strong>{modalAdventure.price4}€</strong> (1–4 Passengers) / <strong>{modalAdventure.price8}€</strong> (5–8 Passengers)
               </div>
               <button
                 type="button"
