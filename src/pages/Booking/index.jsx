@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useBooking } from '../../context/BookingContext';
 import { TOURS_DATA } from '../../constants/toursCatalog';
-import { MOUNTAIN_TRANSFERS_CATALOG, AIRPORT_TRANSFER_LOCATIONS } from '../../constants/transfersCatalog';
+import { MOUNTAIN_TRANSFERS_CATALOG, AIRPORT_TRANSFER_LOCATIONS, MADEIRA_ADVENTURES } from '../../constants/transfersCatalog';
 import { PAYMENT_METHOD, SERVICE_TYPE } from '../../constants/booking';
 import { paymentService } from '../../services/paymentService';
 import { ROUTES } from '../../constants/index';
@@ -17,68 +17,121 @@ export default function Booking() {
   // URL query params
   const serviceParam = searchParams.get('service') || '';
   const dateParam = searchParams.get('date') || '';
+  const returnDateParam = searchParams.get('returnDate') || '';
+  const tripTypeParam = searchParams.get('tripType') || 'one-way';
   const paxParam = searchParams.get('pax') || '2';
-  const pickupParam = searchParams.get('pickup') || '';
+  const fromParam = searchParams.get('from') || '';
   const dropoffParam = searchParams.get('dropoff') || '';
+  const pickupParam = searchParams.get('pickup') || '';
+  const priceParam = searchParams.get('price') || '';
 
   const { booking, markPendingPayment } = useBooking();
 
-  // Find service information
+  // Find service & itinerary information
   const currentService = useMemo(() => {
-    // 1. Tour lookup
-    const tour = TOURS_DATA.find((t) => t.id === serviceParam);
-    if (tour) {
+    // 0. Madeira Adventures lookup
+    const adv = MADEIRA_ADVENTURES.find((a) => a.id === serviceParam);
+    if (adv) {
+      const fixedPrice = priceParam ? Number(priceParam) : (paxParam === '8' ? adv.price8 : adv.price4);
       return {
-        id: tour.id,
-        title: tour.title,
+        id: adv.id,
+        title: adv.title,
         type: SERVICE_TYPE.TOUR,
-        pricePerPerson: tour.price,
-        image: tour.image,
+        isAirportTransfer: false,
+        origin: pickupParam || fromParam || 'Funchal / Accommodation Pickup',
+        destination: adv.title,
+        duration: adv.duration,
+        highlights: adv.highlights,
+        totalCalculatedPrice: fixedPrice,
+        image: adv.image,
       };
     }
 
-    // 2. Airport Transfer lookup
-    if (serviceParam === 'airport-transfer') {
-      const loc = AIRPORT_TRANSFER_LOCATIONS.find((l) => l.name === dropoffParam) || AIRPORT_TRANSFER_LOCATIONS[0];
+    // 1. Airport Transfer lookup
+    if (serviceParam === 'airport-transfer' || fromParam.includes('Airport') || dropoffParam) {
+      const loc = AIRPORT_TRANSFER_LOCATIONS.find(
+        (l) => l.name === dropoffParam || l.id === dropoffParam
+      ) || AIRPORT_TRANSFER_LOCATIONS[4]; // Default Funchal
+
+      const origin = fromParam || 'Madeira Airport (FNC)';
+      const destination = dropoffParam || loc.name;
+      const isRoundTrip = tripTypeParam === 'round-trip';
+      const fixedPrice = priceParam ? Number(priceParam) : (isRoundTrip ? loc.roundTripPrice : loc.oneWayPrice);
+
       return {
         id: 'airport-transfer',
-        title: `Airport Transfer: ${pickupParam || 'Airport'} → ${dropoffParam || loc.name}`,
+        title: `Airport Transfer — ${destination}`,
         type: SERVICE_TYPE.TRANSFER,
-        pricePerPerson: loc ? loc.price : 35,
+        isAirportTransfer: true,
+        origin,
+        destination,
+        isRoundTrip,
+        duration: loc.duration,
+        zone: loc.zone,
+        totalCalculatedPrice: fixedPrice,
         image: null,
       };
     }
 
-    // 3. Mountain Transfer lookup
+    // 2. Mountain Transfer lookup
     const mt = MOUNTAIN_TRANSFERS_CATALOG.find((m) => m.id === serviceParam);
     if (mt) {
       return {
         id: mt.id,
         title: mt.title,
         type: SERVICE_TYPE.TRANSFER,
-        pricePerPerson: mt.price,
+        isAirportTransfer: false,
+        origin: 'Funchal / Hotel Pickup',
+        destination: mt.title,
+        duration: mt.duration,
+        highlights: mt.highlights,
+        totalCalculatedPrice: mt.price * (Number(paxParam) || 2),
         image: null,
       };
     }
 
-    // Fallback: Default Tour (Pico do Areeiro)
+    // 3. Tour lookup
+    const tour = TOURS_DATA.find((t) => t.id === serviceParam);
+    if (tour) {
+      return {
+        id: tour.id,
+        title: tour.title,
+        type: SERVICE_TYPE.TOUR,
+        isAirportTransfer: false,
+        origin: 'Funchal / South Coast Hotels',
+        destination: tour.title,
+        duration: tour.duration,
+        highlights: tour.highlights,
+        totalCalculatedPrice: tour.price * (Number(paxParam) || 1),
+        image: tour.image,
+      };
+    }
+
+    // Fallback default
     const defaultTour = TOURS_DATA[0];
     return {
       id: defaultTour.id,
       title: defaultTour.title,
       type: SERVICE_TYPE.TOUR,
-      pricePerPerson: defaultTour.price,
+      isAirportTransfer: false,
+      origin: 'Funchal',
+      destination: defaultTour.title,
+      duration: defaultTour.duration,
+      highlights: defaultTour.highlights,
+      totalCalculatedPrice: defaultTour.price * (Number(paxParam) || 1),
       image: defaultTour.image,
     };
-  }, [serviceParam, dropoffParam, pickupParam]);
+  }, [serviceParam, fromParam, dropoffParam, tripTypeParam, priceParam, paxParam, pickupParam]);
 
   // Form State
   const [fullName, setFullName] = useState(booking.customer?.name || '');
   const [email, setEmail] = useState(booking.customer?.email || '');
   const [phone, setPhone] = useState(booking.customer?.phone || '');
+  const [pickupAddress, setPickupAddress] = useState('');
+  const [flightNumber, setFlightNumber] = useState('');
   const [paymentMethod, setSelectedPaymentMethod] = useState(PAYMENT_METHOD.STRIPE_CARD);
 
-  // Date and passengers (from URL query, booking context, or sensible defaults)
+  // Date and passengers
   const [selectedDate] = useState(() => {
     if (dateParam) return dateParam;
     if (booking.date) return booking.date;
@@ -88,10 +141,10 @@ export default function Booking() {
   });
 
   const passengers = Number(paxParam) || booking.passengers || 2;
-  const totalPrice = (currentService.pricePerPerson * (currentService.type === SERVICE_TYPE.TRANSFER && serviceParam === 'airport-transfer' ? 1 : passengers)).toFixed(2);
+  const totalPrice = currentService.totalCalculatedPrice.toFixed(2);
 
-  // Formatting Date for summary badge (e.g. "Sat, Nov 22, 2025")
-  const formattedDate = useMemo(() => {
+  // Formatting Date for summary badge
+  const formattedDepartureDate = useMemo(() => {
     try {
       const d = new Date(selectedDate);
       return d.toLocaleDateString('en-US', {
@@ -104,6 +157,21 @@ export default function Booking() {
       return selectedDate;
     }
   }, [selectedDate]);
+
+  const formattedReturnDate = useMemo(() => {
+    if (!returnDateParam) return null;
+    try {
+      const d = new Date(returnDateParam);
+      return d.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    } catch {
+      return returnDateParam;
+    }
+  }, [returnDateParam]);
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -145,15 +213,17 @@ export default function Booking() {
         service_id: currentService.id,
         service_title: currentService.title,
         date: selectedDate,
+        return_date: returnDateParam || null,
+        trip_type: tripTypeParam,
         time_slot: booking.time_slot || '08:00',
         passengers,
-        pickup_location: pickupParam || booking.pickup_location || 'Funchal / Hotel',
+        pickup_location: pickupAddress || currentService.origin,
+        flight_number: flightNumber || null,
         total_amount_eur: Number(totalPrice),
         payment_method: paymentMethod,
       };
 
       if (paymentMethod === PAYMENT_METHOD.PAYPAL) {
-        // Redirect or trigger PayPal checkout
         alert('PayPal integration is initialized. Connecting to PayPal checkout...');
         navigate(ROUTES.BOOKING_SUCCESS + '?ref=' + bookingPayload.ref + '&pm=paypal');
         return;
@@ -193,7 +263,7 @@ export default function Booking() {
       {/* ── Main Two-Column Layout ── */}
       <main className="checkout-main container-constrained">
         <div className="checkout-grid">
-          {/* Left Column: Booking Summary */}
+          {/* Left Column: Booking Summary & Detailed Itinerary */}
           <section className="checkout-summary-card">
             <h2 className="card-heading">Booking Summary</h2>
 
@@ -211,14 +281,54 @@ export default function Booking() {
                 <h3 className="summary-item-title">{currentService.title}</h3>
                 <div className="summary-meta-line">
                   <span className="summary-icon">📅</span>
-                  <span className="summary-text">{formattedDate}</span>
+                  <span className="summary-text">{formattedDepartureDate}</span>
                 </div>
+                {formattedReturnDate && (
+                  <div className="summary-meta-line">
+                    <span className="summary-icon">🔄</span>
+                    <span className="summary-text">Return: {formattedReturnDate}</span>
+                  </div>
+                )}
                 <div className="summary-meta-line">
                   <span className="summary-icon">👤</span>
                   <span className="summary-text">
-                    {passengers} {passengers === 1 ? 'adult' : 'adults'}
+                    {passengers} {passengers === 1 ? 'passenger' : 'passengers'}
                   </span>
                 </div>
+              </div>
+            </div>
+
+            {/* ── Detailed Itinerary Box ── */}
+            <div className="checkout-itinerary-box">
+              <h4 className="itinerary-heading">Transfer & Route Itinerary</h4>
+              
+              <div className="itinerary-timeline">
+                <div className="itinerary-point start">
+                  <div className="point-dot" />
+                  <div className="point-info">
+                    <span className="point-label">Pick-up Location</span>
+                    <strong className="point-val">{currentService.origin}</strong>
+                  </div>
+                </div>
+
+                <div className="itinerary-line">
+                  <span className="route-duration">Est. duration: ~{currentService.duration || '25 min'}</span>
+                </div>
+
+                <div className="itinerary-point end">
+                  <div className="point-dot dropoff" />
+                  <div className="point-info">
+                    <span className="point-label">Drop-off Destination</span>
+                    <strong className="point-val">{currentService.destination}</strong>
+                  </div>
+                </div>
+
+                {currentService.isRoundTrip && (
+                  <div className="itinerary-roundtrip-badge">
+                    <span className="rt-icon">⇄</span>
+                    <span>Round Trip Included (Return on {formattedReturnDate || 'selected date'})</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -284,6 +394,35 @@ export default function Booking() {
                 {errors.phone && <p className="field-error">{errors.phone}</p>}
               </div>
 
+              {/* Optional Hotel / Specific Address or Flight Number */}
+              <div className="form-group">
+                <label htmlFor="pickupAddress" className="form-label">
+                  Hotel / Specific Address
+                </label>
+                <input
+                  id="pickupAddress"
+                  type="text"
+                  placeholder="e.g. Hotel Savoy Palace, Funchal"
+                  className="form-input"
+                  value={pickupAddress}
+                  onChange={(e) => setPickupAddress(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="flightNumber" className="form-label">
+                  Flight Number (Optional for airport pickup)
+                </label>
+                <input
+                  id="flightNumber"
+                  type="text"
+                  placeholder="e.g. TP1685 or FR382"
+                  className="form-input"
+                  value={flightNumber}
+                  onChange={(e) => setFlightNumber(e.target.value)}
+                />
+              </div>
+
               {/* Payment Method Selector */}
               <div className="payment-method-section">
                 <h3 className="section-subheading">Payment Method</h3>
@@ -306,11 +445,8 @@ export default function Booking() {
                     </div>
 
                     <div className="card-brands">
-                      {/* Multibanco / Card badge */}
                       <span className="brand-badge mbway-badge" title="MB WAY / Card">MB</span>
-                      {/* Visa */}
                       <span className="brand-badge visa-badge" title="Visa">VISA</span>
-                      {/* MasterCard */}
                       <span className="brand-badge mc-badge" title="MasterCard">MC</span>
                     </div>
                   </label>
@@ -348,7 +484,7 @@ export default function Booking() {
                 disabled={loading}
                 className="checkout-pay-btn"
               >
-                {loading ? 'Processing...' : 'Pay Now →'}
+                {loading ? 'Processing...' : `Pay Now (€${totalPrice}) →`}
               </button>
             </form>
           </section>

@@ -136,6 +136,107 @@
   font-size: 0.85rem;
 }
 
+/* ── Detailed Itinerary Box ── */
+.checkout-itinerary-box {
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #edf2f7;
+  padding: 18px;
+  margin-bottom: 24px;
+}
+
+.itinerary-heading {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.itinerary-timeline {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  gap: 12px;
+}
+
+.itinerary-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.point-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: 3px solid #dbeafe;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.point-dot.dropoff {
+  background: #10b981;
+  border-color: #d1fae5;
+}
+
+.point-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.point-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.point-val {
+  font-size: 0.92rem;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.itinerary-line {
+  padding-left: 26px;
+  border-left: 2px dashed #cbd5e1;
+  margin-left: 6px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.route-duration {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 600;
+  background: #ffffff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  display: inline-block;
+}
+
+.itinerary-roundtrip-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ede9fe;
+  color: #6d28d9;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.rt-icon {
+  font-size: 1rem;
+}
+
 .summary-total-row {
   display: flex;
   justify-content: space-between;
