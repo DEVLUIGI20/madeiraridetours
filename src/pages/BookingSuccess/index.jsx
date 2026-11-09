@@ -106,7 +106,7 @@ export default function BookingSuccess() {
                 <span className="voucher-item-label">Hora Prevista</span>
                 <span className="voucher-item-value">{bookingTime}</span>
               </div>
-              <div className="voucher-item">
+              <div className="voucher-item voucher-item--full">
                 <span className="voucher-item-label">Ponto de Encontro / Recolha</span>
                 <span className="voucher-item-value">{pickup}</span>
               </div>
@@ -114,12 +114,12 @@ export default function BookingSuccess() {
                 <span className="voucher-item-label">Passageiros</span>
                 <span className="voucher-item-value">{passengers} {passengers === 1 ? 'passageiro' : 'passageiros'}</span>
               </div>
-              {flightNumber && (
+              {flightNumber ? (
                 <div className="voucher-item">
                   <span className="voucher-item-label">Número de Voo</span>
                   <span className="voucher-item-value">✈️ {flightNumber}</span>
                 </div>
-              )}
+              ) : null}
               <div className="voucher-item">
                 <span className="voucher-item-label">Valor Total</span>
                 <span className="voucher-item-value voucher-item-value--price">{totalAmount}</span>
