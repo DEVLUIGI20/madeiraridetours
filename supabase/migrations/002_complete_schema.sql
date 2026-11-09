@@ -93,7 +93,18 @@ ALTER TABLE public.blocked_dates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tours ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.transfer_destinations ENABLE ROW LEVEL SECURITY;
 
--- Leitura Pública para Catálogos e Bloqueios
+-- Leitura Pública para Catálogos e Bloqueios (DROP IF EXISTS evita erros de duplicado)
+DROP POLICY IF EXISTS "Allow public read tours" ON public.tours;
+DROP POLICY IF EXISTS "Allow public read destinations" ON public.transfer_destinations;
+DROP POLICY IF EXISTS "Allow public read blocked_dates" ON public.blocked_dates;
+DROP POLICY IF EXISTS "Allow public insert bookings" ON public.bookings;
+DROP POLICY IF EXISTS "Allow public insert customers" ON public.customers;
+DROP POLICY IF EXISTS "Allow admin full bookings" ON public.bookings;
+DROP POLICY IF EXISTS "Allow admin full customers" ON public.customers;
+DROP POLICY IF EXISTS "Allow admin full blocked_dates" ON public.blocked_dates;
+DROP POLICY IF EXISTS "Allow admin full tours" ON public.tours;
+DROP POLICY IF EXISTS "Allow admin full destinations" ON public.transfer_destinations;
+
 CREATE POLICY "Allow public read tours" ON public.tours FOR SELECT USING (active = true);
 CREATE POLICY "Allow public read destinations" ON public.transfer_destinations FOR SELECT USING (active = true);
 CREATE POLICY "Allow public read blocked_dates" ON public.blocked_dates FOR SELECT USING (true);
