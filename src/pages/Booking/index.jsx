@@ -17,7 +17,9 @@ export default function Booking() {
   // URL query params
   const serviceParam = searchParams.get('service') || '';
   const dateParam = searchParams.get('date') || '';
+  const timeParam = searchParams.get('time') || '';
   const returnDateParam = searchParams.get('returnDate') || '';
+  const returnTimeParam = searchParams.get('returnTime') || '';
   const tripTypeParam = searchParams.get('tripType') || 'one-way';
   const paxParam = searchParams.get('pax') || '2';
   const fromParam = searchParams.get('from') || '';
@@ -140,6 +142,12 @@ export default function Booking() {
     return tomorrow.toISOString().split('T')[0];
   });
 
+  const [selectedTime] = useState(() => {
+    if (timeParam) return timeParam;
+    if (booking.time_slot) return booking.time_slot;
+    return '10:00';
+  });
+
   const passengers = Number(paxParam) || booking.passengers || 2;
   const totalPrice = currentService.totalCalculatedPrice.toFixed(2);
 
@@ -207,6 +215,11 @@ export default function Booking() {
         phone: phone.trim(),
       };
 
+      // Format clean pickup and dropoff description
+      const finalPickup = pickupAddress 
+        ? `${pickupAddress} (${currentService.origin})`
+        : currentService.origin;
+
       const bookingPayload = {
         ref: booking.ref || `MRT-${Date.now()}`,
         service_type: currentService.type,
@@ -215,9 +228,9 @@ export default function Booking() {
         date: selectedDate,
         return_date: returnDateParam || null,
         trip_type: tripTypeParam,
-        time_slot: booking.time_slot || '08:00',
+        time_slot: selectedTime,
         passengers,
-        pickup_location: pickupAddress || currentService.origin,
+        pickup_location: finalPickup,
         flight_number: flightNumber || null,
         total_amount_eur: Number(totalPrice),
         payment_method: paymentMethod,
@@ -281,12 +294,12 @@ export default function Booking() {
                 <h3 className="summary-item-title">{currentService.title}</h3>
                 <div className="summary-meta-line">
                   <span className="summary-icon">📅</span>
-                  <span className="summary-text">{formattedDepartureDate}</span>
+                  <span className="summary-text">{formattedDepartureDate} às {selectedTime}</span>
                 </div>
                 {formattedReturnDate && (
                   <div className="summary-meta-line">
                     <span className="summary-icon">🔄</span>
-                    <span className="summary-text">Return: {formattedReturnDate}</span>
+                    <span className="summary-text">Return: {formattedReturnDate} {returnTimeParam ? `às ${returnTimeParam}` : ''}</span>
                   </div>
                 )}
                 <div className="summary-meta-line">

@@ -3,10 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { MADEIRA_ADVENTURES, AIRPORT_TRANSFER_LOCATIONS } from '../../constants/transfersCatalog';
 import ImagePlaceholder from '../../components/common/ImagePlaceholder';
 import DestinationDropdown from '../../components/common/DestinationDropdown';
+import usePageTitle from '../../hooks/usePageTitle';
 import './Transfers.css';
 
 export default function Transfers() {
   const navigate = useNavigate();
+  usePageTitle(
+    'Transfers & Aventuras na Ilha da Madeira',
+    'Transfers para levadas, Pico do Areeiro, Fanal e aeroporto FNC. Viatura privada até 8 passageiros com serviço porta a porta.'
+  );
 
   // Selected adventure state - null on initial load so user chooses an adventure
   const [selectedAdventure, setSelectedAdventure] = useState(null);

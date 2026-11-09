@@ -933,7 +933,51 @@
 }
 
 @media (max-width: 680px) {
+  .transfers-hero {
+    min-height: auto;
+    margin-bottom: 18px;
+  }
+
+  .transfers-hero-content {
+    padding: 24px 16px;
+  }
+
+  .transfers-hero-title {
+    font-size: 1.75rem;
+  }
+
+  .transfer-booking-card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .transfer-booking-card select,
+  .transfer-booking-card input {
+    font-size: 16px; /* Avoid iOS zoom */
+    min-height: 44px; /* Touch target */
+  }
+
   .adventures-grid {
     grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .adventure-card-compact {
+    border-radius: 14px;
+  }
+
+  .time-slots-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .time-slot-chip {
+    min-height: 40px;
+    font-size: 0.88rem;
+  }
+
+  .booking-confirm-cta {
+    min-height: 50px;
+    font-size: 1rem;
+    border-radius: 12px;
   }
 }

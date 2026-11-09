@@ -2,10 +2,11 @@ import { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from '../components/navigation/Navbar';
 import Footer from '../components/navigation/Footer';
+import WhatsAppButton from '../components/common/WhatsAppButton';
 
 /**
  * Main public layout base structure.
- * Wraps all public pages with Navbar, dynamic content, and Footer.
+ * Wraps all public pages with Navbar, dynamic content, Footer and WhatsApp FAB.
  * Automatically scrolls to anchor (e.g. #about) or tops page on route change.
  */
 export default function MainLayout() {
@@ -33,6 +34,7 @@ export default function MainLayout() {
         <Outlet />
       </main>
       <Footer />
+      <WhatsAppButton />
     </div>
   );
 }

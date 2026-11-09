@@ -112,11 +112,25 @@ export default function DestinationDropdown({
         </svg>
       </button>
 
-      {/* Popover Menu */}
+      {/* Popover Menu / Mobile Bottom Sheet */}
       {isOpen && (
-        <div className="dest-dropdown-panel animate-pop">
-          {/* Quick Search */}
-          <div className="dest-search-bar">
+        <>
+          <div className="dest-dropdown-backdrop" onClick={() => setIsOpen(false)} />
+          <div className="dest-dropdown-panel animate-pop">
+            <div className="dest-sheet-drag-handle" aria-hidden="true" />
+            <div className="dest-mobile-header">
+              <span className="dest-mobile-title">{label || 'Selecionar Local'}</span>
+              <button
+                type="button"
+                className="dest-mobile-close-btn"
+                onClick={() => setIsOpen(false)}
+                aria-label="Fechar"
+              >
+                ✕
+              </button>
+            </div>
+            {/* Quick Search */}
+            <div className="dest-search-bar">
             <svg viewBox="0 0 20 20" fill="currentColor" className="search-icon">
               <path
                 fillRule="evenodd"
@@ -218,6 +232,7 @@ export default function DestinationDropdown({
             )}
           </div>
         </div>
+        </>
       )}
     </div>
   );

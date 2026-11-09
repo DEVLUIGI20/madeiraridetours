@@ -5,10 +5,15 @@ import { AIRPORT_TRANSFER_LOCATIONS, calculateTransferPrice } from '../../consta
 import TourCard from '../../components/common/TourCard';
 import ImagePlaceholder from '../../components/common/ImagePlaceholder';
 import DestinationDropdown from '../../components/common/DestinationDropdown';
+import usePageTitle from '../../hooks/usePageTitle';
 import './Home.css';
 
 export default function Home() {
   const navigate = useNavigate();
+  usePageTitle(
+    'Transfers Privados & Passeios na Madeira',
+    'Transfers privados com motoristas profissionais na Ilha da Madeira. Aeroporto FNC, Pico do Areeiro, tours e levadas com cancelamento gratuito e reserva segura.'
+  );
 
   // Transfers routing states: Starts by default at Airport -> Funchal
   const [fromLoc, setFromLoc] = useState('airport');

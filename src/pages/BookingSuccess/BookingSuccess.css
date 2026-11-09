@@ -1,0 +1,335 @@
+/* ==========================================================================
+   Booking Success & Digital Voucher Styles
+   ========================================================================== */
+
+.booking-success-page {
+  background-color: #f8fafc;
+  min-height: 85vh;
+  padding: 40px 20px 80px;
+  font-family: var(--font-family);
+  display: flex;
+  justify-content: center;
+}
+
+.success-container {
+  max-width: 680px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── Top Status Banner ── */
+.success-banner {
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 36px 24px 28px;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+}
+
+.success-icon-badge {
+  width: 64px;
+  height: 64px;
+  background: #dcfce7;
+  color: #16a34a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 16px;
+  box-shadow: 0 0 0 8px #f0fdf4;
+}
+
+.success-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 8px;
+}
+
+.success-subtitle {
+  color: #64748b;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 auto 16px;
+  max-width: 500px;
+}
+
+.email-sent-alert {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ── Digital Voucher Ticket Card ── */
+.voucher-ticket {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+  position: relative;
+}
+
+.voucher-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #ffffff;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.voucher-brand-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 2px;
+}
+
+.voucher-brand-sub {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.voucher-ref-box {
+  text-align: right;
+}
+
+.voucher-ref-label {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.voucher-ref-code {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #f59e0b;
+  letter-spacing: 0.05em;
+  font-family: monospace;
+}
+
+/* Body rows */
+.voucher-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.voucher-service-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px;
+}
+
+.voucher-status-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.voucher-status-pill.confirmed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.voucher-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #f1f5f9;
+}
+
+.voucher-item-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.voucher-item-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.voucher-item-value--price {
+  font-size: 1.2rem;
+  color: #4f46e5;
+}
+
+/* Tear Line Decoration */
+.voucher-tear-line {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin: 0 -1px;
+}
+
+.voucher-tear-notch {
+  width: 20px;
+  height: 20px;
+  background: #f8fafc;
+  border-radius: 50%;
+  border: 1px solid #cbd5e1;
+}
+
+.voucher-tear-notch.left {
+  margin-left: -10px;
+}
+
+.voucher-tear-notch.right {
+  margin-right: -10px;
+}
+
+.voucher-tear-dots {
+  flex: 1;
+  border-top: 2px dashed #cbd5e1;
+  height: 0;
+}
+
+/* Instructions */
+.voucher-instructions {
+  padding: 20px 24px;
+  background: #ffffff;
+}
+
+.voucher-inst-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 10px;
+}
+
+.voucher-inst-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.85rem;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.voucher-inst-list li {
+  margin-bottom: 6px;
+}
+
+/* ── Actions (Print & WhatsApp) ── */
+.voucher-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.voucher-btn {
+  flex: 1;
+  min-height: 48px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.voucher-btn--calendar {
+  background: #0f172a;
+  color: #ffffff;
+  border: 1px solid #0f172a;
+}
+
+.voucher-btn--calendar:hover {
+  background: #1e293b;
+}
+
+.voucher-btn--print {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+}
+
+.voucher-btn--print:hover {
+  background: #f1f5f9;
+}
+
+.voucher-btn--whatsapp {
+  background: #25d366;
+  color: #ffffff;
+}
+
+.voucher-btn--whatsapp:hover {
+  background: #20bd5a;
+}
+
+.voucher-btn--home {
+  background: #0f172a;
+  color: #ffffff;
+  width: 100%;
+}
+
+.voucher-btn--home:hover {
+  background: #1e293b;
+}
+
+/* Print Styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .voucher-ticket, .voucher-ticket * {
+    visibility: visible;
+  }
+  .voucher-ticket {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+  .voucher-actions, .success-banner {
+    display: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .voucher-grid {
+    grid-template-columns: 1fr;
+  }
+  .voucher-actions {
+    flex-direction: column;
+  }
+}
+

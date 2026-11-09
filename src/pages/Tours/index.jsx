@@ -2,9 +2,15 @@ import { useState, useMemo } from 'react';
 import { TOURS_DATA, TOUR_CATEGORIES } from '../../constants/toursCatalog';
 import TourCard from '../../components/common/TourCard';
 import ImagePlaceholder from '../../components/common/ImagePlaceholder';
+import usePageTitle from '../../hooks/usePageTitle';
 import './Tours.css';
 
 export default function Tours() {
+  usePageTitle(
+    'Tours Privados na Madeira — Experiências e Excursões',
+    'Conheça as melhores excursões privadas na Madeira: Tour Oeste (Porto Moniz), Tour Este (Santana), Fanal Místico e levadas guiadas.'
+  );
+
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('popular');
 

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import AdminLayout from '../layouts/AdminLayout';
 import AdminGuard from '../components/guards/AdminGuard';
+import ErrorBoundary from '../components/common/ErrorBoundary';
 
 // Direct load for Home
 import Home from '../pages/Home';
@@ -18,6 +19,8 @@ const Booking = lazy(() => import('../pages/Booking'));
 const BookingSuccess = lazy(() => import('../pages/BookingSuccess'));
 const BookingCancel = lazy(() => import('../pages/BookingCancel'));
 const Faq = lazy(() => import('../pages/Faq'));
+const Privacy = lazy(() => import('../pages/Privacy'));
+const Terms = lazy(() => import('../pages/Terms'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 const Admin = lazy(() => import('../pages/Admin'));
 const AdminLogin = lazy(() => import('../pages/AdminLogin'));
@@ -53,37 +56,41 @@ function PageLoader() {
 export default function AppRouter() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-          {/* Public Website Pages with MainLayout */}
-          <Route path="/" element={<MainLayout />}>
-            <Route index element={<Home />} />
-            <Route path="tours" element={<Tours />} />
-            <Route path="tours/:id" element={<TourDetail />} />
-            <Route path="transfers" element={<Transfers />} />
-            <Route path="custom-tour" element={<CustomTour />} />
-            <Route path="about" element={<About />} />
-            <Route path="contact" element={<Contact />} />
-            <Route path="booking" element={<Booking />} />
-            <Route path="booking/success" element={<BookingSuccess />} />
-            <Route path="booking/cancel" element={<BookingCancel />} />
-            <Route path="faq" element={<Faq />} />
-          </Route>
-
-          {/* Admin Login Route */}
-          <Route path="/admin/login" element={<AdminLogin />} />
-
-          {/* Protected Admin Routes */}
-          <Route element={<AdminGuard />}>
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<Admin />} />
+      <ErrorBoundary>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* Public Website Pages with MainLayout */}
+            <Route path="/" element={<MainLayout />}>
+              <Route index element={<Home />} />
+              <Route path="tours" element={<Tours />} />
+              <Route path="tours/:id" element={<TourDetail />} />
+              <Route path="transfers" element={<Transfers />} />
+              <Route path="custom-tour" element={<CustomTour />} />
+              <Route path="about" element={<About />} />
+              <Route path="contact" element={<Contact />} />
+              <Route path="booking" element={<Booking />} />
+              <Route path="booking/success" element={<BookingSuccess />} />
+              <Route path="booking/cancel" element={<BookingCancel />} />
+              <Route path="faq" element={<Faq />} />
+              <Route path="privacy" element={<Privacy />} />
+              <Route path="terms" element={<Terms />} />
             </Route>
-          </Route>
 
-          {/* 404 Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
+            {/* Admin Login Route */}
+            <Route path="/admin/login" element={<AdminLogin />} />
+
+            {/* Protected Admin Routes */}
+            <Route element={<AdminGuard />}>
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<Admin />} />
+              </Route>
+            </Route>
+
+            {/* 404 Route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
     </BrowserRouter>
   );
 }

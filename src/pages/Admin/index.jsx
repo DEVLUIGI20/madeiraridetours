@@ -271,6 +271,12 @@ export default function Admin() {
                       {b.pickup_location && (
                         <div className="admin-subtext">📍 {b.pickup_location}</div>
                       )}
+                      {b.flight_number && (
+                        <div className="admin-subtext">✈️ Voo: {b.flight_number}</div>
+                      )}
+                      {b.trip_type === 'round-trip' && b.return_date && (
+                        <div className="admin-subtext">🔄 Regresso: {b.return_date}</div>
+                      )}
                     </td>
                     <td>{b.passengers || 1}</td>
                     <td>
