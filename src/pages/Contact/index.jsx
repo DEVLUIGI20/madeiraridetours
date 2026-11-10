@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import ImagePlaceholder from '../../components/common/ImagePlaceholder';
+import { useLanguage } from '../../hooks/useLanguage';
 import './Contact.css';
 
 export default function Contact() {
+  const { currentLang } = useLanguage();
   const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
@@ -20,9 +22,13 @@ export default function Contact() {
           <div className="contact-hero-overlay" />
         </div>
         <div className="contact-hero-content container-constrained">
-          <h1 className="contact-hero-title">Contact Us</h1>
+          <h1 className="contact-hero-title">
+            {currentLang === 'pt' ? 'Contacte-nos' : currentLang === 'de' ? 'Kontaktieren Sie uns' : currentLang === 'fr' ? 'Contactez-nous' : currentLang === 'es' ? 'Contáctenos' : 'Contact Us'}
+          </h1>
           <p className="contact-hero-subtitle">
-            We are here to help! Get in touch for questions, bespoke tours or bookings.
+            {currentLang === 'pt'
+              ? 'Estamos aqui para ajudar! Fale connosco para esclarecer dúvidas, passeios à medida ou reservas.'
+              : 'We are here to help! Get in touch for questions, bespoke tours or bookings.'}
           </p>
         </div>
       </section>
@@ -43,7 +49,7 @@ export default function Contact() {
             <div className="contact-info-card">
               <div className="contact-info-icon">📞</div>
               <div>
-                <h4>Phone / WhatsApp</h4>
+                <h4>{currentLang === 'pt' ? 'Telefone / WhatsApp' : 'Phone / WhatsApp'}</h4>
                 <a href="https://wa.me/351916326716" target="_blank" rel="noreferrer">+351 916 326 716</a>
               </div>
             </div>
@@ -51,29 +57,29 @@ export default function Contact() {
             <div className="contact-info-card">
               <div className="contact-info-icon">📍</div>
               <div>
-                <h4>Location</h4>
-                <p>Funchal, Madeira Island, Portugal</p>
+                <h4>{currentLang === 'pt' ? 'Localização' : 'Location'}</h4>
+                <p>{currentLang === 'pt' ? 'Funchal, Ilha da Madeira, Portugal' : 'Funchal, Madeira Island, Portugal'}</p>
               </div>
             </div>
           </div>
 
           {/* Center: Message Form */}
           <div className="contact-form-card">
-            <h3>Send us a message</h3>
+            <h3>{currentLang === 'pt' ? 'Envie-nos uma mensagem' : 'Send us a message'}</h3>
 
             {submitted ? (
               <div className="contact-success-msg">
-                <span>✓</span> Thank you! We will get back to you shortly via WhatsApp or Email.
+                <span>✓</span> {currentLang === 'pt' ? 'Obrigado! Entraremos em contacto brevemente via WhatsApp ou Email.' : 'Thank you! We will get back to you shortly via WhatsApp or Email.'}
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="contact-form">
                 <div className="form-two-cols">
                   <label className="contact-label">
-                    <span>Name *</span>
+                    <span>{currentLang === 'pt' ? 'Nome *' : 'Name *'}</span>
                     <input
                       type="text"
                       required
-                      placeholder="Your full name"
+                      placeholder={currentLang === 'pt' ? 'O seu nome completo' : 'Your full name'}
                       value={formData.name}
                       onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
                       className="contact-input"
@@ -94,11 +100,11 @@ export default function Contact() {
                 </div>
 
                 <label className="contact-label">
-                  <span>Message *</span>
+                  <span>{currentLang === 'pt' ? 'Mensagem *' : 'Message *'}</span>
                   <textarea
                     rows={5}
                     required
-                    placeholder="Tell us what you would like to know or what dates you have in mind..."
+                    placeholder={currentLang === 'pt' ? 'Diga-nos o que gostaria de saber ou as datas pretendidas...' : 'Tell us what you would like to know or what dates you have in mind...'}
                     value={formData.message}
                     onChange={(e) => setFormData((p) => ({ ...p, message: e.target.value }))}
                     className="contact-textarea"
@@ -106,7 +112,7 @@ export default function Contact() {
                 </label>
 
                 <button type="submit" className="contact-submit-btn">
-                  Send Message →
+                  {currentLang === 'pt' ? 'Enviar Mensagem →' : 'Send Message →'}
                 </button>
               </form>
             )}
@@ -117,7 +123,7 @@ export default function Contact() {
             <ImagePlaceholder
               alt="Madeira Location Map"
               aspectRatio="1/1"
-              label="Funchal Headquarters"
+              label={currentLang === 'pt' ? 'Sede no Funchal' : 'Funchal Headquarters'}
             />
           </div>
         </div>

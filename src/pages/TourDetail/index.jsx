@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { TOURS_DATA } from '../../constants/toursCatalog';
 import ImagePlaceholder from '../../components/common/ImagePlaceholder';
+import { useLanguage } from '../../hooks/useLanguage';
 import './TourDetail.css';
 
 export default function TourDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { currentLang } = useLanguage();
   const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'itinerary', 'includes'
   const [date, setDate] = useState('');
   const [passengers, setPassengers] = useState(1);
@@ -33,7 +35,7 @@ export default function TourDetail() {
 
         <div className="tour-detail-hero-content container-constrained">
           <Link to="/tours" className="tour-back-link">
-            ← Back to Tours
+            {currentLang === 'pt' ? '← Voltar aos Passeios' : currentLang === 'de' ? '← Zurück zu Touren' : '← Back to Tours'}
           </Link>
           <div className="tour-header-flex">
             <div>
@@ -42,14 +44,14 @@ export default function TourDetail() {
               <div className="tour-detail-rating">
                 <span className="star-icon">★</span>
                 <strong>{tour.rating.toFixed(1)}</strong>
-                <span>({tour.reviewsCount} reviews)</span>
+                <span>({tour.reviewsCount} {currentLang === 'pt' ? 'avaliações' : 'reviews'})</span>
               </div>
             </div>
 
             <div className="tour-header-price-badge">
-              <span className="price-from">From</span>
+              <span className="price-from">{currentLang === 'pt' ? 'Desde' : 'From'}</span>
               <strong className="price-val">€{tour.price}</strong>
-              <span className="price-unit">per person</span>
+              <span className="price-unit">{currentLang === 'pt' ? 'por pessoa' : 'per person'}</span>
             </div>
           </div>
         </div>
@@ -66,21 +68,21 @@ export default function TourDetail() {
                 className={`tour-tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
                 onClick={() => setActiveTab('overview')}
               >
-                Overview
+                {currentLang === 'pt' ? 'Visão Geral' : currentLang === 'de' ? 'Übersicht' : currentLang === 'fr' ? 'Aperçu' : 'Overview'}
               </button>
               <button
                 type="button"
                 className={`tour-tab-btn ${activeTab === 'itinerary' ? 'active' : ''}`}
                 onClick={() => setActiveTab('itinerary')}
               >
-                Itinerary
+                {currentLang === 'pt' ? 'Itinerário' : currentLang === 'de' ? 'Reiseplan' : 'Itinerary'}
               </button>
               <button
                 type="button"
                 className={`tour-tab-btn ${activeTab === 'includes' ? 'active' : ''}`}
                 onClick={() => setActiveTab('includes')}
               >
-                Includes
+                {currentLang === 'pt' ? 'Incluído' : currentLang === 'de' ? 'Inbegriffen' : 'Includes'}
               </button>
             </div>
 
@@ -88,7 +90,9 @@ export default function TourDetail() {
               {activeTab === 'overview' && (
                 <div className="overview-tab-pane">
                   <p className="overview-text">{tour.overview}</p>
-                  <h3 className="section-mini-heading">Key Highlights</h3>
+                  <h3 className="section-mini-heading">
+                    {currentLang === 'pt' ? 'Destaques Principais' : 'Key Highlights'}
+                  </h3>
                   <ul className="highlights-list">
                     {tour.highlights.map((h, i) => (
                       <li key={i}>
@@ -97,8 +101,10 @@ export default function TourDetail() {
                     ))}
                   </ul>
 
-                  {/* 4 Photo slots placeholders as seen in mockup */}
-                  <h3 className="section-mini-heading">Photo Gallery</h3>
+                  {/* 4 Photo slots placeholders */}
+                  <h3 className="section-mini-heading">
+                    {currentLang === 'pt' ? 'Galeria de Fotografias' : 'Photo Gallery'}
+                  </h3>
                   <div className="gallery-slots-grid">
                     {[1, 2, 3, 4].map((slot) => (
                       <ImagePlaceholder
@@ -130,7 +136,9 @@ export default function TourDetail() {
 
               {activeTab === 'includes' && (
                 <div className="includes-tab-pane">
-                  <h3 className="section-mini-heading">What is Included</h3>
+                  <h3 className="section-mini-heading">
+                    {currentLang === 'pt' ? 'O Que Está Incluído' : 'What is Included'}
+                  </h3>
                   <ul className="includes-list">
                     {tour.includes.map((inc, i) => (
                       <li key={i}>
@@ -143,14 +151,14 @@ export default function TourDetail() {
             </div>
           </div>
 
-          {/* Right: Floating Booking Box matching Mockup */}
+          {/* Right: Floating Booking Box */}
           <aside className="tour-detail-right">
             <div className="booking-sidebar-card">
-              <h3>Book This Tour</h3>
+              <h3>{currentLang === 'pt' ? 'Reservar Este Passeio' : 'Book This Tour'}</h3>
 
               <form onSubmit={handleBook} className="sidebar-form">
                 <label className="sidebar-label">
-                  <span>Select Date</span>
+                  <span>{currentLang === 'pt' ? 'Data Pretendida' : 'Select Date'}</span>
                   <input
                     type="date"
                     required
@@ -161,7 +169,7 @@ export default function TourDetail() {
                 </label>
 
                 <label className="sidebar-label">
-                  <span>Passengers</span>
+                  <span>{currentLang === 'pt' ? 'Passageiros' : 'Passengers'}</span>
                   <select
                     value={passengers}
                     onChange={(e) => setPassengers(Number(e.target.value))}
@@ -169,7 +177,9 @@ export default function TourDetail() {
                   >
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                       <option key={n} value={n}>
-                        {n} {n === 1 ? 'person' : 'people'}
+                        {n} {n === 1 
+                          ? (currentLang === 'pt' ? 'pessoa' : 'person') 
+                          : (currentLang === 'pt' ? 'pessoas' : 'people')}
                       </option>
                     ))}
                   </select>
@@ -177,17 +187,17 @@ export default function TourDetail() {
 
                 <div className="sidebar-price-breakdown">
                   <div className="breakdown-row">
-                    <span>Price per person</span>
+                    <span>{currentLang === 'pt' ? 'Preço por pessoa' : 'Price per person'}</span>
                     <strong>€{tour.price}</strong>
                   </div>
                   <div className="breakdown-row total">
-                    <span>Estimated Total</span>
+                    <span>{currentLang === 'pt' ? 'Total Estimado' : 'Estimated Total'}</span>
                     <strong>€{tour.price * passengers}</strong>
                   </div>
                 </div>
 
                 <button type="submit" className="sidebar-cta-btn">
-                  Reserve Online →
+                  {currentLang === 'pt' ? 'Reservar Online →' : 'Reserve Online →'}
                 </button>
               </form>
             </div>
