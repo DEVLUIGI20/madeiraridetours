@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../constants';
+import { useLanguage } from '../../hooks/useLanguage';
 import './Footer.css';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
 export default function Footer() {
+  const { currentLang } = useLanguage();
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
 
@@ -27,19 +29,23 @@ export default function Footer() {
             <span className="m-logo-bold">MadeiraRide</span>
             <span className="m-logo-light">Tours</span>
           </Link>
-          <p className="m-footer-tagline">Explore · Discover · Experience</p>
+          <p className="m-footer-tagline">
+            {currentLang === 'pt' ? 'Explorar · Descobrir · Viver a Madeira' : 'Explore · Discover · Experience'}
+          </p>
         </div>
 
 
         {/* Column 2: Quick Links (2 sub-columns) */}
         <div className="m-footer-col m-footer-links-col">
-          <h4 className="m-footer-heading">Quick Links</h4>
+          <h4 className="m-footer-heading">
+            {currentLang === 'pt' ? 'Links Rápidos' : currentLang === 'de' ? 'Schnelllinks' : currentLang === 'fr' ? 'Liens Rapides' : currentLang === 'es' ? 'Enlaces Rápidos' : 'Quick Links'}
+          </h4>
           <div className="m-footer-links-grid">
             <ul className="m-links-subcol">
-              <li><Link to={ROUTES.ABOUT || '/about'}>About</Link></li>
-              <li><Link to={ROUTES.CONTACT}>Contact</Link></li>
+              <li><Link to={ROUTES.ABOUT || '/about'}>{currentLang === 'pt' ? 'Sobre Nós' : currentLang === 'de' ? 'Über uns' : currentLang === 'fr' ? 'À propos' : currentLang === 'es' ? 'Sobre nosotros' : 'About'}</Link></li>
+              <li><Link to={ROUTES.CONTACT}>{currentLang === 'pt' ? 'Contactos' : currentLang === 'de' ? 'Kontakt' : currentLang === 'fr' ? 'Contact' : currentLang === 'es' ? 'Contacto' : 'Contact'}</Link></li>
               <li><Link to={ROUTES.FAQ || '/faq'}>FAQ</Link></li>
-              <li><Link to="/terms">Terms & Conditions</Link></li>
+              <li><Link to="/terms">{currentLang === 'pt' ? 'Termos e Condições' : currentLang === 'de' ? 'AGB' : currentLang === 'fr' ? 'Conditions Générales' : currentLang === 'es' ? 'Términos y Condiciones' : 'Terms & Conditions'}</Link></li>
             </ul>
           </div>
         </div>
@@ -47,7 +53,9 @@ export default function Footer() {
 
         {/* Column 3: Our Services */}
         <div className="m-footer-col m-footer-services-col">
-          <h4 className="m-footer-heading">Our Services</h4>
+          <h4 className="m-footer-heading">
+            {currentLang === 'pt' ? 'Os Nossos Serviços' : currentLang === 'de' ? 'Unsere Leistungen' : currentLang === 'fr' ? 'Nos Services' : currentLang === 'es' ? 'Nuestros Servicios' : 'Our Services'}
+          </h4>
           <ul className="m-services-list">
             <li>
               <Link to={ROUTES.TOURS} className="m-service-item">
@@ -56,7 +64,7 @@ export default function Footer() {
                   <circle cx="9" cy="10" r="2" />
                   <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
                 </svg>
-                <span>Tours</span>
+                <span>{currentLang === 'pt' ? 'Passeios' : currentLang === 'de' ? 'Touren' : currentLang === 'fr' ? 'Circuits' : 'Tours'}</span>
               </Link>
             </li>
             <li>
@@ -67,7 +75,7 @@ export default function Footer() {
                   <path d="M9 17h6" />
                   <circle cx="17" cy="17" r="2" />
                 </svg>
-                <span>Transfers</span>
+                <span>{currentLang === 'pt' ? 'Transfers Aeroporto' : currentLang === 'fr' ? 'Transferts' : currentLang === 'es' ? 'Traslados' : 'Transfers'}</span>
               </Link>
             </li>
             <li>
@@ -77,7 +85,7 @@ export default function Footer() {
                   <line x1="8" y1="2" x2="8" y2="18" />
                   <line x1="16" y1="6" x2="16" y2="22" />
                 </svg>
-                <span>Custom Tours</span>
+                <span>{currentLang === 'pt' ? 'Passeios Personalizados' : currentLang === 'de' ? 'Individuelle Touren' : currentLang === 'fr' ? 'Circuits sur Mesure' : 'Custom Tours'}</span>
               </Link>
             </li>
           </ul>
@@ -86,25 +94,31 @@ export default function Footer() {
 
         {/* Column 4: Stay Connected & Socials */}
         <div className="m-footer-col m-footer-subscribe-col">
-          <h4 className="m-footer-heading">Stay Connected</h4>
-          <p className="m-footer-subtext">Get the latest updates and special offers.</p>
+          <h4 className="m-footer-heading">
+            {currentLang === 'pt' ? 'Fique em Contacto' : currentLang === 'de' ? 'In Kontakt bleiben' : currentLang === 'fr' ? 'Restez Connecté' : 'Stay Connected'}
+          </h4>
+          <p className="m-footer-subtext">
+            {currentLang === 'pt' ? 'Receba novidades e ofertas exclusivas na Madeira.' : 'Get the latest updates and special offers.'}
+          </p>
 
           <form className="m-subscribe-form" onSubmit={handleSubscribe}>
             <input
               type="email"
               className="m-subscribe-input"
-              placeholder="Your email address"
+              placeholder={currentLang === 'pt' ? 'O seu endereço de email' : 'Your email address'}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
             <button type="submit" className="m-subscribe-btn">
-              Subscribe &rarr;
+              {currentLang === 'pt' ? 'Subscrever →' : 'Subscribe →'}
             </button>
           </form>
 
           {isSubscribed && (
-            <span className="m-subscribe-success">✓ Thank you for subscribing!</span>
+            <span className="m-subscribe-success">
+              {currentLang === 'pt' ? '✓ Obrigado pela sua subscrição!' : '✓ Thank you for subscribing!'}
+            </span>
           )}
 
           <div className="m-social-links">

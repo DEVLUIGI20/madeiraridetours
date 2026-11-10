@@ -274,8 +274,10 @@ export default function Admin() {
                       {b.flight_number && (
                         <div className="admin-subtext">✈️ Voo: {b.flight_number}</div>
                       )}
-                      {b.trip_type === 'round-trip' && b.return_date && (
-                        <div className="admin-subtext">🔄 Regresso: {b.return_date}</div>
+                      {(b.trip_type === 'round-trip' || b.return_date) && (
+                        <div className="admin-subtext" style={{ color: '#4338ca', fontWeight: 600 }}>
+                          🔄 Ida e Volta {b.return_date ? `| Regresso: ${b.return_date}${b.return_time ? ` às ${b.return_time}` : ''}` : ''}
+                        </div>
                       )}
                     </td>
                     <td>{b.passengers || 1}</td>

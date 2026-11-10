@@ -9,12 +9,8 @@
 import { supabase } from '../lib/supabase';
 import { TOURS_DATA } from '../constants/toursCatalog';
 import {
-  DESTINATIONS,
-  POPULAR_DESTINATIONS,
   MADEIRA_ADVENTURES,
   AIRPORT_TRANSFER_LOCATIONS,
-  STANDARD_PRICE,
-  EXECUTIVE_PRICE
 } from '../constants/transfersCatalog';
 
 // In-memory cache to prevent redundant fetches
@@ -99,14 +95,17 @@ export async function getTransferCatalog({ forceRefresh = false } = {}) {
     console.warn('[catalogService] Supabase destinations fetch failed, using fallback catalog:', err?.message || err);
   }
 
+  const defaultNames = AIRPORT_TRANSFER_LOCATIONS.map((l) => l.name);
+  const defaultPopular = AIRPORT_TRANSFER_LOCATIONS.filter((l) => l.popular).map((l) => l.name);
+
   // Resilient fallback to static catalog
-  cache.destinations = DESTINATIONS;
-  cache.popular = POPULAR_DESTINATIONS;
+  cache.destinations = defaultNames;
+  cache.popular = defaultPopular;
   return {
-    destinations: DESTINATIONS,
-    popular: POPULAR_DESTINATIONS,
-    standardPrice: STANDARD_PRICE,
-    executivePrice: EXECUTIVE_PRICE
+    destinations: defaultNames,
+    popular: defaultPopular,
+    standardPrice: 30,
+    executivePrice: 50
   };
 }
 
@@ -138,10 +137,42 @@ export async function getAdventureRoutes() {
 }
 
 /**
- * Fetch airport transfer locations with fallback
+ * Fetch airport transfer locations with live fallback from Supabase table 'transfer_destinations'
  * @returns {Promise<Array>}
  */
 export async function getAirportLocations() {
+  if (cache.airportLocations) return cache.airportLocations;
+
+  try {
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('transfer_destinations')
+        .select('*')
+        .eq('active', true)
+        .order('one_way_price', { ascending: true });
+
+      if (!error && data && data.length > 0) {
+        // Map database columns to app schema
+        const mapped = data.map((d) => ({
+          id: d.id,
+          name: d.name,
+          subtitle: d.subtitle,
+          region: d.region || 'south-west',
+          oneWayPrice: Number(d.one_way_price),
+          roundTripPrice: Number(d.round_trip_price),
+          duration: d.duration || '~25 min',
+          popular: d.is_popular || false,
+        }));
+
+        cache.airportLocations = mapped;
+        return mapped;
+      }
+    }
+  } catch (err) {
+    console.warn('[catalogService] Error fetching transfer_destinations from Supabase:', err);
+  }
+
+  cache.airportLocations = AIRPORT_TRANSFER_LOCATIONS;
   return AIRPORT_TRANSFER_LOCATIONS;
 }
 

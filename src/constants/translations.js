@@ -13,6 +13,8 @@ export const SUPPORTED_LANGUAGES = [
 export const TRANSLATIONS = {
   en: {
     nav: {
+      home: 'Home',
+      tours: 'Tours',
       ourTours: 'Custom Tours',
       transfers: 'Transfers',
       aboutUs: 'About us',
@@ -283,7 +285,9 @@ export const TRANSLATIONS = {
   },
   pt: {
     nav: {
-      ourTours: 'Custom Tours',
+      home: 'Início',
+      tours: 'Passeios',
+      ourTours: 'Passeios Privados',
       transfers: 'Transfers',
       aboutUs: 'Sobre nós',
       booking: 'Reservas',
@@ -553,7 +557,9 @@ export const TRANSLATIONS = {
   },
   de: {
     nav: {
-      ourTours: 'Custom Tours',
+      home: 'Startseite',
+      tours: 'Touren',
+      ourTours: 'Private Touren',
       transfers: 'Transfers',
       aboutUs: 'Über uns',
       booking: 'Buchung',
@@ -823,7 +829,9 @@ export const TRANSLATIONS = {
   },
   fr: {
     nav: {
-      ourTours: 'Custom Tours',
+      home: 'Accueil',
+      tours: 'Circuits',
+      ourTours: 'Circuits Privés',
       transfers: 'Transferts',
       aboutUs: 'À propos',
       booking: 'Réservation',
@@ -1132,7 +1140,9 @@ export const TRANSLATIONS = {
   },
   es: {
     nav: {
-      ourTours: 'Custom Tours',
+      home: 'Inicio',
+      tours: 'Tours',
+      ourTours: 'Tours Privados',
       transfers: 'Traslados',
       aboutUs: 'Sobre nosotros',
       booking: 'Reservas',

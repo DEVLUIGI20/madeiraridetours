@@ -8,10 +8,10 @@ export default function Navbar() {
   const { t } = useLanguage();
 
   const navLinks = [
-    { label: 'Home', path: ROUTES.HOME },
-    { label: 'Tours', path: ROUTES.TOURS },
-    { label: 'Transfers', path: ROUTES.TRANSFERS },
-    { label: 'Custom Tour', path: '/custom-tour' }
+    { label: t('nav.home') || 'Home', path: ROUTES.HOME },
+    { label: t('nav.tours') || 'Tours', path: ROUTES.TOURS },
+    { label: t('nav.transfers') || 'Transfers', path: ROUTES.TRANSFERS },
+    { label: t('nav.ourTours') || 'Custom Tour', path: '/custom-tour' }
   ];
 
   return (
@@ -43,26 +43,28 @@ export default function Navbar() {
           </ul>
         </nav>
 
-        {/* Right Section: Language Selector + Book Now Pill Button */}
+        {/* Right side Language Selector */}
         <div className="navbar-right">
           <LanguageSelector />
-          <Link to={ROUTES.BOOKING} className="navbar-book-btn">
-            {t('Book Now')} →
-          </Link>
         </div>
       </div>
 
       {/* Mobile Horizontal Bar */}
       <nav className="navbar-mobile-nav" aria-label="Mobile Navigation">
-        {navLinks.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) => (isActive ? 'nav-mobile-link active' : 'nav-mobile-link')}
-          >
-            {item.label}
-          </NavLink>
-        ))}
+        <div className="navbar-mobile-links">
+          {navLinks.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) => (isActive ? 'nav-mobile-link active' : 'nav-mobile-link')}
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </div>
+        <div className="navbar-mobile-lang">
+          <LanguageSelector />
+        </div>
       </nav>
     </header>
   );

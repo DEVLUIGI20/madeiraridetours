@@ -17,6 +17,9 @@ export async function sendBookingConfirmationEmail(bookingDetails) {
     service_title,
     date,
     time_slot,
+    return_date,
+    return_time,
+    trip_type,
     pickup_location,
     passengers,
     total_amount_eur,
@@ -87,6 +90,15 @@ export async function sendBookingConfirmationEmail(bookingDetails) {
               <td class="label">Hora:</td>
               <td class="value">${time_slot}</td>
             </tr>
+            ${trip_type === 'round-trip' && return_date ? `
+            <tr>
+              <td class="label">Viagem:</td>
+              <td class="value">Ida e Volta (Round Trip)</td>
+            </tr>
+            <tr>
+              <td class="label">Regresso:</td>
+              <td class="value"><strong>${return_date}</strong> ${return_time ? `às ${return_time}` : ''}</td>
+            </tr>` : ''}
             <tr>
               <td class="label">Ponto de Encontro:</td>
               <td class="value">${pickup_location}</td>

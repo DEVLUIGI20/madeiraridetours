@@ -227,6 +227,7 @@ export default function Booking() {
         service_title: currentService.title,
         date: selectedDate,
         return_date: returnDateParam || null,
+        return_time: returnTimeParam || null,
         trip_type: tripTypeParam,
         time_slot: selectedTime,
         passengers,

@@ -51,9 +51,13 @@ export default function BookingSuccess() {
   const totalAmount = booking?.total_amount ? `€${booking.total_amount}` : 'Confirmado';
   const passengers = booking?.passengers || 2;
   const flightNumber = booking?.flight_number;
+  const tripType = booking?.trip_type;
+  const returnDate = booking?.return_date;
+  const returnTime = booking?.return_time;
+  const isRoundTrip = tripType === 'round-trip' || !!returnDate;
 
   const voucherWhatsAppMsg = makeWhatsAppUrl(
-    `Olá! Acabei de efetuar a reserva ${bookingRef} para ${serviceName} no dia ${bookingDate} às ${bookingTime}.`
+    `Olá! Acabei de efetuar a reserva ${bookingRef} para ${serviceName} no dia ${bookingDate} às ${bookingTime}${isRoundTrip && returnDate ? ` com regresso a ${returnDate}` : ''}.`
   );
 
   const handlePrint = () => {
@@ -94,18 +98,35 @@ export default function BookingSuccess() {
           <div className="voucher-body">
             <div>
               <h3 className="voucher-service-title">{serviceName}</h3>
-              <span className="voucher-status-pill confirmed">● Reserva Registada</span>
+              <div className="voucher-pills-row">
+                <span className="voucher-status-pill confirmed">● Reserva Registada</span>
+                {isRoundTrip && (
+                  <span className="voucher-status-pill roundtrip">🔄 Ida e Volta</span>
+                )}
+              </div>
             </div>
 
             <div className="voucher-grid">
               <div className="voucher-item">
-                <span className="voucher-item-label">Data da Viagem</span>
+                <span className="voucher-item-label">Data da Viagem (Ida)</span>
                 <span className="voucher-item-value">{bookingDate}</span>
               </div>
               <div className="voucher-item">
                 <span className="voucher-item-label">Hora Prevista</span>
                 <span className="voucher-item-value">{bookingTime}</span>
               </div>
+              {isRoundTrip && returnDate && (
+                <>
+                  <div className="voucher-item">
+                    <span className="voucher-item-label">Data de Regresso (Volta)</span>
+                    <span className="voucher-item-value voucher-item-value--return">🔄 {returnDate}</span>
+                  </div>
+                  <div className="voucher-item">
+                    <span className="voucher-item-label">Hora do Regresso</span>
+                    <span className="voucher-item-value">{returnTime || 'A combinar'}</span>
+                  </div>
+                </>
+              )}
               <div className="voucher-item voucher-item--full">
                 <span className="voucher-item-label">Ponto de Encontro / Recolha</span>
                 <span className="voucher-item-value">{pickup}</span>

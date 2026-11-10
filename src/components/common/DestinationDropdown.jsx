@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { AIRPORT_TRANSFER_LOCATIONS, TRANSFER_REGIONS } from '../../constants/transfersCatalog';
+import { getAirportLocations } from '../../services/catalogService';
 import './DestinationDropdown.css';
 
 const AIRPORT_OPTION = {
@@ -11,7 +12,7 @@ const AIRPORT_OPTION = {
 
 /**
  * Modern luxury dropdown for selecting Madeira Transfer Locations.
- * showDuration prop allows hiding the "~20 min" label on pick-up inputs.
+ * Dynamically queries Supabase transfer_destinations with seamless fallback.
  */
 export default function DestinationDropdown({
   selectedId,
@@ -23,15 +24,29 @@ export default function DestinationDropdown({
   showPrice = true,
   showDuration = true,
 }) {
+  const [locations, setLocations] = useState(AIRPORT_TRANSFER_LOCATIONS);
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef(null);
+
+  // Sync live locations and prices from Supabase
+  useEffect(() => {
+    let isMounted = true;
+    getAirportLocations().then((liveLocations) => {
+      if (isMounted && liveLocations && liveLocations.length > 0) {
+        setLocations(liveLocations);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Determine currently selected object
   const isSelectedAirport = selectedId === 'airport';
   const selectedLoc = isSelectedAirport
     ? AIRPORT_OPTION
-    : AIRPORT_TRANSFER_LOCATIONS.find((l) => l.id === selectedId) || AIRPORT_TRANSFER_LOCATIONS[0];
+    : locations.find((l) => l.id === selectedId) || locations[0];
 
   const activePrice = !isSelectedAirport
     ? (tripType === 'round-trip' ? selectedLoc.roundTripPrice : selectedLoc.oneWayPrice)
@@ -59,7 +74,7 @@ export default function DestinationDropdown({
     'fnc'.includes(q)
   );
 
-  const filteredLocations = AIRPORT_TRANSFER_LOCATIONS.filter((l) => {
+  const filteredLocations = locations.filter((l) => {
     if (l.id === disabledId) return false;
     if (!q) return true;
     return (

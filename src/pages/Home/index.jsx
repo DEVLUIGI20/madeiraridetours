@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { TOURS_DATA } from '../../constants/toursCatalog';
 import { AIRPORT_TRANSFER_LOCATIONS, calculateTransferPrice } from '../../constants/transfersCatalog';
+import { useLanguage } from '../../hooks/useLanguage';
 import TourCard from '../../components/common/TourCard';
 import ImagePlaceholder from '../../components/common/ImagePlaceholder';
 import DestinationDropdown from '../../components/common/DestinationDropdown';
@@ -10,13 +11,14 @@ import './Home.css';
 
 export default function Home() {
   const navigate = useNavigate();
+  const { t, currentLang } = useLanguage();
   usePageTitle(
-    'Transfers Privados & Passeios na Madeira',
-    'Transfers privados com motoristas profissionais na Ilha da Madeira. Aeroporto FNC, Pico do Areeiro, tours e levadas com cancelamento gratuito e reserva segura.'
+    t('hero.slide1Title')?.replace('\n', ' ') || 'Transfers Privados & Passeios na Madeira',
+    t('hero.slide1Subtitle') || 'Transfers privados com motoristas profissionais na Ilha da Madeira.'
   );
 
-  // Transfers routing states: Starts by default at Airport -> Funchal
-  const [fromLoc, setFromLoc] = useState('airport');
+  // Transfers routing: Origin is fixed to Airport (FNC)
+  const fromLoc = 'airport';
   const [destLoc, setDestLoc] = useState('funchal');
   const [tripType, setTripType] = useState('one-way');
   const [date, setDate] = useState('');
@@ -76,12 +78,30 @@ export default function Home() {
         </div>
 
         <div className="home-hero__content container-constrained">
-          <span className="home-hero__tag">EXPLORE MADEIRA</span>
+          <span className="home-hero__tag">{currentLang === 'pt' ? 'EXPLORAR A MADEIRA' : 'EXPLORE MADEIRA'}</span>
           <h1 className="home-hero__title">
-            Unforgettable Tours<br />& Transfers
+            {currentLang === 'pt' ? (
+              <>Passeios Inesquecíveis<br />& Transfers</>
+            ) : currentLang === 'de' ? (
+              <>Unvergessliche Touren<br />& Transfers</>
+            ) : currentLang === 'fr' ? (
+              <>Circuits Inoubliables<br />& Transferts</>
+            ) : currentLang === 'es' ? (
+              <>Tours Inolvidables<br />& Traslados</>
+            ) : (
+              <>Unforgettable Tours<br />& Transfers</>
+            )}
           </h1>
           <p className="home-hero__subtitle">
-            Reliable private airport & island-wide transfers between any zones with upfront fixed prices.
+            {currentLang === 'pt'
+              ? 'Transfers privados e pontuais do aeroporto e por toda a Madeira com preços fixos garantidos.'
+              : currentLang === 'de'
+              ? 'Zuverlässige private Flughafen- und Inseltransfers mit festen Festpreisen im Voraus.'
+              : currentLang === 'fr'
+              ? 'Transferts privés fiables depuis l’aéroport et sur toute l’île avec des tarifs fixes.'
+              : currentLang === 'es'
+              ? 'Traslados privados confiables desde el aeropuerto y por toda la isla con precios fijos.'
+              : 'Reliable private airport & island-wide transfers between any zones with upfront fixed prices.'}
           </p>
 
           {/* Trip Type Selector (One-way / Round-trip) */}
@@ -91,31 +111,31 @@ export default function Home() {
               className={`trip-type-btn ${tripType === 'one-way' ? 'active' : ''}`}
               onClick={() => setTripType('one-way')}
             >
-              One Way (Ida)
+              {currentLang === 'pt' ? 'Ida' : currentLang === 'de' ? 'Einfache Fahrt' : currentLang === 'fr' ? 'Aller simple' : currentLang === 'es' ? 'Solo ida' : 'One Way'}
             </button>
             <button
               type="button"
               className={`trip-type-btn ${tripType === 'round-trip' ? 'active' : ''}`}
               onClick={() => setTripType('round-trip')}
             >
-              Round Trip (Ida e Volta)
+              {currentLang === 'pt' ? 'Ida e Volta' : currentLang === 'de' ? 'Hin- und Rückfahrt' : currentLang === 'fr' ? 'Aller-retour' : currentLang === 'es' ? 'Ida y vuelta' : 'Round Trip'}
             </button>
           </div>
 
           {/* Floating Booking Bar */}
-          <form onSubmit={handleBook} className="home-search-bar">
-            {/* FROM - Rich Dropdown (No duration estimates shown on pick-up) */}
-            <div className="search-field search-field--custom-dropdown">
-              <DestinationDropdown
-                selectedId={fromLoc}
-                tripType={tripType}
-                onChange={(newId) => setFromLoc(newId)}
-                label="From"
-                allowAirport={true}
-                disabledId={destLoc}
-                showPrice={false}
-                showDuration={false}
-              />
+          <form onSubmit={handleBook} className={`home-search-bar ${tripType === 'round-trip' ? 'home-search-bar--roundtrip' : ''}`}>
+            {/* FROM - Fixed Departure from Airport */}
+            <div className="search-field search-field--fixed-airport">
+              <span className="search-field__label">
+                {currentLang === 'pt' ? 'Partida (Aeroporto)' : currentLang === 'de' ? 'Abfahrt (Flughafen)' : currentLang === 'fr' ? 'Départ (Aéroport)' : currentLang === 'es' ? 'Origen (Aeropuerto)' : 'From (Partida)'}
+              </span>
+              <div className="search-field__fixed-val">
+                <span className="fixed-val__icon">✈️</span>
+                <div className="fixed-val__text">
+                  <strong>Madeira Airport (FNC)</strong>
+                  <small>{currentLang === 'pt' ? 'Aeroporto Internacional Cristiano Ronaldo' : 'Cristiano Ronaldo International Airport'}</small>
+                </div>
+              </div>
             </div>
 
             {/* DESTINATION - Rich Dropdown */}
@@ -124,18 +144,20 @@ export default function Home() {
                 selectedId={destLoc}
                 tripType={tripType}
                 onChange={(newId) => setDestLoc(newId)}
-                label="Destination"
-                allowAirport={true}
-                disabledId={fromLoc}
+                label={currentLang === 'pt' ? 'Destino' : currentLang === 'de' ? 'Zielort' : currentLang === 'fr' ? 'Destination' : currentLang === 'es' ? 'Destino' : 'Destination'}
+                allowAirport={false}
+                disabledId="airport"
                 showPrice={true}
                 showDuration={true}
               />
             </div>
 
             {/* DATE */}
-            <div className="search-field">
+            <div className="search-field search-field--date search-field--departure-date">
               <span className="search-field__label">
-                {tripType === 'round-trip' ? 'Departure Date' : 'Date'}
+                {tripType === 'round-trip'
+                  ? (currentLang === 'pt' ? 'Data de Partida (Ida)' : currentLang === 'de' ? 'Hinfahrt-Datum' : currentLang === 'fr' ? 'Date de départ' : 'Departure Date')
+                  : (currentLang === 'pt' ? 'Data da Viagem' : currentLang === 'de' ? 'Datum' : currentLang === 'fr' ? 'Date' : 'Date')}
               </span>
               <input
                 type="date"
@@ -147,8 +169,10 @@ export default function Home() {
             </div>
 
             {/* TIME OF PICKUP */}
-            <div className="search-field search-field--time">
-              <span className="search-field__label">Pick-up Time</span>
+            <div className="search-field search-field--time search-field--departure-time">
+              <span className="search-field__label">
+                {currentLang === 'pt' ? 'Hora de Recolha' : currentLang === 'de' ? 'Abholzeit' : currentLang === 'fr' ? 'Heure de départ' : 'Pick-up Time'}
+              </span>
               <input
                 type="time"
                 required
@@ -161,8 +185,10 @@ export default function Home() {
             {/* RETURN DATE & TIME (If Round Trip) */}
             {tripType === 'round-trip' && (
               <>
-                <div className="search-field">
-                  <span className="search-field__label">Return Date</span>
+                <div className="search-field search-field--date search-field--return-date">
+                  <span className="search-field__label">
+                    {currentLang === 'pt' ? 'Data de Regresso (Volta)' : currentLang === 'de' ? 'Rückfahrt-Datum' : currentLang === 'fr' ? 'Date de retour' : 'Return Date'}
+                  </span>
                   <input
                     type="date"
                     required
@@ -171,8 +197,10 @@ export default function Home() {
                     className="search-field__input"
                   />
                 </div>
-                <div className="search-field search-field--time">
-                  <span className="search-field__label">Return Time</span>
+                <div className="search-field search-field--time search-field--return-time">
+                  <span className="search-field__label">
+                    {currentLang === 'pt' ? 'Hora de Regresso' : currentLang === 'de' ? 'Rückfahrt-Uhrzeit' : currentLang === 'fr' ? 'Heure de retour' : 'Return Time'}
+                  </span>
                   <input
                     type="time"
                     required
@@ -186,15 +214,19 @@ export default function Home() {
 
             {/* PASSENGERS */}
             <div className="search-field search-field--pax">
-              <span className="search-field__label">Passengers</span>
+              <span className="search-field__label">
+                {currentLang === 'pt' ? 'Passageiros' : currentLang === 'de' ? 'Passagiere' : currentLang === 'fr' ? 'Passagers' : 'Passengers'}
+              </span>
               <select
                 value={passengers}
                 onChange={(e) => setPassengers(Number(e.target.value))}
-                className="search-field__input"
+                className="search-field__input search-field__input--pax"
               >
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                   <option key={n} value={n}>
-                    {n} {n === 1 ? '' : ''}
+                    {n} {n === 1 
+                      ? (currentLang === 'pt' ? 'Passageiro' : currentLang === 'de' ? 'Passagier' : currentLang === 'fr' ? 'Passager' : 'Passenger')
+                      : (currentLang === 'pt' ? 'Passageiros' : currentLang === 'de' ? 'Passagiere' : currentLang === 'fr' ? 'Passagers' : 'Passengers')}
                   </option>
                 ))}
               </select>
@@ -202,7 +234,7 @@ export default function Home() {
 
             {/* BOOK BUTTON WITH LIVE PRICE */}
             <button type="submit" className="home-search-btn home-book-btn">
-              <span>Book (€{estimatedPrice})</span>
+              <span>{currentLang === 'pt' ? 'Reservar' : currentLang === 'de' ? 'Buchen' : currentLang === 'fr' ? 'Réserver' : currentLang === 'es' ? 'Reservar' : 'Book'} (€{estimatedPrice})</span>
               <span aria-hidden="true">→</span>
             </button>
           </form>
@@ -220,8 +252,12 @@ export default function Home() {
               </svg>
             </span>
             <div>
-              <h3 className="feature-item__title">Secure Payments</h3>
-              <p className="feature-item__desc">Powered by Stripe</p>
+              <h3 className="feature-item__title">
+                {currentLang === 'pt' ? 'Pagamentos Seguros' : currentLang === 'de' ? 'Sichere Zahlungen' : currentLang === 'fr' ? 'Paiements Sécurisés' : 'Secure Payments'}
+              </h3>
+              <p className="feature-item__desc">
+                {currentLang === 'pt' ? 'Processado via Stripe' : currentLang === 'de' ? 'Über Stripe' : currentLang === 'fr' ? 'Propulsé par Stripe' : 'Powered by Stripe'}
+              </p>
             </div>
           </div>
 
@@ -232,8 +268,12 @@ export default function Home() {
               </svg>
             </span>
             <div>
-              <h3 className="feature-item__title">24/7 Support</h3>
-              <p className="feature-item__desc">We're here to help</p>
+              <h3 className="feature-item__title">
+                {currentLang === 'pt' ? 'Apoio 24/7' : currentLang === 'de' ? '24/7 Kundenservice' : currentLang === 'fr' ? 'Support 24/7' : '24/7 Support'}
+              </h3>
+              <p className="feature-item__desc">
+                {currentLang === 'pt' ? 'Sempre disponíveis para ajudar' : currentLang === 'de' ? 'Wir helfen gerne' : currentLang === 'fr' ? 'À votre écoute' : "We're here to help"}
+              </p>
             </div>
           </div>
 
@@ -244,8 +284,12 @@ export default function Home() {
               </svg>
             </span>
             <div>
-              <h3 className="feature-item__title">Top Rated Tours</h3>
-              <p className="feature-item__desc">5.0 from 1,000+ reviews</p>
+              <h3 className="feature-item__title">
+                {currentLang === 'pt' ? 'Passeios de Topo' : currentLang === 'de' ? 'Bestbewertete Touren' : currentLang === 'fr' ? 'Circuits Populaires' : 'Top Rated Tours'}
+              </h3>
+              <p className="feature-item__desc">
+                {currentLang === 'pt' ? '5.0 de mais de 1.000 avaliações' : currentLang === 'de' ? '5.0 aus 1.000+ Bewertungen' : currentLang === 'fr' ? '5.0 sur 1 000+ avis' : '5.0 from 1,000+ reviews'}
+              </p>
             </div>
           </div>
 
@@ -259,8 +303,12 @@ export default function Home() {
               </svg>
             </span>
             <div>
-              <h3 className="feature-item__title">Comfortable Transfers</h3>
-              <p className="feature-item__desc">Travel in style & safety</p>
+              <h3 className="feature-item__title">
+                {currentLang === 'pt' ? 'Transfers Confortáveis' : currentLang === 'de' ? 'Komfortable Transfers' : currentLang === 'fr' ? 'Transferts Confortables' : 'Comfortable Transfers'}
+              </h3>
+              <p className="feature-item__desc">
+                {currentLang === 'pt' ? 'Viagens seguras e com estilo' : currentLang === 'de' ? 'Stilvoll und sicher reisen' : currentLang === 'fr' ? 'Voyagez avec confort et sécurité' : 'Travel in style & safety'}
+              </p>
             </div>
           </div>
         </div>
@@ -270,11 +318,15 @@ export default function Home() {
       <section className="home-top-experiences container-constrained">
         <div className="section-head">
           <div>
-            <span className="section-head__tag">POPULAR TOURS</span>
-            <h2 className="section-head__title">Our Top Experiences</h2>
+            <span className="section-head__tag">
+              {currentLang === 'pt' ? 'PASSEIOS POPULARES' : currentLang === 'de' ? 'BELIEBTE TOUREN' : currentLang === 'fr' ? 'CIRCUITS POPULAIRES' : 'POPULAR TOURS'}
+            </span>
+            <h2 className="section-head__title">
+              {currentLang === 'pt' ? 'As Nossas Melhores Experiências' : currentLang === 'de' ? 'Unsere besten Erlebnisse' : currentLang === 'fr' ? 'Nos Meilleures Expériences' : 'Our Top Experiences'}
+            </h2>
           </div>
           <Link to="/tours" className="section-head__all-link">
-            View All Tours →
+            {currentLang === 'pt' ? 'Ver Todos os Passeios →' : currentLang === 'de' ? 'Alle Touren ansehen →' : currentLang === 'fr' ? 'Voir Tous les Circuits →' : 'View All Tours →'}
           </Link>
         </div>
 
