@@ -62,9 +62,6 @@ export default function Navbar() {
             </NavLink>
           ))}
         </div>
-        <div className="navbar-mobile-lang">
-          <LanguageSelector />
-        </div>
       </nav>
     </header>
   );
