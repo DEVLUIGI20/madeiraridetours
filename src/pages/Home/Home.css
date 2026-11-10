@@ -501,14 +501,40 @@
     padding: 12px;
     border-radius: 16px;
     gap: 8px;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .home-search-bar.home-search-bar--roundtrip {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+    padding: 12px !important;
+    gap: 8px !important;
+  }
+
+  .home-search-bar.home-search-bar--roundtrip .search-field {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    width: 100% !important;
+  }
+
+  .home-search-bar.home-search-bar--roundtrip .home-search-btn {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    width: 100% !important;
   }
 
   .search-field {
     flex: 1 1 100%;
-    padding: 10px 8px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
     background: #f8fafc;
     border-radius: 10px;
     border-bottom: none;
+    border-right: none;
     margin-bottom: 4px;
   }
 

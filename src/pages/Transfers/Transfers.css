@@ -533,8 +533,17 @@
 .adventure-media.mini {
   position: relative;
   width: 100%;
-  height: 105px;
+  height: 140px;
+  max-height: 140px;
   background: #e2e8f0;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.adventure-media.mini .img-placeholder-wrapper {
+  height: 100% !important;
+  max-height: 140px !important;
+  aspect-ratio: auto !important;
 }
 
 .adventure-badge {
@@ -607,6 +616,18 @@
   font-size: 0.72rem;
   color: #475569;
   line-height: 1.3;
+}
+
+.adventure-desc-text {
+  font-size: 0.78rem;
+  color: #475569;
+  line-height: 1.4;
+  margin: 0 0 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* View Itinerary Trigger Link in Card */
@@ -767,16 +788,17 @@
 .modal-close-btn {
   background: #e2e8f0;
   border: none;
-  font-size: 1.4rem;
   width: 32px;
   height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
   cursor: pointer;
   color: #475569;
   transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 .modal-close-btn:hover {
@@ -896,13 +918,28 @@
 }
 
 .modal-price-col {
-  font-size: 0.82rem;
-  color: #0f172a;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.modal-price-col strong {
+.modal-price-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.modal-price-row .pax-tag {
+  font-weight: 600;
+  color: #334155;
+}
+
+.modal-price-row .pax-val {
   color: #4f46e5;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  font-weight: 800;
 }
 
 .modal-select-cta {

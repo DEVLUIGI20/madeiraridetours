@@ -44,19 +44,22 @@ export default function Tours() {
 
   const getCategoryLabel = (cat) => {
     if (cat.id === 'all') {
-      return currentLang === 'pt' ? 'Todos os Passeios' : currentLang === 'de' ? 'Alle Touren' : currentLang === 'fr' ? 'Tous les Circuits' : currentLang === 'es' ? 'Todos los Tours' : 'All Tours';
+      return currentLang === 'pt' ? 'Todos' : currentLang === 'de' ? 'Alle' : currentLang === 'fr' ? 'Tous' : currentLang === 'es' ? 'Todos' : 'All Tours';
     }
-    if (cat.id === 'full-day') {
-      return currentLang === 'pt' ? 'Dia Inteiro' : currentLang === 'de' ? 'Ganztägig' : currentLang === 'fr' ? 'Journée Complète' : currentLang === 'es' ? 'Día Completo' : 'Full Day';
+    if (cat.id === 'nature') {
+      return currentLang === 'pt' ? 'Natureza' : currentLang === 'de' ? 'Natur' : currentLang === 'fr' ? 'Nature' : currentLang === 'es' ? 'Naturaleza' : 'Nature';
     }
-    if (cat.id === 'half-day') {
-      return currentLang === 'pt' ? 'Meio Dia' : currentLang === 'de' ? 'Halbtags' : currentLang === 'fr' ? 'Demi-journée' : currentLang === 'es' ? 'Medio Día' : 'Half Day';
+    if (cat.id === 'levada') {
+      return currentLang === 'pt' ? 'Levadas' : currentLang === 'de' ? 'Levada-Wanderungen' : currentLang === 'fr' ? 'Levadas' : currentLang === 'es' ? 'Levadas' : 'Levada Walks';
     }
-    if (cat.id === 'sunrise-sunset') {
-      return currentLang === 'pt' ? 'Nascer & Pôr do Sol' : currentLang === 'de' ? 'Sonnenaufgang & Sonnenuntergang' : currentLang === 'fr' ? 'Lever & Coucher de Soleil' : currentLang === 'es' ? 'Amanecer y Atardecer' : 'Sunrise & Sunset';
+    if (cat.id === 'adventure') {
+      return currentLang === 'pt' ? 'Aventura' : currentLang === 'de' ? 'Abenteuer' : currentLang === 'fr' ? 'Aventure' : currentLang === 'es' ? 'Aventura' : 'Adventure';
     }
-    if (cat.id === 'nature-levadas') {
-      return currentLang === 'pt' ? 'Natureza & Levadas' : currentLang === 'de' ? 'Natur & Levadas' : currentLang === 'fr' ? 'Nature & Levadas' : currentLang === 'es' ? 'Naturaleza y Levadas' : 'Nature & Levadas';
+    if (cat.id === 'sightseeing') {
+      return currentLang === 'pt' ? 'Panorâmicos' : currentLang === 'de' ? 'Sightseeing' : currentLang === 'fr' ? 'Panoramique' : currentLang === 'es' ? 'Panorámicos' : 'Sightseeing';
+    }
+    if (cat.id === 'luxury') {
+      return currentLang === 'pt' ? 'Exclusivos' : currentLang === 'de' ? 'Exklusiv' : currentLang === 'fr' ? 'Exclusif' : currentLang === 'es' ? 'Exclusivos' : 'Luxury';
     }
     return cat.label;
   };

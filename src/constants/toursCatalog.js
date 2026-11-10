@@ -11,8 +11,6 @@ export const TOUR_CATEGORIES = [
   { id: 'nature', label: 'Nature' },
   { id: 'levada', label: 'Levada Walks' },
   { id: 'adventure', label: 'Adventure' },
-  { id: 'sightseeing', label: 'Sightseeing' },
-  { id: 'luxury', label: 'Luxury' },
 ];
 
 export const TOURS_DATA = [

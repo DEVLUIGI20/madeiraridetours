@@ -119,3 +119,99 @@
   color: #64748b;
   font-size: 1rem;
 }
+
+/* ── Tours Grid — Desktop ── */
+.tours-grid-mockup {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .tours-grid-mockup {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .tours-grid-mockup {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* ── Mobile Optimization for Tours ── */
+@media (max-width: 640px) {
+  .tours-hero-banner {
+    min-height: 180px;
+    margin-bottom: 18px;
+  }
+
+  .tours-hero-content {
+    padding: 24px 16px;
+  }
+
+  .tours-controls-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .tours-categories-pills {
+    display: flex;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding: 4px 16px 8px;
+    margin: 0 -16px; /* Bleed to screen edges for seamless horizontal swiping */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 8px;
+  }
+
+  .tours-categories-pills::-webkit-scrollbar {
+    display: none;
+  }
+
+  .category-pill {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
+  .tours-sort-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: #ffffff;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    box-sizing: border-box;
+  }
+
+  .sort-label {
+    font-size: 0.84rem;
+    color: #64748b;
+  }
+
+  .sort-select {
+    font-size: 16px; /* Avoid iOS zoom */
+    min-height: 38px;
+    border: none;
+    background: transparent;
+    font-weight: 700;
+    color: #0f172a;
+    text-align: right;
+    direction: ltr;
+  }
+
+  .tours-grid-mockup {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+}
