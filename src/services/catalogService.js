@@ -148,16 +148,25 @@ export async function getAirportLocations() {
       const { data, error } = await supabase
         .from('transfer_destinations')
         .select('*')
-        .eq('active', true)
         .order('one_way_price', { ascending: true });
 
       if (!error && data && data.length > 0) {
+        // Helper to normalize regions from database (e.g. 'south-east' -> 'east', 'north-west'/'north-east' -> 'north')
+        const normalizeRegion = (r) => {
+          if (!r) return 'south-west';
+          if (r === 'south-east' || r === 'east') return 'east';
+          if (r === 'north-west' || r === 'north-east' || r === 'north') return 'north';
+          if (r === 'funchal') return 'funchal';
+          if (r === 'mountain') return 'mountain';
+          return 'south-west';
+        };
+
         // Map database columns to app schema
         const mapped = data.map((d) => ({
           id: d.id,
           name: d.name,
           subtitle: d.subtitle,
-          region: d.region || 'south-west',
+          region: normalizeRegion(d.region),
           oneWayPrice: Number(d.one_way_price),
           roundTripPrice: Number(d.round_trip_price),
           duration: d.duration || '~25 min',

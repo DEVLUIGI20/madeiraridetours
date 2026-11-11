@@ -3,6 +3,9 @@
  * Sends professional booking confirmation emails directly to customers.
  */
 
+import { MADEIRA_ADVENTURES } from '../constants/transfersCatalog';
+import { TOURS_DATA } from '../constants/toursCatalog';
+
 const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY || '';
 
 /**
@@ -24,6 +27,10 @@ export async function sendBookingConfirmationEmail(bookingDetails) {
     passengers,
     total_amount_eur,
     flight_number,
+    customer_phone,
+    payment_method,
+    service_id,
+    service_type,
   } = bookingDetails;
 
   if (!customer_email) {
@@ -36,6 +43,15 @@ export async function sendBookingConfirmationEmail(bookingDetails) {
     return { success: false, reason: 'missing_api_key' };
   }
   const apiKey = RESEND_API_KEY;
+
+  const isAirportBooking = service_id === 'airport-transfer' || 
+    service_type === 'transfer' && (!service_id || service_id.includes('airport')) || 
+    Boolean(flight_number);
+
+  // Find tour or adventure itinerary if available
+  const adventureObj = MADEIRA_ADVENTURES.find((a) => a.id === service_id || a.title === service_title);
+  const tourObj = TOURS_DATA.find((t) => t.id === service_id || t.title === service_title);
+  const matchedItinerary = adventureObj?.itinerary || tourObj?.itinerary || null;
 
   const htmlContent = `
     <!DOCTYPE html>
@@ -79,49 +95,87 @@ export async function sendBookingConfirmationEmail(bookingDetails) {
 
           <table class="grid-table">
             <tr>
+              <td class="label">Cliente:</td>
+              <td class="value">${customer_name}</td>
+            </tr>
+            <tr>
+              <td class="label">Email:</td>
+              <td class="value">${customer_email}</td>
+            </tr>
+            ${customer_phone ? `
+            <tr>
+              <td class="label">Telefone:</td>
+              <td class="value">${customer_phone}</td>
+            </tr>` : ''}
+            <tr>
               <td class="label">Serviço:</td>
               <td class="value">${service_title}</td>
             </tr>
             <tr>
-              <td class="label">Data:</td>
-              <td class="value">${date}</td>
+              <td class="label">Data de Ida:</td>
+              <td class="value"><strong>${date}</strong></td>
             </tr>
             <tr>
-              <td class="label">Hora:</td>
-              <td class="value">${time_slot}</td>
+              <td class="label">Hora de Recolha:</td>
+              <td class="value"><strong>${time_slot}</strong></td>
             </tr>
             ${trip_type === 'round-trip' && return_date ? `
             <tr>
-              <td class="label">Viagem:</td>
+              <td class="label">Tipo de Viagem:</td>
               <td class="value">Ida e Volta (Round Trip)</td>
             </tr>
             <tr>
-              <td class="label">Regresso:</td>
+              <td class="label">Data de Regresso:</td>
               <td class="value"><strong>${return_date}</strong> ${return_time ? `às ${return_time}` : ''}</td>
             </tr>` : ''}
             <tr>
-              <td class="label">Ponto de Encontro:</td>
+              <td class="label">Ponto de Recolha / Hotel:</td>
               <td class="value">${pickup_location}</td>
             </tr>
             <tr>
               <td class="label">Passageiros:</td>
-              <td class="value">${passengers}</td>
+              <td class="value">${passengers} ${passengers === 1 ? 'passageiro' : 'passageiros'}</td>
             </tr>
             ${flight_number ? `
             <tr>
               <td class="label">Número de Voo:</td>
-              <td class="value">${flight_number}</td>
+              <td class="value">✈️ ${flight_number}</td>
+            </tr>` : ''}
+            ${payment_method ? `
+            <tr>
+              <td class="label">Método de Pagamento:</td>
+              <td class="value">${payment_method === 'stripe_card' ? 'Cartão de Crédito / Débito' : payment_method}</td>
             </tr>` : ''}
             <tr>
-              <td class="label">Total:</td>
-              <td class="value" style="color: #4f46e5; font-size: 16px;">€${total_amount_eur}</td>
+              <td class="label">Valor Total:</td>
+              <td class="value" style="color: #4f46e5; font-size: 18px; font-weight: 800;">€${total_amount_eur}</td>
             </tr>
           </table>
 
+          ${matchedItinerary && matchedItinerary.length > 0 ? `
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 24px;">
+            <h4 style="margin: 0 0 12px; color: #0f172a; font-size: 15px; font-weight: 800;">📍 Itinerário Completo da Excursão:</h4>
+            <div style="margin: 0; padding: 0;">
+              ${matchedItinerary.map((step, idx) => `
+                <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                  <span style="background: #e0e7ff; color: #4338ca; font-weight: 800; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">${step.step || (idx + 1)}</span>
+                  <div>
+                    <strong style="color: #0f172a; font-size: 13px;">${step.titlePt || step.title}</strong>
+                    ${step.descPt || step.desc ? `<p style="margin: 2px 0 0; color: #64748b; font-size: 12px; line-height: 1.4;">${step.descPt || step.desc}</p>` : ''}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          ` : ''}
+
           <div class="instructions-box">
             <h4>Instruções do Motorista:</h4>
-            • <strong>Aeroporto (FNC):</strong> O motorista aguarda na área de chegadas com uma placa com o seu nome.<br>
-            • <strong>Hotel / Alojamento:</strong> Por favor aguarde na receção ou entrada 5 minutos antes da hora marcada.
+            ${isAirportBooking ? `
+            • <strong>No Aeroporto (FNC):</strong> O motorista aguarda na área de chegadas com uma placa com o seu nome. Monitorizamos o seu voo em tempo real.<br>
+            ` : ''}
+            • <strong>No Hotel / Morada de Recolha:</strong> Por favor aguarde na receção ou entrada principal 5 minutos antes da hora marcada.<br>
+            • Pode apresentar este comprovativo digital diretamente no telemóvel ao motorista.
           </div>
 
           <div style="text-align: center; margin-top: 20px;">

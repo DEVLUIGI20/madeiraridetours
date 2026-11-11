@@ -157,7 +157,7 @@ export default function DestinationDropdown({
               type="text"
               autoFocus
               className="dest-search-input"
-              placeholder="Search Airport, Funchal, Caniço..."
+              placeholder={allowAirport ? "Search Airport, Funchal, Caniço..." : "Search Funchal, Caniço, Santa Cruz..."}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onClick={(e) => e.stopPropagation()}

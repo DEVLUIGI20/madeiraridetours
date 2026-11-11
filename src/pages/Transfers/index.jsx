@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MADEIRA_ADVENTURES, AIRPORT_TRANSFER_LOCATIONS } from '../../constants/transfersCatalog';
+import { getAirportLocations } from '../../services/catalogService';
 import { useLanguage } from '../../hooks/useLanguage';
 import ImagePlaceholder from '../../components/common/ImagePlaceholder';
 import DestinationDropdown from '../../components/common/DestinationDropdown';
@@ -35,11 +36,26 @@ export default function Transfers() {
   const [date, setDate] = useState('');
   const [selectedTimeSlot, setSelectedTimeSlot] = useState('');
   const [groupSize, setGroupSize] = useState('4');
+  const [locations, setLocations] = useState(AIRPORT_TRANSFER_LOCATIONS);
 
+  useEffect(() => {
+    let isMounted = true;
+    getAirportLocations().then((liveLocations) => {
+      if (isMounted && liveLocations && liveLocations.length > 0) {
+        setLocations(liveLocations);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const pickupLoc = locations.find((l) => l.id === pickupId) || locations[0];
+
+  // Compute price: if an adventure is selected use its price, otherwise use the one‑way price of the chosen pickup location
   const currentPrice = selectedAdventure
     ? (groupSize === '4' ? selectedAdventure.price4 : selectedAdventure.price8)
-    : 0;
-  const pickupLoc = AIRPORT_TRANSFER_LOCATIONS.find((l) => l.id === pickupId) || AIRPORT_TRANSFER_LOCATIONS[0];
+    : (pickupLoc?.oneWayPrice || 30);
 
   const handleSelectAdventure = (adv) => {
     if (selectedAdventure?.id === adv.id) {
@@ -153,7 +169,8 @@ export default function Transfers() {
                       tripType="one-way"
                       onChange={(newId) => setPickupId(newId)}
                       label={currentLang === 'pt' ? 'Local de Recolha / Zona' : currentLang === 'de' ? 'Abholort / Zone' : currentLang === 'fr' ? 'Lieu de prise en charge' : 'Pick-up Location / Zone'}
-                      allowAirport={true}
+                      allowAirport={false}
+                      disabledId="airport"
                       showPrice={false}
                       showDuration={false}
                     />
@@ -236,7 +253,11 @@ export default function Transfers() {
                   {/* Highlights & Logistics */}
                   <div className="selected-adv-highlights">
                     <span className="highlights-label">{currentLang === 'pt' ? 'Logística de Recolha:' : 'Pick-up Logistics:'}</span>
-                    <p className="adv-pickup-desc">{selectedAdventure.pickupArea}</p>
+                    <p className="adv-pickup-desc">
+                      {currentLang === 'pt' 
+                        ? `Recolha direta no seu hotel ou alojamento em ${pickupLoc.name}` 
+                        : `Direct pick-up at your Hotel / Accommodation in ${pickupLoc.name}`}
+                    </p>
 
                     <div className="adv-itinerary-preview-row">
                       <span className="highlights-label" style={{ margin: 0 }}>{currentLang === 'pt' ? 'Itinerário:' : 'Full Itinerary:'}</span>

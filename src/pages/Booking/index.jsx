@@ -1,8 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useBooking } from '../../context/BookingContext';
 import { TOURS_DATA } from '../../constants/toursCatalog';
 import { MOUNTAIN_TRANSFERS_CATALOG, AIRPORT_TRANSFER_LOCATIONS, MADEIRA_ADVENTURES } from '../../constants/transfersCatalog';
+import { getAirportLocations } from '../../services/catalogService';
 import { PAYMENT_METHOD, SERVICE_TYPE } from '../../constants/booking';
 import { paymentService } from '../../services/paymentService';
 import { ROUTES } from '../../constants/index';
@@ -28,6 +29,19 @@ export default function Booking() {
   const priceParam = searchParams.get('price') || '';
 
   const { booking, markPendingPayment } = useBooking();
+  const [locations, setLocations] = useState(AIRPORT_TRANSFER_LOCATIONS);
+
+  useEffect(() => {
+    let isMounted = true;
+    getAirportLocations().then((liveLocations) => {
+      if (isMounted && liveLocations && liveLocations.length > 0) {
+        setLocations(liveLocations);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Find service & itinerary information
   const currentService = useMemo(() => {
@@ -51,9 +65,9 @@ export default function Booking() {
 
     // 1. Airport Transfer lookup
     if (serviceParam === 'airport-transfer' || fromParam.includes('Airport') || dropoffParam) {
-      const loc = AIRPORT_TRANSFER_LOCATIONS.find(
+      const loc = locations.find(
         (l) => l.name === dropoffParam || l.id === dropoffParam
-      ) || AIRPORT_TRANSFER_LOCATIONS[4]; // Default Funchal
+      ) || locations[0]; // Default Funchal
 
       const origin = fromParam || 'Madeira Airport (FNC)';
       const destination = dropoffParam || loc.name;
@@ -123,7 +137,7 @@ export default function Booking() {
       totalCalculatedPrice: defaultTour.price * (Number(paxParam) || 1),
       image: defaultTour.image,
     };
-  }, [serviceParam, fromParam, dropoffParam, tripTypeParam, priceParam, paxParam, pickupParam]);
+  }, [serviceParam, fromParam, dropoffParam, tripTypeParam, priceParam, paxParam, pickupParam, locations]);
 
   // Form State
   const [fullName, setFullName] = useState(booking.customer?.name || '');
@@ -232,7 +246,7 @@ export default function Booking() {
         time_slot: selectedTime,
         passengers,
         pickup_location: finalPickup,
-        flight_number: flightNumber || null,
+        flight_number: currentService.isAirportTransfer ? (flightNumber || null) : null,
         total_amount_eur: Number(totalPrice),
         payment_method: paymentMethod,
       };
@@ -411,7 +425,9 @@ export default function Booking() {
               {/* Optional Hotel / Specific Address or Flight Number */}
               <div className="form-group">
                 <label htmlFor="pickupAddress" className="form-label">
-                  Hotel / Specific Address
+                  {currentService.isAirportTransfer 
+                    ? 'Hotel / Destination Address' 
+                    : 'Hotel / Pick-up Address'}
                 </label>
                 <input
                   id="pickupAddress"
@@ -423,19 +439,22 @@ export default function Booking() {
                 />
               </div>
 
-              <div className="form-group">
-                <label htmlFor="flightNumber" className="form-label">
-                  Flight Number (Optional for airport pickup)
-                </label>
-                <input
-                  id="flightNumber"
-                  type="text"
-                  placeholder="e.g. TP1685 or FR382"
-                  className="form-input"
-                  value={flightNumber}
-                  onChange={(e) => setFlightNumber(e.target.value)}
-                />
-              </div>
+              {/* Flight Number: ONLY shown for Airport Transfers */}
+              {currentService.isAirportTransfer && (
+                <div className="form-group">
+                  <label htmlFor="flightNumber" className="form-label">
+                    Flight Number (Optional for airport arrival tracking)
+                  </label>
+                  <input
+                    id="flightNumber"
+                    type="text"
+                    placeholder="e.g. TP1685 or FR382"
+                    className="form-input"
+                    value={flightNumber}
+                    onChange={(e) => setFlightNumber(e.target.value)}
+                  />
+                </div>
+              )}
 
               {/* Payment Method Selector */}
               <div className="payment-method-section">

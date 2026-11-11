@@ -164,83 +164,37 @@
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.5);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    background: transparent;
     z-index: 9998;
-    animation: fadeIn 0.2s ease forwards;
   }
 
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  .dest-sheet-drag-handle,
+  .dest-mobile-header {
+    display: none !important;
   }
 
   .dest-dropdown-panel {
-    position: fixed;
-    top: auto;
-    bottom: 0;
+    position: absolute;
+    top: calc(100% + 8px);
+    bottom: auto;
     left: 0;
-    right: 0;
-    width: 100vw;
-    max-width: 100vw;
-    max-height: 85vh;
-    border-radius: 20px 20px 0 0;
-    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
-    border: none;
-    border-top: 1px solid #e2e8f0;
+    right: auto;
+    width: 100%;
+    min-width: 290px;
+    max-width: calc(100vw - 32px);
+    height: auto;
+    max-height: 340px;
+    border-radius: 14px;
+    box-shadow: 0 12px 36px -4px rgba(15, 23, 42, 0.22), 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+    border: 1px solid #cbd5e1;
     z-index: 9999;
     display: flex;
     flex-direction: column;
-    animation: slideUpSheet 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
-  @keyframes slideUpSheet {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-  }
-
-  .dest-sheet-drag-handle {
-    display: block;
-    width: 36px;
-    height: 4px;
-    background: #cbd5e1;
-    border-radius: 4px;
-    margin: 10px auto 4px;
-    flex-shrink: 0;
-  }
-
-  .dest-mobile-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 18px 10px;
-    border-bottom: 1px solid #f1f5f9;
-  }
-
-  .dest-mobile-title {
-    font-size: 0.95rem;
-    font-weight: 800;
-    color: #0f172a;
-    letter-spacing: -0.01em;
-  }
-
-  .dest-mobile-close-btn {
-    border: none;
-    background: #f1f5f9;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    color: #64748b;
-    cursor: pointer;
+    animation: popIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   .dest-search-bar {
-    padding: 12px 16px;
+    padding: 8px 12px;
   }
 
   .dest-search-input {
@@ -248,21 +202,24 @@
   }
 
   .dest-items-scroll {
-    max-height: 55vh;
-    padding: 8px 12px 24px;
+    flex: 1;
+    max-height: 280px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 6px 8px 12px;
   }
 
   .dest-option-item {
-    padding: 12px 14px;
-    min-height: 48px;
+    padding: 8px 10px;
+    min-height: 38px;
   }
 
   .dest-item-name {
-    font-size: 0.95rem;
+    font-size: 0.88rem;
   }
 
   .dest-item-price {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 }
 

@@ -55,6 +55,31 @@ export const paymentService = {
 
     // 2. Direct Resilient Record (Allows testing full booking flow even before Stripe keys are set up)
     try {
+      // Always store in sessionStorage as client fallback so voucher page has 100% complete details
+      try {
+        sessionStorage.setItem(`voucher_${booking.ref}`, JSON.stringify({
+          booking_ref: booking.ref,
+          customer_name: customer.name,
+          customer_email: customer.email,
+          customer_phone: customer.phone,
+          service_name: booking.service_title,
+          booking_date: booking.date,
+          booking_time: booking.time_slot,
+          return_date: booking.return_date || null,
+          return_time: booking.return_time || null,
+          trip_type: booking.trip_type || 'one-way',
+          passengers: booking.passengers || 1,
+          pickup_location: booking.pickup_location,
+          flight_number: booking.flight_number || null,
+          total_amount: booking.total_amount_eur,
+          payment_method: booking.payment_method || 'stripe_card',
+          service_id: booking.service_id,
+          service_type: booking.service_type,
+        }));
+      } catch (storageErr) {
+        console.warn('[paymentService] Failed to cache voucher locally:', storageErr);
+      }
+
       if (supabase) {
         // Save customer
         let customerId = null;
@@ -111,6 +136,10 @@ export const paymentService = {
             passengers: booking.passengers || 1,
             total_amount_eur: booking.total_amount_eur,
             flight_number: booking.flight_number,
+            customer_phone: customer.phone,
+            payment_method: booking.payment_method,
+            service_id: booking.service_id,
+            service_type: booking.service_type,
           });
         } catch (emailErr) {
           console.warn('[paymentService] Email trigger error:', emailErr);

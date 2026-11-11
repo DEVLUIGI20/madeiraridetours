@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { TOURS_DATA } from '../../constants/toursCatalog';
-import { AIRPORT_TRANSFER_LOCATIONS, calculateTransferPrice } from '../../constants/transfersCatalog';
+import { AIRPORT_TRANSFER_LOCATIONS } from '../../constants/transfersCatalog';
+import { getAirportLocations } from '../../services/catalogService';
 import { useLanguage } from '../../hooks/useLanguage';
 import TourCard from '../../components/common/TourCard';
 import ImagePlaceholder from '../../components/common/ImagePlaceholder';
@@ -26,16 +27,32 @@ export default function Home() {
   const [returnDate, setReturnDate] = useState('');
   const [returnTime, setReturnTime] = useState('14:00');
   const [passengers, setPassengers] = useState(1);
+  const [locations, setLocations] = useState(AIRPORT_TRANSFER_LOCATIONS);
+
+  useEffect(() => {
+    let isMounted = true;
+    getAirportLocations().then((liveLocations) => {
+      if (isMounted && liveLocations && liveLocations.length > 0) {
+        setLocations(liveLocations);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const featuredTours = TOURS_DATA.filter((t) => t.featured);
 
-  // Dynamic pricing calculation
-  const rateInfo = calculateTransferPrice(fromLoc, destLoc, tripType);
-  const estimatedPrice = rateInfo.price;
+  // Dynamic pricing calculation directly synced with Supabase live locations
+  const selectedLocation = locations.find((l) => l.id === destLoc) || locations[0];
+  const estimatedPrice = selectedLocation
+    ? (tripType === 'round-trip' ? selectedLocation.roundTripPrice : selectedLocation.oneWayPrice)
+    : 30;
+  const estimatedDuration = selectedLocation?.duration || '~25 min';
 
   const getLabel = (id) => {
     if (id === 'airport') return 'Madeira Airport (FNC)';
-    const found = AIRPORT_TRANSFER_LOCATIONS.find((l) => l.id === id);
+    const found = locations.find((l) => l.id === id);
     return found ? found.name : id;
   };
 
@@ -53,7 +70,7 @@ export default function Home() {
       time: pickupTime,
       pax: passengers.toString(),
       price: estimatedPrice.toString(),
-      duration: rateInfo.duration,
+      duration: estimatedDuration,
     });
 
     if (tripType === 'round-trip' && returnDate) {
