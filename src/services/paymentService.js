@@ -75,6 +75,7 @@ export const paymentService = {
           payment_method: booking.payment_method || 'stripe_card',
           service_id: booking.service_id,
           service_type: booking.service_type,
+          language: booking.language || 'en',
         }));
       } catch (storageErr) {
         console.warn('[paymentService] Failed to cache voucher locally:', storageErr);
@@ -140,6 +141,7 @@ export const paymentService = {
             payment_method: booking.payment_method,
             service_id: booking.service_id,
             service_type: booking.service_type,
+            language: booking.language || 'en',
           });
         } catch (emailErr) {
           console.warn('[paymentService] Email trigger error:', emailErr);

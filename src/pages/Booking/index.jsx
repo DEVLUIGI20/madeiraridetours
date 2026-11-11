@@ -8,12 +8,14 @@ import { PAYMENT_METHOD, SERVICE_TYPE } from '../../constants/booking';
 import { paymentService } from '../../services/paymentService';
 import { ROUTES } from '../../constants/index';
 import { sanitizeText, isValidEmail, isValidPhone } from '../../utils/security';
+import { useLanguage } from '../../hooks/useLanguage';
 import ImagePlaceholder from '../../components/common/ImagePlaceholder';
 import './Booking.css';
 
 export default function Booking() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { currentLang } = useLanguage();
 
   // URL query params
   const serviceParam = searchParams.get('service') || '';
@@ -249,6 +251,7 @@ export default function Booking() {
         flight_number: currentService.isAirportTransfer ? (flightNumber || null) : null,
         total_amount_eur: Number(totalPrice),
         payment_method: paymentMethod,
+        language: currentLang || 'en',
       };
 
       if (paymentMethod === PAYMENT_METHOD.PAYPAL) {

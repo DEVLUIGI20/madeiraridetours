@@ -31,6 +31,7 @@ export async function sendBookingConfirmationEmail(bookingDetails) {
     payment_method,
     service_id,
     service_type,
+    language = 'en',
   } = bookingDetails;
 
   if (!customer_email) {
@@ -48,6 +49,149 @@ export async function sendBookingConfirmationEmail(bookingDetails) {
     service_type === 'transfer' && (!service_id || service_id.includes('airport')) || 
     Boolean(flight_number);
 
+  // Internationalized texts
+  const lang = ['pt', 'en', 'de', 'fr', 'es'].includes(language) ? language : 'en';
+
+  const i18n = {
+    pt: {
+      sub: 'Confirmação de Reserva & Voucher Digital',
+      greeting: 'Olá',
+      thanks: 'Obrigado por escolher a <strong>Madeira Ride Tours</strong>! A sua reserva foi confirmada com sucesso.',
+      bookingRef: 'Referência de Reserva',
+      customer: 'Cliente:',
+      email: 'Email:',
+      phone: 'Telefone:',
+      service: 'Serviço:',
+      date: 'Data de Ida:',
+      time: 'Hora de Recolha:',
+      tripType: 'Tipo de Viagem:',
+      roundTripVal: 'Ida e Volta (Round Trip)',
+      returnDate: 'Data de Regresso:',
+      pickup: 'Ponto de Recolha / Hotel:',
+      pax: 'Passageiros:',
+      flight: 'Número de Voo:',
+      payment: 'Método de Pagamento:',
+      card: 'Cartão de Crédito / Débito',
+      total: 'Valor Total:',
+      itineraryTitle: '📍 Itinerário Completo da Excursão:',
+      instTitle: 'Instruções do Motorista:',
+      airportInst: '• <strong>No Aeroporto (FNC):</strong> O motorista aguarda na área de chegadas com uma placa com o seu nome. Monitorizamos o seu voo em tempo real.<br>',
+      hotelInst: '• <strong>No Hotel / Morada de Recolha:</strong> Por favor aguarde na receção ou entrada principal 5 minutos antes da hora marcada.<br>• Pode apresentar este comprovativo digital diretamente no telemóvel ao motorista.',
+      waBtn: 'Falar com o Motorista no WhatsApp',
+      footer: 'Madeira Ride Tours · Ilha da Madeira, Portugal<br>Contacto: info@madeiraridetours.com · +351 916 326 716',
+    },
+    en: {
+      sub: 'Booking Confirmation & Digital Voucher',
+      greeting: 'Hello',
+      thanks: 'Thank you for choosing <strong>Madeira Ride Tours</strong>! Your booking has been successfully confirmed.',
+      bookingRef: 'Booking Reference',
+      customer: 'Customer:',
+      email: 'Email:',
+      phone: 'Phone:',
+      service: 'Service:',
+      date: 'Departure Date:',
+      time: 'Pick-up Time:',
+      tripType: 'Trip Type:',
+      roundTripVal: 'Round Trip',
+      returnDate: 'Return Date:',
+      pickup: 'Pick-up Location / Hotel:',
+      pax: 'Passengers:',
+      flight: 'Flight Number:',
+      payment: 'Payment Method:',
+      card: 'Credit / Debit Card',
+      total: 'Total Amount:',
+      itineraryTitle: '📍 Full Tour Itinerary:',
+      instTitle: 'Driver Instructions:',
+      airportInst: '• <strong>At Madeira Airport (FNC):</strong> Your driver will be waiting in the arrival hall holding a name board. We track your flight in real-time.<br>',
+      hotelInst: '• <strong>At Hotel / Pick-up Address:</strong> Please be ready at reception or main entrance 5 minutes before scheduled time.<br>• You can show this digital voucher directly on your phone.',
+      waBtn: 'Contact Driver via WhatsApp',
+      footer: 'Madeira Ride Tours · Madeira Island, Portugal<br>Contact: info@madeiraridetours.com · +351 916 326 716',
+    },
+    de: {
+      sub: 'Buchungsbestätigung & Digitaler Voucher',
+      greeting: 'Hallo',
+      thanks: 'Vielen Dank, dass Sie sich für <strong>Madeira Ride Tours</strong> entschieden haben! Ihre Buchung wurde bestätigt.',
+      bookingRef: 'Buchungsreferenz',
+      customer: 'Kunde:',
+      email: 'E-Mail:',
+      phone: 'Telefon:',
+      service: 'Service:',
+      date: 'Hinfahrt-Datum:',
+      time: 'Abholzeit:',
+      tripType: 'Fahrtart:',
+      roundTripVal: 'Hin- und Rückfahrt',
+      returnDate: 'Rückfahrt-Datum:',
+      pickup: 'Abholort / Hotel:',
+      pax: 'Passagiere:',
+      flight: 'Flugnummer:',
+      payment: 'Zahlungsmethode:',
+      card: 'Kredit- / Debitkarte',
+      total: 'Gesamtbetrag:',
+      itineraryTitle: '📍 Vollständiger Reiseverlauf:',
+      instTitle: 'Fahrerhinweise:',
+      airportInst: '• <strong>Am Flughafen Madeira (FNC):</strong> Ihr Fahrer erwartet Sie in der Ankunftshalle mit einem Namensschild. Wir überwachen Ihren Flug live.<br>',
+      hotelInst: '• <strong>Am Hotel / Abholadresse:</strong> Bitte warten Sie 5 Minuten vor Abfahrt an der Rezeption oder am Haupteingang.<br>• Sie können diesen Gutschein direkt auf dem Handy vorzeigen.',
+      waBtn: 'Fahrer über WhatsApp kontaktieren',
+      footer: 'Madeira Ride Tours · Insel Madeira, Portugal<br>Kontakt: info@madeiraridetours.com · +351 916 326 716',
+    },
+    fr: {
+      sub: 'Confirmation de Réservation & Bon Numérique',
+      greeting: 'Bonjour',
+      thanks: 'Merci d’avoir choisi <strong>Madeira Ride Tours</strong> ! Votre réservation est confirmée avec succès.',
+      bookingRef: 'Référence de Réservation',
+      customer: 'Client :',
+      email: 'Email :',
+      phone: 'Téléphone :',
+      service: 'Service :',
+      date: 'Date de départ :',
+      time: 'Heure de prise en charge :',
+      tripType: 'Type de trajet :',
+      roundTripVal: 'Aller-retour',
+      returnDate: 'Date de retour :',
+      pickup: 'Lieu de prise en charge / Hôtel :',
+      pax: 'Passagers :',
+      flight: 'Numéro de vol :',
+      payment: 'Mode de paiement :',
+      card: 'Carte Bancaire',
+      total: 'Montant Total :',
+      itineraryTitle: '📍 Itinéraire Complet :',
+      instTitle: 'Consignes du Chauffeur :',
+      airportInst: '• <strong>À l’Aéroport de Madère (FNC) :</strong> Le chauffeur vous attendra dans le hall des arrivées avec une pancarte à votre nom. Nous suivons votre vol en direct.<br>',
+      hotelInst: '• <strong>À l’Hôtel / Adresse de départ :</strong> Merci de vous présenter à l’accueil 5 minutes avant l’heure prévue.<br>• Vous pouvez présenter ce bon directement sur votre smartphone.',
+      waBtn: 'Contacter le Chauffeur sur WhatsApp',
+      footer: 'Madeira Ride Tours · Île de Madère, Portugal<br>Contact : info@madeiraridetours.com · +351 916 326 716',
+    },
+    es: {
+      sub: 'Confirmación de Reserva y Voucher Digital',
+      greeting: 'Hola',
+      thanks: '¡Gracias por elegir <strong>Madeira Ride Tours</strong>! Su reserva ha sido confirmada con éxito.',
+      bookingRef: 'Referencia de Reserva',
+      customer: 'Cliente:',
+      email: 'Correo Electrónico:',
+      phone: 'Teléfono:',
+      service: 'Servicio:',
+      date: 'Fecha de Ida:',
+      time: 'Hora de Recogida:',
+      tripType: 'Tipo de Viaje:',
+      roundTripVal: 'Ida y Vuelta',
+      returnDate: 'Fecha de Regreso:',
+      pickup: 'Lugar de Recogida / Hotel:',
+      pax: 'Pasajeros:',
+      flight: 'Número de Vuelo:',
+      payment: 'Método de Pago:',
+      card: 'Tarjeta de Crédito / Débito',
+      total: 'Importe Total:',
+      itineraryTitle: '📍 Itinerario Completo:',
+      instTitle: 'Instrucciones del Conductor:',
+      airportInst: '• <strong>En el Aeropuerto (FNC):</strong> El conductor le esperará en llegadas con un cartel con su nombre. Seguimos su vuelo en tiempo real.<br>',
+      hotelInst: '• <strong>En el Hotel / Dirección de Recogida:</strong> Por favor espere en recepción 5 minutos antes de la hora prevista.<br>• Puede mostrar este voucher digital en su teléfono móvil.',
+      waBtn: 'Contactar al Conductor por WhatsApp',
+      footer: 'Madeira Ride Tours · Isla de Madeira, Portugal<br>Contacto: info@madeiraridetours.com · +351 916 326 716',
+    },
+  };
+
+  const t = i18n[lang] || i18n.en;
+
   // Find tour or adventure itinerary if available
   const adventureObj = MADEIRA_ADVENTURES.find((a) => a.id === service_id || a.title === service_title);
   const tourObj = TOURS_DATA.find((t) => t.id === service_id || t.title === service_title);
@@ -55,7 +199,7 @@ export async function sendBookingConfirmationEmail(bookingDetails) {
 
   const htmlContent = `
     <!DOCTYPE html>
-    <html lang="pt">
+    <html lang="${lang}">
     <head>
       <meta charset="utf-8">
       <style>
@@ -82,112 +226,112 @@ export async function sendBookingConfirmationEmail(bookingDetails) {
       <div class="email-card">
         <div class="email-header">
           <h1>Madeira Ride Tours</h1>
-          <p>Confirmação de Reserva & Voucher Digital</p>
+          <p>${t.sub}</p>
         </div>
         <div class="email-body">
-          <p style="font-size: 16px; margin-top: 0;">Olá <strong>${customer_name}</strong>,</p>
-          <p style="color: #475569; font-size: 14px; line-height: 1.5;">Obrigado por escolher a <strong>Madeira Ride Tours</strong>! A sua reserva foi confirmada com sucesso.</p>
+          <p style="font-size: 16px; margin-top: 0;">${t.greeting} <strong>${customer_name}</strong>,</p>
+          <p style="color: #475569; font-size: 14px; line-height: 1.5;">${t.thanks}</p>
           
           <div class="ref-box">
-            <span>Referência de Reserva</span>
+            <span>${t.bookingRef}</span>
             <strong>${ref}</strong>
           </div>
 
           <table class="grid-table">
             <tr>
-              <td class="label">Cliente:</td>
+              <td class="label">${t.customer}</td>
               <td class="value">${customer_name}</td>
             </tr>
             <tr>
-              <td class="label">Email:</td>
+              <td class="label">${t.email}</td>
               <td class="value">${customer_email}</td>
             </tr>
             ${customer_phone ? `
             <tr>
-              <td class="label">Telefone:</td>
+              <td class="label">${t.phone}</td>
               <td class="value">${customer_phone}</td>
             </tr>` : ''}
             <tr>
-              <td class="label">Serviço:</td>
-              <td class="value">${service_title}</td>
+              <td class="label">${t.service}</td>
+              <td class="value">${(lang === 'pt' && adventureObj?.titlePt) ? adventureObj.titlePt : service_title}</td>
             </tr>
             <tr>
-              <td class="label">Data de Ida:</td>
+              <td class="label">${t.date}</td>
               <td class="value"><strong>${date}</strong></td>
             </tr>
             <tr>
-              <td class="label">Hora de Recolha:</td>
+              <td class="label">${t.time}</td>
               <td class="value"><strong>${time_slot}</strong></td>
             </tr>
             ${trip_type === 'round-trip' && return_date ? `
             <tr>
-              <td class="label">Tipo de Viagem:</td>
-              <td class="value">Ida e Volta (Round Trip)</td>
+              <td class="label">${t.tripType}</td>
+              <td class="value">${t.roundTripVal}</td>
             </tr>
             <tr>
-              <td class="label">Data de Regresso:</td>
-              <td class="value"><strong>${return_date}</strong> ${return_time ? `às ${return_time}` : ''}</td>
+              <td class="label">${t.returnDate}</td>
+              <td class="value"><strong>${return_date}</strong> ${return_time ? `(${return_time})` : ''}</td>
             </tr>` : ''}
             <tr>
-              <td class="label">Ponto de Recolha / Hotel:</td>
+              <td class="label">${t.pickup}</td>
               <td class="value">${pickup_location}</td>
             </tr>
             <tr>
-              <td class="label">Passageiros:</td>
-              <td class="value">${passengers} ${passengers === 1 ? 'passageiro' : 'passageiros'}</td>
+              <td class="label">${t.pax}</td>
+              <td class="value">${passengers}</td>
             </tr>
             ${flight_number ? `
             <tr>
-              <td class="label">Número de Voo:</td>
+              <td class="label">${t.flight}</td>
               <td class="value">✈️ ${flight_number}</td>
             </tr>` : ''}
             ${payment_method ? `
             <tr>
-              <td class="label">Método de Pagamento:</td>
-              <td class="value">${payment_method === 'stripe_card' ? 'Cartão de Crédito / Débito' : payment_method}</td>
+              <td class="label">${t.payment}</td>
+              <td class="value">${payment_method === 'stripe_card' ? t.card : payment_method}</td>
             </tr>` : ''}
             <tr>
-              <td class="label">Valor Total:</td>
+              <td class="label">${t.total}</td>
               <td class="value" style="color: #4f46e5; font-size: 18px; font-weight: 800;">€${total_amount_eur}</td>
             </tr>
           </table>
 
           ${matchedItinerary && matchedItinerary.length > 0 ? `
           <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 24px;">
-            <h4 style="margin: 0 0 12px; color: #0f172a; font-size: 15px; font-weight: 800;">📍 Itinerário Completo da Excursão:</h4>
+            <h4 style="margin: 0 0 12px; color: #0f172a; font-size: 15px; font-weight: 800;">${t.itineraryTitle}</h4>
             <div style="margin: 0; padding: 0;">
-              ${matchedItinerary.map((step, idx) => `
+              ${matchedItinerary.map((step, idx) => {
+                const titleStr = (lang === 'pt' && step.titlePt) ? step.titlePt : step.title;
+                const descStr = (lang === 'pt' && step.descPt) ? step.descPt : step.desc;
+                return `
                 <div style="display: flex; gap: 12px; margin-bottom: 12px;">
                   <span style="background: #e0e7ff; color: #4338ca; font-weight: 800; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">${step.step || (idx + 1)}</span>
                   <div>
-                    <strong style="color: #0f172a; font-size: 13px;">${step.titlePt || step.title}</strong>
-                    ${step.descPt || step.desc ? `<p style="margin: 2px 0 0; color: #64748b; font-size: 12px; line-height: 1.4;">${step.descPt || step.desc}</p>` : ''}
+                    <strong style="color: #0f172a; font-size: 13px;">${titleStr}</strong>
+                    ${descStr ? `<p style="margin: 2px 0 0; color: #64748b; font-size: 12px; line-height: 1.4;">${descStr}</p>` : ''}
                   </div>
                 </div>
-              `).join('')}
+              `;
+              }).join('')}
             </div>
           </div>
           ` : ''}
 
           <div class="instructions-box">
-            <h4>Instruções do Motorista:</h4>
-            ${isAirportBooking ? `
-            • <strong>No Aeroporto (FNC):</strong> O motorista aguarda na área de chegadas com uma placa com o seu nome. Monitorizamos o seu voo em tempo real.<br>
-            ` : ''}
-            • <strong>No Hotel / Morada de Recolha:</strong> Por favor aguarde na receção ou entrada principal 5 minutos antes da hora marcada.<br>
-            • Pode apresentar este comprovativo digital diretamente no telemóvel ao motorista.
+            <h4>${t.instTitle}</h4>
+            ${isAirportBooking ? t.airportInst : ''}
+            ${t.hotelInst}
           </div>
 
           <div style="text-align: center; margin-top: 20px;">
-            <a href="https://wa.me/351916326716?text=Ola%20tenho%20uma%20duvida%20sobre%20a%20reserva%20${ref}" class="btn-whatsapp">
-              Falar com o Motorista no WhatsApp
+            <a href="https://wa.me/351916326716?text=${encodeURIComponent(ref)}" class="btn-whatsapp">
+              ${t.waBtn}
             </a>
           </div>
         </div>
 
         <div class="email-footer">
-          Madeira Ride Tours · Ilha da Madeira, Portugal<br>
-          Contacto: info@madeiraridetours.com · +351 916 326 716
+          ${t.footer}
         </div>
       </div>
     </body>
