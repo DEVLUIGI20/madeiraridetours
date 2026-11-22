@@ -61,7 +61,15 @@ export default function BookingSuccess() {
   const serviceName = booking?.service_name || 'Transfer Privado na Madeira';
   const bookingDate = booking?.booking_date || 'Data confirmada';
   const bookingTime = booking?.booking_time || '10:00';
-  const pickup = booking?.pickup_location || 'Aeroporto da Madeira (FNC) / Hotel';
+  const bookingLang = booking?.language || currentLang || 'en';
+
+  // Sanitize pickup string: remove unwanted parenthesis leftovers or nested brackets
+  const rawPickup = booking?.pickup_location || '';
+  const cleanPickup = rawPickup
+    .replace(/\s*\((Anywhere in Madeira|Onde desejar)[^)]*\)*\s*\)?/gi, '')
+    .replace(/\)+$/, '')
+    .trim();
+  const pickup = cleanPickup || (bookingLang === 'pt' ? 'Hotel / Alojamento do Cliente' : 'Customer Hotel / Accommodation');
   const totalAmount = booking?.total_amount ? `€${booking.total_amount}` : 'Confirmado';
   const passengers = booking?.passengers || 1;
   const flightNumber = booking?.flight_number;
@@ -71,18 +79,17 @@ export default function BookingSuccess() {
   const isRoundTrip = tripType === 'round-trip' || !!returnDate;
   const paymentMethod = booking?.payment_method || 'stripe_card';
   const serviceId = booking?.service_id || '';
-  const bookingLang = booking?.language || currentLang || 'en';
 
   usePageTitle(
     bookingLang === 'pt'
       ? 'Reserva Confirmada — Voucher Digital'
       : bookingLang === 'de'
-      ? 'Buchung Bestätigt — Digitaler Voucher'
-      : bookingLang === 'fr'
-      ? 'Réservation Confirmée — Bon Numérique'
-      : bookingLang === 'es'
-      ? 'Reserva Confirmada — Voucher Digital'
-      : 'Booking Confirmed — Digital Voucher',
+        ? 'Buchung Bestätigt — Digitaler Voucher'
+        : bookingLang === 'fr'
+          ? 'Réservation Confirmée — Bon Numérique'
+          : bookingLang === 'es'
+            ? 'Reserva Confirmada — Voucher Digital'
+            : 'Booking Confirmed — Digital Voucher',
     'Madeira Ride Tours Voucher'
   );
 
@@ -258,12 +265,51 @@ export default function BookingSuccess() {
 
   // Match adventure or tour to get the full itinerary
   const matchedAdventure = MADEIRA_ADVENTURES.find((a) => a.id === serviceId || a.title === serviceName || a.titlePt === serviceName);
-  const matchedTour = TOURS_DATA.find((t) => t.id === serviceId || t.title === serviceName);
-  const itineraryStops = matchedAdventure?.itinerary || matchedTour?.itinerary || null;
+  const matchedTour = TOURS_DATA.find((t) => t.id === serviceId || t.title === serviceName || t.titleEn === serviceName);
+  
+  // Resolve itinerary: from tour/adventure, or generate complete step-by-step itinerary for transfers
+  let itineraryStops = matchedAdventure?.itinerary || matchedTour?.itinerary || null;
 
-  const localizedServiceName = (bookingLang === 'pt' && matchedAdventure?.titlePt) 
-    ? matchedAdventure.titlePt 
-    : serviceName;
+  if (!itineraryStops || itineraryStops.length === 0) {
+    if (isAirportBooking) {
+      itineraryStops = bookingLang === 'pt' ? [
+        { step: 1, title: `Recolha: ${pickup}`, desc: flightNumber ? `Motorista com placa identificativa na área de chegadas. Voo monitorizado: ${flightNumber}.` : `Ponto de encontro e recolha direta à hora combinada.` },
+        { step: 2, title: `Viagem Direta em Viatura Privada`, desc: `Trajeto confortável e seguro em viatura com ar condicionado e assistência de bagagem.` },
+        { step: 3, title: `Chegada ao Destino: ${serviceName.replace(/Airport Transfer\s*[—–-]\s*/i, '').replace(/Transfer de Aeroporto\s*[—–-]\s*/i, '') || 'Hotel / Alojamento'}`, desc: `Drop-off direto na entrada do hotel ou morada de alojamento solicitada.` },
+        ...(isRoundTrip ? [{ step: 4, title: `Viagem de Regresso (Volta)`, desc: returnDate ? `Recolha de regresso agendada para ${returnDate} às ${returnTime || 'hora combinada'}.` : `Regresso combinado de acordo com a sua preferência.` }] : [])
+      ] : [
+        { step: 1, title: `Pick-up: ${pickup}`, desc: flightNumber ? `Chauffeur with name sign at arrivals hall. Flight tracked: ${flightNumber}.` : `Meeting point and direct pick-up at scheduled time.` },
+        { step: 2, title: `Direct Ride in Private Vehicle`, desc: `Comfortable journey with air conditioning and full luggage assistance.` },
+        { step: 3, title: `Drop-off: ${serviceName.replace(/Airport Transfer\s*[—–-]\s*/i, '').replace(/Transfer de Aeroporto\s*[—–-]\s*/i, '') || 'Hotel / Accommodation'}`, desc: `Direct arrival at your accommodation main entrance.` },
+        ...(isRoundTrip ? [{ step: 4, title: `Return Journey`, desc: returnDate ? `Return transfer scheduled for ${returnDate} at ${returnTime || 'agreed time'}.` : `Return ride arranged at your convenience.` }] : [])
+      ];
+    } else {
+      itineraryStops = bookingLang === 'pt' ? [
+        { step: 1, title: `Recolha: ${pickup}`, desc: `Recolha direta no seu alojamento à hora marcada.` },
+        { step: 2, title: `Transporte Privado Dedicado`, desc: `Percurso panorâmico direto com motorista local experiente.` },
+        { step: 3, title: `Chegada ao Ponto de Destino`, desc: `Desembarque com todo o conforto e assistência.` },
+        ...(isRoundTrip ? [{ step: 4, title: `Regresso Garantido`, desc: `Viagem de volta combinada à sua hora de preferência.` }] : [])
+      ] : [
+        { step: 1, title: `Pick-up: ${pickup}`, desc: `Direct pick-up at your accommodation at scheduled time.` },
+        { step: 2, title: `Dedicated Private Transfer`, desc: `Direct scenic ride with experienced local driver.` },
+        { step: 3, title: `Arrival at Destination`, desc: `Drop-off with luggage assistance and convenience.` },
+        ...(isRoundTrip ? [{ step: 4, title: `Guaranteed Return`, desc: `Return journey scheduled at your preferred time.` }] : [])
+      ];
+    }
+  }
+
+  // Resolve localized service title properly for both Adventures and Tours across all languages
+  let localizedServiceName = serviceName;
+  if (matchedTour) {
+    if (bookingLang === 'pt') localizedServiceName = matchedTour.title;
+    else if (bookingLang === 'de') localizedServiceName = matchedTour.titleDe || matchedTour.titleEn || matchedTour.title;
+    else if (bookingLang === 'fr') localizedServiceName = matchedTour.titleFr || matchedTour.titleEn || matchedTour.title;
+    else if (bookingLang === 'es') localizedServiceName = matchedTour.titleEs || matchedTour.titleEn || matchedTour.title;
+    else localizedServiceName = matchedTour.titleEn || matchedTour.title;
+  } else if (matchedAdventure) {
+    if (bookingLang === 'pt') localizedServiceName = matchedAdventure.titlePt || matchedAdventure.title;
+    else localizedServiceName = matchedAdventure.title;
+  }
 
   const voucherWhatsAppMsg = makeWhatsAppUrl(
     `Olá! Acabei de efetuar a reserva ${bookingRef} para ${localizedServiceName} no dia ${bookingDate} às ${bookingTime}${isRoundTrip && returnDate ? ` com regresso a ${returnDate}` : ''}.`
@@ -276,7 +322,7 @@ export default function BookingSuccess() {
   return (
     <div className="booking-success-page">
       <div className="success-container">
-        
+
         {/* Top Success Banner */}
         <section className="success-banner">
           <div className="success-icon-badge" aria-hidden="true">✓</div>
@@ -322,7 +368,7 @@ export default function BookingSuccess() {
               </div>
               <div className="voucher-item">
                 <span className="voucher-item-label">{vT.contact}</span>
-                <span className="voucher-item-value">{customerEmail}{customerPhone ? ` · ${customerPhone}` : ''}</span>
+                <span className="voucher-item-value">{customerPhone ? `${customerPhone} · ${customerEmail}` : customerEmail}</span>
               </div>
               <div className="voucher-item">
                 <span className="voucher-item-label">{vT.depDate}</span>
@@ -379,8 +425,26 @@ export default function BookingSuccess() {
                 <div className="voucher-itinerary-timeline">
                   {itineraryStops.map((item, idx) => {
                     const stepNum = item.step || (idx + 1);
-                    const stepTitle = (bookingLang === 'pt' && item.titlePt) ? item.titlePt : item.title;
-                    const stepDesc = (bookingLang === 'pt' && item.descPt) ? item.descPt : item.desc;
+                    // Robust multilingual resolution: specific lang -> English -> Portuguese
+                    const langSuffix = bookingLang === 'pt' ? 'Pt' : bookingLang === 'de' ? 'De' : bookingLang === 'fr' ? 'Fr' : bookingLang === 'es' ? 'Es' : 'En';
+                    let stepTitle = item[`title${langSuffix}`] || (bookingLang === 'pt' ? (item.titlePt || item.title) : (item.titleEn || item.title));
+                    let stepDesc = item[`desc${langSuffix}`] || (bookingLang === 'pt' ? (item.descPt || item.desc) : (item.descEn || item.desc));
+
+                    // If it is the first step (pick-up) and the customer provided a pickup address, display their actual address!
+                    if (idx === 0 && pickup && pickup.trim()) {
+                      const pickupLabel = bookingLang === 'pt' ? 'Recolha' : bookingLang === 'de' ? 'Abholung' : bookingLang === 'fr' ? 'Prise en charge' : bookingLang === 'es' ? 'Recogida' : 'Pick-up';
+                      stepTitle = `${pickupLabel}: ${pickup}`;
+                      stepDesc = bookingLang === 'pt'
+                        ? `Recolha direta no seu alojamento (${pickup}) à hora combinada.`
+                        : bookingLang === 'de'
+                          ? `Direkte Abholung an Ihrer Unterkunft (${pickup}) zur vereinbarten Zeit.`
+                          : bookingLang === 'fr'
+                            ? `Prise en charge directe à votre hébergement (${pickup}) à l'heure convenue.`
+                            : bookingLang === 'es'
+                              ? `Recogida directa en su alojamiento (${pickup}) a la hora acordada.`
+                              : `Direct pick-up from your accommodation (${pickup}) at the scheduled time.`;
+                    }
+
                     return (
                       <div key={idx} className="voucher-itinerary-step">
                         <span className="voucher-itinerary-num">{stepNum}</span>

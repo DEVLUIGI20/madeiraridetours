@@ -24,6 +24,46 @@ const cache = {
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 /**
+ * Multilingual fields that exist in the static catalog but not in Supabase.
+ * When Supabase returns a tour, we merge these fields from TOURS_DATA so that
+ * language switching works for all languages on every page.
+ */
+const I18N_FIELDS = [
+  'titleEn', 'titleDe', 'titleFr', 'titleEs',
+  'subtitleEn', 'subtitleDe', 'subtitleFr', 'subtitleEs',
+  'overview', 'overviewEn',
+  'highlights', 'highlightsEn', 'highlightsDe', 'highlightsFr', 'highlightsEs',
+  'itinerary', 'includes',
+];
+
+/**
+ * Mapping between different ID variations in Supabase vs static catalog.
+ */
+const ID_ALIASES = {
+  'sunrise-pico-do-areeiro': 'sunrise-pico-areiro',
+  'sunset-pico-do-areeiro': 'sunset-pico-areiro',
+  'pr9-levada-caldeirao-verde': 'pr9-caldeirao-verde',
+};
+
+/**
+ * Merges multilingual fields from the static catalog into a Supabase tour row.
+ * Supabase fields (title, subtitle, price4, price8, active, etc.) take precedence.
+ * Notice: if subtitle is empty or updated in Supabase, we honor Supabase and DO NOT overwrite it.
+ */
+function mergeI18n(supabaseTour) {
+  const canonicalId = ID_ALIASES[supabaseTour.id] || supabaseTour.id;
+  const staticTour = TOURS_DATA.find((t) => t.id === canonicalId || t.id === supabaseTour.id);
+  if (!staticTour) return supabaseTour;
+  const merged = { ...supabaseTour };
+  for (const field of I18N_FIELDS) {
+    if (merged[field] === undefined || merged[field] === null) {
+      merged[field] = staticTour[field];
+    }
+  }
+  return merged;
+}
+
+/**
  * Fetch all available tours with local fallback
  * @returns {Promise<Array>}
  */
@@ -42,9 +82,11 @@ export async function getTours({ forceRefresh = false } = {}) {
         .order('id', { ascending: true });
 
       if (!error && data && data.length > 0) {
-        cache.tours = data;
+        // Merge static i18n fields so language switching works on all pages
+        const merged = data.map(mergeI18n);
+        cache.tours = merged;
         cache.lastFetched = now;
-        return data;
+        return merged;
       }
     }
   } catch (err) {

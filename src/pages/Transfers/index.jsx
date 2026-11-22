@@ -332,10 +332,51 @@ export default function Transfers() {
             <div className="adventures-grid">
               {MADEIRA_ADVENTURES.map((adv) => {
                 const isSelected = selectedAdventure?.id === adv.id;
-                const advTitle = currentLang === 'pt' && adv.titlePt ? adv.titlePt : adv.title;
-                const advBadge = currentLang === 'pt' && adv.badgePt ? adv.badgePt : adv.badge;
-                const advOverview = currentLang === 'pt' && adv.overviewPt ? adv.overviewPt : adv.overview;
-                const advPickup = currentLang === 'pt' && adv.pickupTimePt ? adv.pickupTimePt : adv.pickupTime;
+                const langSuffix = currentLang.charAt(0).toUpperCase() + currentLang.slice(1);
+                const advTitle = (currentLang !== 'en' && adv[`title${langSuffix}`]) ? adv[`title${langSuffix}`] : (adv.titlePt && currentLang === 'pt' ? adv.titlePt : adv.title);
+                const advBadge = (currentLang !== 'en' && adv[`badge${langSuffix}`]) ? adv[`badge${langSuffix}`] : (adv.badgePt && currentLang === 'pt' ? adv.badgePt : adv.badge);
+                const advOverview = (currentLang !== 'en' && adv[`overview${langSuffix}`]) ? adv[`overview${langSuffix}`] : (adv.overviewPt && currentLang === 'pt' ? adv.overviewPt : adv.overview);
+                const advPickup = (currentLang !== 'en' && adv[`pickupTime${langSuffix}`]) ? adv[`pickupTime${langSuffix}`] : (adv.pickupTimePt && currentLang === 'pt' ? adv.pickupTimePt : adv.pickupTime);
+
+                const hotelPickupLabel = {
+                  pt: 'Recolha no Hotel',
+                  de: 'Hotel-Abholung',
+                  fr: 'Prise en charge hôtel',
+                  es: 'Recogida en el Hotel',
+                  en: 'Hotel Pick-up'
+                }[currentLang] || 'Hotel Pick-up';
+
+                const itineraryLabel = {
+                  pt: `Ver Itinerário (${adv.itinerary.length} paragens)`,
+                  de: `Reiseverlauf ansehen (${adv.itinerary.length} Stopps)`,
+                  fr: `Voir l'itinéraire (${adv.itinerary.length} arrêts)`,
+                  es: `Ver Itinerario (${adv.itinerary.length} paradas)`,
+                  en: `View Full Itinerary (${adv.itinerary.length} stops)`
+                }[currentLang] || `View Full Itinerary (${adv.itinerary.length} stops)`;
+
+                const passengersLabel = {
+                  pt: 'Passageiros',
+                  de: 'Passagiere',
+                  fr: 'Passagers',
+                  es: 'Pasajeros',
+                  en: 'Passengers'
+                }[currentLang] || 'Passengers';
+
+                const selectedLabel = {
+                  pt: 'Selecionado ✓',
+                  de: 'Ausgewählt ✓',
+                  fr: 'Sélectionné ✓',
+                  es: 'Seleccionado ✓',
+                  en: 'Selected ✓'
+                }[currentLang] || 'Selected ✓';
+
+                const bookLabel = {
+                  pt: 'Reservar',
+                  de: 'Buchen',
+                  fr: 'Réserver',
+                  es: 'Reservar',
+                  en: 'Book'
+                }[currentLang] || 'Book';
 
                 return (
                   <article
@@ -350,7 +391,7 @@ export default function Transfers() {
                       />
                       <span className="adventure-badge">{advBadge}</span>
                       {isSelected && (
-                        <span className="selected-tag">{currentLang === 'pt' ? 'Selecionado' : 'Selected'}</span>
+                        <span className="selected-tag">{selectedLabel}</span>
                       )}
                     </div>
 
@@ -362,7 +403,7 @@ export default function Transfers() {
                           <span className="icon">🕒</span> {advPickup}
                         </span>
                         <span className="logistics-item">
-                          <span className="icon">📍</span> {currentLang === 'pt' ? 'Recolha no Hotel' : 'Hotel Pick-up'}
+                          <span className="icon">📍</span> {hotelPickupLabel}
                         </span>
                       </div>
 
@@ -375,18 +416,18 @@ export default function Transfers() {
                           onClick={() => setModalAdventure(adv)}
                         >
                           <span className="icon">🗺️</span>
-                          <span>{currentLang === 'pt' ? `Ver Itinerário (${adv.itinerary.length} paragens)` : `View Full Itinerary (${adv.itinerary.length} stops)`}</span>
+                          <span>{itineraryLabel}</span>
                         </button>
                       </div>
 
                       <div className="adventure-footer mini">
                         <div className="adventure-pricing">
                           <div className="price-line">
-                            <span className="pax">1–4 {currentLang === 'pt' ? 'Passageiros' : 'Passengers'}</span>
+                            <span className="pax">1–4 {passengersLabel}</span>
                             <strong className="amt">{adv.price4}€</strong>
                           </div>
                           <div className="price-line">
-                            <span className="pax">5–8 {currentLang === 'pt' ? 'Passageiros' : 'Passengers'}</span>
+                            <span className="pax">5–8 {passengersLabel}</span>
                             <strong className="amt">{adv.price8}€</strong>
                           </div>
                         </div>
@@ -397,9 +438,7 @@ export default function Transfers() {
                           onClick={() => handleSelectAdventure(adv)}
                           title={isSelected ? 'Click to unselect / Desselecionar' : 'Click to select / Reservar'}
                         >
-                          {isSelected 
-                            ? (currentLang === 'pt' ? 'Selecionado ✓' : 'Selected ✓') 
-                            : (currentLang === 'pt' ? 'Reservar' : 'Book')}
+                          {isSelected ? selectedLabel : bookLabel}
                         </button>
                       </div>
                     </div>
@@ -412,91 +451,102 @@ export default function Transfers() {
       </section>
 
       {/* ── Full Itinerary Modal Dialog ── */}
-      {modalAdventure && (
-        <div className="itinerary-modal-backdrop" onClick={() => setModalAdventure(null)}>
-          <div className="itinerary-modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <div>
-                <span className="modal-badge">
-                  {currentLang === 'pt' && modalAdventure.badgePt ? modalAdventure.badgePt : modalAdventure.badge}
-                </span>
-                <h3 className="modal-title">
-                  {currentLang === 'pt' && modalAdventure.titlePt ? modalAdventure.titlePt : modalAdventure.title}
-                </h3>
-                <p className="modal-schedule">
-                  🕒 {currentLang === 'pt' ? 'Horário:' : 'Schedule:'} <strong>{currentLang === 'pt' && modalAdventure.pickupTimePt ? modalAdventure.pickupTimePt : modalAdventure.pickupTime}</strong> · {currentLang === 'pt' ? 'Regresso:' : 'Return:'} <strong>{currentLang === 'pt' && modalAdventure.dropoffTimePt ? modalAdventure.dropoffTimePt : modalAdventure.dropoffTime}</strong>
-                </p>
+      {modalAdventure && (() => {
+        const langSuffix = currentLang.charAt(0).toUpperCase() + currentLang.slice(1);
+        const mBadge = (currentLang !== 'en' && modalAdventure[`badge${langSuffix}`]) ? modalAdventure[`badge${langSuffix}`] : (modalAdventure.badgePt && currentLang === 'pt' ? modalAdventure.badgePt : modalAdventure.badge);
+        const mTitle = (currentLang !== 'en' && modalAdventure[`title${langSuffix}`]) ? modalAdventure[`title${langSuffix}`] : (modalAdventure.titlePt && currentLang === 'pt' ? modalAdventure.titlePt : modalAdventure.title);
+        const mOverview = (currentLang !== 'en' && modalAdventure[`overview${langSuffix}`]) ? modalAdventure[`overview${langSuffix}`] : (modalAdventure.overviewPt && currentLang === 'pt' ? modalAdventure.overviewPt : modalAdventure.overview);
+        const mPickup = (currentLang !== 'en' && modalAdventure[`pickupTime${langSuffix}`]) ? modalAdventure[`pickupTime${langSuffix}`] : (modalAdventure.pickupTimePt && currentLang === 'pt' ? modalAdventure.pickupTimePt : modalAdventure.pickupTime);
+        const mDropoff = (currentLang !== 'en' && modalAdventure[`dropoffTime${langSuffix}`]) ? modalAdventure[`dropoffTime${langSuffix}`] : (modalAdventure.dropoffTimePt && currentLang === 'pt' ? modalAdventure.dropoffTimePt : modalAdventure.dropoffTime);
+        const mIncludes = (currentLang !== 'en' && modalAdventure[`includes${langSuffix}`]) ? modalAdventure[`includes${langSuffix}`] : (modalAdventure.includesPt && currentLang === 'pt' ? modalAdventure.includesPt : modalAdventure.includes);
+
+        const scheduleLabel = { pt: 'Horário:', de: 'Abfahrt:', fr: 'Horaire :', es: 'Horario:', en: 'Schedule:' }[currentLang] || 'Schedule:';
+        const returnLabel = { pt: 'Regresso:', de: 'Rückkehr:', fr: 'Retour :', es: 'Regreso:', en: 'Return:' }[currentLang] || 'Return:';
+        const timelineTitle = { pt: 'Paragens & Itinerário Detalhado', de: 'Detaillierter Reiseverlauf & Stopps', fr: 'Arrêts & Itinéraire Détaillé', es: 'Paradas e Itinerario Detallado', en: 'Detailed Stops & Itinerary' }[currentLang] || 'Detailed Stops & Itinerary';
+        const includesTitle = { pt: 'O que está incluído:', de: 'Was enthalten ist:', fr: 'Ce qui est inclus :', es: 'Qué está incluido:', en: "What's Included:" }[currentLang] || "What's Included:";
+        const passengersLabel = { pt: 'Passageiros', de: 'Passagiere', fr: 'Passagers', es: 'Pasajeros', en: 'Passengers' }[currentLang] || 'Passengers';
+        const selectCta = { pt: 'Selecionar Aventura →', de: 'Abenteuer Auswählen →', fr: 'Sélectionner cette Excursion →', es: 'Seleccionar Aventura →', en: 'Select Adventure →' }[currentLang] || 'Select Adventure →';
+
+        return (
+          <div className="itinerary-modal-backdrop" onClick={() => setModalAdventure(null)}>
+            <div className="itinerary-modal-card" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <div>
+                  <span className="modal-badge">{mBadge}</span>
+                  <h3 className="modal-title">{mTitle}</h3>
+                  <p className="modal-schedule">
+                    🕒 {scheduleLabel} <strong>{mPickup}</strong> · {returnLabel} <strong>{mDropoff}</strong>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="modal-close-btn"
+                  onClick={() => setModalAdventure(null)}
+                  aria-label="Close"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
               </div>
-              <button
-                type="button"
-                className="modal-close-btn"
-                onClick={() => setModalAdventure(null)}
-                aria-label="Close"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </div>
 
-            <div className="modal-body">
-              <p className="modal-overview">
-                {currentLang === 'pt' && modalAdventure.overviewPt ? modalAdventure.overviewPt : modalAdventure.overview}
-              </p>
+              <div className="modal-body">
+                <p className="modal-overview">{mOverview}</p>
 
-              <h4 className="timeline-title">{currentLang === 'pt' ? 'Paragens & Itinerário Detalhado' : 'Detailed Stops & Itinerary'}</h4>
-              <div className="modal-timeline">
-                {modalAdventure.itinerary.map((item, idx) => {
-                  const stepTitle = currentLang === 'pt' && item.titlePt ? item.titlePt : item.title;
-                  const stepDesc = currentLang === 'pt' && item.descPt ? item.descPt : item.desc;
-                  return (
-                    <div key={idx} className="timeline-step-row">
-                      <div className="timeline-step-num">{item.step}</div>
-                      <div className="timeline-step-content">
-                        <strong className="step-title">{stepTitle}</strong>
-                        <p className="step-desc">{stepDesc}</p>
+                <h4 className="timeline-title">{timelineTitle}</h4>
+                <div className="modal-timeline">
+                  {modalAdventure.itinerary.map((item, idx) => {
+                    const stepTitle = (currentLang !== 'en' && item[`title${langSuffix}`]) ? item[`title${langSuffix}`] : (item.titlePt && currentLang === 'pt' ? item.titlePt : item.title);
+                    const stepDesc = (currentLang !== 'en' && item[`desc${langSuffix}`]) ? item[`desc${langSuffix}`] : (item.descPt && currentLang === 'pt' ? item.descPt : item.desc);
+                    return (
+                      <div key={idx} className="timeline-step-row">
+                        <div className="timeline-step-num">{item.step}</div>
+                        <div className="timeline-step-content">
+                          <strong className="step-title">{stepTitle}</strong>
+                          <p className="step-desc">{stepDesc}</p>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
+
+                <div className="modal-includes-box">
+                  <span className="includes-title">{includesTitle}</span>
+                  <div className="includes-tags">
+                    {(mIncludes || []).map((inc, i) => (
+                      <span key={i} className="include-pill">✓ {inc}</span>
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              <div className="modal-includes-box">
-                <span className="includes-title">{currentLang === 'pt' ? 'O que está incluído:' : "What's Included:"}</span>
-                <div className="includes-tags">
-                  {(currentLang === 'pt' && modalAdventure.includesPt ? modalAdventure.includesPt : modalAdventure.includes).map((inc, i) => (
-                    <span key={i} className="include-pill">✓ {inc}</span>
-                  ))}
+              <div className="modal-footer">
+                <div className="modal-price-col">
+                  <div className="modal-price-row">
+                    <span className="pax-tag">1–4 {passengersLabel}:</span>
+                    <strong className="pax-val">{modalAdventure.price4}€</strong>
+                  </div>
+                  <div className="modal-price-row">
+                    <span className="pax-tag">5–8 {passengersLabel}:</span>
+                    <strong className="pax-val">{modalAdventure.price8}€</strong>
+                  </div>
                 </div>
+                <button
+                  type="button"
+                  className="modal-select-cta"
+                  onClick={() => {
+                    handleSelectAdventure(modalAdventure);
+                    setModalAdventure(null);
+                  }}
+                >
+                  {selectCta}
+                </button>
               </div>
-            </div>
-
-            <div className="modal-footer">
-              <div className="modal-price-col">
-                <div className="modal-price-row">
-                  <span className="pax-tag">1–4 {currentLang === 'pt' ? 'Passageiros' : 'Passengers'}:</span>
-                  <strong className="pax-val">{modalAdventure.price4}€</strong>
-                </div>
-                <div className="modal-price-row">
-                  <span className="pax-tag">5–8 {currentLang === 'pt' ? 'Passageiros' : 'Passengers'}:</span>
-                  <strong className="pax-val">{modalAdventure.price8}€</strong>
-                </div>
-              </div>
-              <button
-                type="button"
-                className="modal-select-cta"
-                onClick={() => {
-                  handleSelectAdventure(modalAdventure);
-                  setModalAdventure(null);
-                }}
-              >
-                {currentLang === 'pt' ? 'Selecionar Aventura →' : 'Select Adventure →'}
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

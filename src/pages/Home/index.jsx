@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { TOURS_DATA } from '../../constants/toursCatalog';
 import { AIRPORT_TRANSFER_LOCATIONS } from '../../constants/transfersCatalog';
-import { getAirportLocations } from '../../services/catalogService';
+import { getAirportLocations, getTours } from '../../services/catalogService';
 import { bookingService } from '../../services/bookingService';
 import { useLanguage } from '../../hooks/useLanguage';
 import TourCard from '../../components/common/TourCard';
@@ -34,6 +34,7 @@ export default function Home() {
   const [passengers, setPassengers] = useState(1);
   const [locations, setLocations] = useState(AIRPORT_TRANSFER_LOCATIONS);
   const [blockedDates, setBlockedDates] = useState([]);
+  const [allTours, setAllTours] = useState(TOURS_DATA);
 
   useEffect(() => {
     let isMounted = true;
@@ -47,12 +48,33 @@ export default function Home() {
         setBlockedDates(res.data);
       }
     });
+    getTours().then((liveTours) => {
+      if (isMounted && liveTours && liveTours.length > 0) {
+        setAllTours(liveTours);
+      }
+    });
     return () => {
       isMounted = false;
     };
   }, []);
 
-  const featuredTours = TOURS_DATA.filter((t) => t.featured);
+  // Display always exactly 4 top featured tours (static, consistent and non-rotating)
+  const featuredTours = useMemo(() => {
+    const list = allTours.length > 0 ? allTours : TOURS_DATA;
+    const featuredOnly = list.filter((t) => t.featured);
+    if (featuredOnly.length >= 4) {
+      return featuredOnly.slice(0, 4);
+    }
+    // If fewer than 4 are marked featured, fill up to 4 from the main catalog without duplicates
+    const combined = [...featuredOnly];
+    for (const tour of list) {
+      if (combined.length >= 4) break;
+      if (!combined.some((t) => t.id === tour.id)) {
+        combined.push(tour);
+      }
+    }
+    return combined.slice(0, 4);
+  }, [allTours]);
 
   // Dynamic pricing calculation directly synced with Supabase live locations
   const selectedLocation = locations.find((l) => l.id === destLoc) || locations[0];

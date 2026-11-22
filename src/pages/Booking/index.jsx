@@ -13,10 +13,179 @@ import { useLanguage } from '../../hooks/useLanguage';
 import ImagePlaceholder from '../../components/common/ImagePlaceholder';
 import './Booking.css';
 
+const CHECKOUT_I18N = {
+  pt: {
+    heroTitle: 'Finalizar Reserva',
+    heroSubtitle: 'Conclua a sua reserva com total segurança',
+    summaryHeading: 'Resumo da Reserva',
+    at: 'às',
+    return: 'Regresso',
+    passengers: 'Passageiros',
+    itineraryHeading: 'Itinerário & Detalhes da Rota',
+    pickupLocation: 'Local de Recolha',
+    pickupDefault: 'Onde desejar (Hotel / Alojamento)',
+    dropoffDestination: 'Destino / Chegada',
+    estDuration: 'Duração estimada:',
+    roundTripIncluded: (date) => `Ida e Volta Incluída (Regresso em ${date || 'data selecionada'})`,
+    total: 'Total',
+    yourDetails: 'Os Seus Dados',
+    fullName: 'Nome Completo',
+    namePlaceholder: 'João Silva',
+    email: 'Endereço de Email',
+    emailPlaceholder: 'joao@email.com',
+    phone: 'Número de Telefone / WhatsApp',
+    phonePlaceholder: '+351 912 345 678',
+    hotelAirport: 'Hotel / Morada de Destino',
+    hotelStandard: 'Hotel / Morada de Recolha',
+    hotelPlaceholder: 'Ex: Hotel Savoy Palace, Funchal',
+    flightNumber: 'Número de Voo (Opcional, para monitorização de chegada)',
+    flightPlaceholder: 'Ex: TP1685 ou FR382',
+    paymentMethod: 'Método de Pagamento',
+    card: 'Cartão de Crédito ou Débito',
+    paypal: 'PayPal',
+    processing: 'A processar...',
+    payNow: (amount) => `Pagar Agora (€${amount}) →`,
+    airportPrefix: 'Transfer de Aeroporto —',
+  },
+  en: {
+    heroTitle: 'Checkout',
+    heroSubtitle: 'Complete your booking securely',
+    summaryHeading: 'Booking Summary',
+    at: 'at',
+    return: 'Return',
+    passengers: 'Passengers',
+    itineraryHeading: 'Transfer & Route Itinerary',
+    pickupLocation: 'Pick-up Location',
+    pickupDefault: 'Anywhere in Madeira (Hotel / Address)',
+    dropoffDestination: 'Drop-off Destination',
+    estDuration: 'Est. duration:',
+    roundTripIncluded: (date) => `Round Trip Included (Return on ${date || 'selected date'})`,
+    total: 'Total',
+    yourDetails: 'Your Details',
+    fullName: 'Full Name',
+    namePlaceholder: 'John Smith',
+    email: 'Email Address',
+    emailPlaceholder: 'john@email.com',
+    phone: 'Phone Number / WhatsApp',
+    phonePlaceholder: '+44 7123 456789',
+    hotelAirport: 'Hotel / Destination Address',
+    hotelStandard: 'Hotel / Pick-up Address',
+    hotelPlaceholder: 'e.g. Hotel Savoy Palace, Funchal',
+    flightNumber: 'Flight Number (Optional for airport arrival tracking)',
+    flightPlaceholder: 'e.g. TP1685 or FR382',
+    paymentMethod: 'Payment Method',
+    card: 'Credit or Debit Card',
+    paypal: 'PayPal',
+    processing: 'Processing...',
+    payNow: (amount) => `Pay Now (€${amount}) →`,
+    airportPrefix: 'Airport Transfer —',
+  },
+  de: {
+    heroTitle: 'Buchung Abschließen',
+    heroSubtitle: 'Schließen Sie Ihre Buchung sicher ab',
+    summaryHeading: 'Buchungsübersicht',
+    at: 'um',
+    return: 'Rückfahrt',
+    passengers: 'Passagiere',
+    itineraryHeading: 'Reiseverlauf & Routendetails',
+    pickupLocation: 'Abholort',
+    pickupDefault: 'Überall auf Madeira (Hotel / Adresse)',
+    dropoffDestination: 'Zielort',
+    estDuration: 'Geschätzte Dauer:',
+    roundTripIncluded: (date) => `Hin- und Rückfahrt inklusive (Rückfahrt am ${date || 'ausgewählten Datum'})`,
+    total: 'Gesamt',
+    yourDetails: 'Ihre Daten',
+    fullName: 'Vollständiger Name',
+    namePlaceholder: 'Max Mustermann',
+    email: 'E-Mail-Adresse',
+    emailPlaceholder: 'max@beispiel.de',
+    phone: 'Telefonnummer / WhatsApp',
+    phonePlaceholder: '+49 170 1234567',
+    hotelAirport: 'Hotel / Zieladresse',
+    hotelStandard: 'Hotel / Abholadresse',
+    hotelPlaceholder: 'z.B. Hotel Savoy Palace, Funchal',
+    flightNumber: 'Flugnummer (Optional zur Flugüberwachung)',
+    flightPlaceholder: 'z.B. LH4300 oder TP1685',
+    paymentMethod: 'Zahlungsmethode',
+    card: 'Kredit- oder Debitkarte',
+    paypal: 'PayPal',
+    processing: 'Wird verarbeitet...',
+    payNow: (amount) => `Jetzt Bezahlen (€${amount}) →`,
+    airportPrefix: 'Flughafentransfer —',
+  },
+  fr: {
+    heroTitle: 'Finaliser la Réservation',
+    heroSubtitle: 'Complétez votre réservation en toute sécurité',
+    summaryHeading: 'Récapitulatif de la Réservation',
+    at: 'à',
+    return: 'Retour',
+    passengers: 'Passagers',
+    itineraryHeading: 'Itinéraire & Détails du Trajet',
+    pickupLocation: 'Lieu de Prise en Charge',
+    pickupDefault: 'Partout à Madère (Hôtel / Adresse)',
+    dropoffDestination: 'Destination d\'arrivée',
+    estDuration: 'Durée estimée :',
+    roundTripIncluded: (date) => `Aller-retour inclus (Retour le ${date || 'date sélectionnée'})`,
+    total: 'Total',
+    yourDetails: 'Vos Coordonnées',
+    fullName: 'Nom Complet',
+    namePlaceholder: 'Jean Dupont',
+    email: 'Adresse E-mail',
+    emailPlaceholder: 'jean@email.com',
+    phone: 'Numéro de Téléphone / WhatsApp',
+    phonePlaceholder: '+33 6 12 34 56 78',
+    hotelAirport: 'Hôtel / Adresse de Destination',
+    hotelStandard: 'Hôtel / Adresse de Prise en Charge',
+    hotelPlaceholder: 'Ex: Hôtel Savoy Palace, Funchal',
+    flightNumber: 'Numéro de Vol (Optionnel pour le suivi)',
+    flightPlaceholder: 'Ex: TP1685 ou AF1234',
+    paymentMethod: 'Mode de Paiement',
+    card: 'Carte Bancaire',
+    paypal: 'PayPal',
+    processing: 'Traitement en cours...',
+    payNow: (amount) => `Payer Maintenant (€${amount}) →`,
+    airportPrefix: 'Transfert Aéroport —',
+  },
+  es: {
+    heroTitle: 'Finalizar Reserva',
+    heroSubtitle: 'Complete su reserva con total seguridad',
+    summaryHeading: 'Resumen de la Reserva',
+    at: 'a las',
+    return: 'Regreso',
+    passengers: 'Pasajeros',
+    itineraryHeading: 'Itinerario y Detalles de la Ruta',
+    pickupLocation: 'Lugar de Recogida',
+    pickupDefault: 'Donde desee (Hotel / Alojamiento)',
+    dropoffDestination: 'Destino de Llegada',
+    estDuration: 'Duración estimada:',
+    roundTripIncluded: (date) => `Ida y Vuelta Incluida (Regreso el ${date || 'fecha seleccionada'})`,
+    total: 'Total',
+    yourDetails: 'Sus Datos',
+    fullName: 'Nombre Completo',
+    namePlaceholder: 'Juan Pérez',
+    email: 'Correo Electrónico',
+    emailPlaceholder: 'juan@email.com',
+    phone: 'Número de Teléfono / WhatsApp',
+    phonePlaceholder: '+34 612 345 678',
+    hotelAirport: 'Hotel / Dirección de Destino',
+    hotelStandard: 'Hotel / Dirección de Recogida',
+    hotelPlaceholder: 'Ej: Hotel Savoy Palace, Funchal',
+    flightNumber: 'Número de Vuelo (Opcional para seguimiento)',
+    flightPlaceholder: 'Ej: TP1685 o IB3100',
+    paymentMethod: 'Método de Pago',
+    card: 'Tarjeta de Crédito o Débito',
+    paypal: 'PayPal',
+    processing: 'Procesando...',
+    payNow: (amount) => `Pagar Ahora (€${amount}) →`,
+    airportPrefix: 'Traslado de Aeropuerto —',
+  },
+};
+
 export default function Booking() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { currentLang } = useLanguage();
+  const bT = CHECKOUT_I18N[currentLang] || CHECKOUT_I18N.en;
 
   // URL query params
   const serviceParam = searchParams.get('service') || '';
@@ -52,19 +221,30 @@ export default function Booking() {
     };
   }, []);
 
+  // Helper to resolve localized title for tour or adventure
+  const resolveTitle = (item) => {
+    if (!item) return '';
+    if (currentLang === 'pt') return item.titlePt || item.title;
+    if (currentLang === 'de') return item.titleDe || item.titleEn || item.title;
+    if (currentLang === 'fr') return item.titleFr || item.titleEn || item.title;
+    if (currentLang === 'es') return item.titleEs || item.titleEn || item.title;
+    return item.titleEn || item.title;
+  };
+
   // Find service & itinerary information
   const currentService = useMemo(() => {
     // 0. Madeira Adventures lookup
     const adv = MADEIRA_ADVENTURES.find((a) => a.id === serviceParam);
     if (adv) {
       const fixedPrice = priceParam ? Number(priceParam) : (paxParam === '8' ? adv.price8 : adv.price4);
+      const title = resolveTitle(adv);
       return {
         id: adv.id,
-        title: adv.title,
+        title,
         type: SERVICE_TYPE.TOUR,
         isAirportTransfer: false,
-        origin: pickupParam || fromParam || (currentLang === 'pt' ? 'Onde desejar (Hotel / Alojamento)' : 'Anywhere in Madeira (Hotel / Address)'),
-        destination: adv.title,
+        origin: pickupParam || fromParam || bT.pickupDefault,
+        destination: title,
         duration: adv.duration,
         highlights: adv.highlights,
         totalCalculatedPrice: fixedPrice,
@@ -78,14 +258,14 @@ export default function Booking() {
         (l) => l.name === dropoffParam || l.id === dropoffParam
       ) || locations[0]; // Default Funchal
 
-      const origin = fromParam || 'Madeira Airport (FNC)';
+      const origin = fromParam || (currentLang === 'pt' ? 'Aeroporto da Madeira (FNC)' : 'Madeira Airport (FNC)');
       const destination = dropoffParam || loc.name;
       const isRoundTrip = tripTypeParam === 'round-trip';
       const fixedPrice = priceParam ? Number(priceParam) : (isRoundTrip ? loc.roundTripPrice : loc.oneWayPrice);
 
       return {
         id: 'airport-transfer',
-        title: `Airport Transfer — ${destination}`,
+        title: `${bT.airportPrefix} ${destination}`,
         type: SERVICE_TYPE.TRANSFER,
         isAirportTransfer: true,
         origin,
@@ -101,13 +281,14 @@ export default function Booking() {
     // 2. Mountain Transfer lookup
     const mt = MOUNTAIN_TRANSFERS_CATALOG.find((m) => m.id === serviceParam);
     if (mt) {
+      const title = resolveTitle(mt);
       return {
         id: mt.id,
-        title: mt.title,
+        title,
         type: SERVICE_TYPE.TRANSFER,
         isAirportTransfer: false,
-        origin: 'Funchal / Hotel Pickup',
-        destination: mt.title,
+        origin: pickupParam || fromParam || bT.pickupDefault,
+        destination: title,
         duration: mt.duration,
         highlights: mt.highlights,
         totalCalculatedPrice: mt.price * (Number(paxParam) || 2),
@@ -121,7 +302,6 @@ export default function Booking() {
       const paxNum = Number(paxParam) || 1;
       let calculatedPrice = tour.price;
 
-      // Tiered vehicle pricing if configured (e.g. 1-4 pax vs 5-8 pax)
       if (tour.price4 && tour.price8) {
         calculatedPrice = paxNum > 4 ? tour.price8 : tour.price4;
       } else if (priceParam) {
@@ -130,13 +310,14 @@ export default function Booking() {
         calculatedPrice = tour.price;
       }
 
+      const title = resolveTitle(tour);
       return {
         id: tour.id,
-        title: tour.title,
+        title,
         type: SERVICE_TYPE.TOUR,
         isAirportTransfer: false,
-        origin: pickupParam || (currentLang === 'pt' ? 'Onde desejar (Hotel / Alojamento)' : 'Anywhere in Madeira (Hotel / Address)'),
-        destination: tour.title,
+        origin: pickupParam || bT.pickupDefault,
+        destination: title,
         duration: tour.duration,
         highlights: tour.highlights,
         totalCalculatedPrice: calculatedPrice,
@@ -146,134 +327,114 @@ export default function Booking() {
 
     // Fallback default
     const defaultTour = toursList[0] || TOURS_DATA[0];
+    const defaultTitle = resolveTitle(defaultTour);
     return {
       id: defaultTour.id,
-      title: defaultTour.title,
+      title: defaultTitle,
       type: SERVICE_TYPE.TOUR,
       isAirportTransfer: false,
-      origin: currentLang === 'pt' ? 'Onde desejar (Hotel / Alojamento)' : 'Anywhere in Madeira (Hotel / Address)',
-      destination: defaultTour.title,
+      origin: bT.pickupDefault,
+      destination: defaultTitle,
       duration: defaultTour.duration,
       highlights: defaultTour.highlights,
       totalCalculatedPrice: defaultTour.price || 90,
       image: defaultTour.image,
     };
-  }, [serviceParam, fromParam, dropoffParam, tripTypeParam, priceParam, paxParam, pickupParam, locations, toursList]);
+  }, [serviceParam, fromParam, dropoffParam, tripTypeParam, priceParam, paxParam, pickupParam, locations, toursList, currentLang, bT]);
 
   // Form State
+  const initialPickup = pickupParam || '';
   const [fullName, setFullName] = useState(booking.customer?.name || '');
   const [email, setEmail] = useState(booking.customer?.email || '');
   const [phone, setPhone] = useState(booking.customer?.phone || '');
-  const [pickupAddress, setPickupAddress] = useState('');
+  const [pickupAddress, setPickupAddress] = useState(initialPickup);
+  const [pickupZoneParam] = useState(pickupParam || '');
   const [flightNumber, setFlightNumber] = useState('');
-  const [paymentMethod, setSelectedPaymentMethod] = useState(PAYMENT_METHOD.STRIPE_CARD);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
+    booking.paymentMethod || PAYMENT_METHOD.STRIPE_CARD
+  );
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
-  // Date and passengers
-  const [selectedDate] = useState(() => {
-    if (dateParam) return dateParam;
-    if (booking.date) return booking.date;
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 2);
-    return tomorrow.toISOString().split('T')[0];
-  });
+  // Dynamic values
+  const [passengers, setPassengers] = useState(Number(paxParam) || booking.passengers || 2);
+  const selectedDate = dateParam || booking.date || getDefaultDate();
+  const selectedTime = timeParam || booking.timeSlot || '10:00';
 
-  const [selectedTime] = useState(() => {
-    if (timeParam) return timeParam;
-    if (booking.time_slot) return booking.time_slot;
-    return '10:00';
-  });
-
-  // Active tour info for tiered pricing labels
-  const activeTourInfo = useMemo(() => {
-    return toursList.find((t) => t.id === serviceParam) || TOURS_DATA.find((t) => t.id === serviceParam);
-  }, [toursList, serviceParam]);
-
-  const p4Price = activeTourInfo?.price4 || activeTourInfo?.price || 90;
-  const p8Price = activeTourInfo?.price8 || (activeTourInfo?.price ? Math.round(activeTourInfo.price * 1.33) : 120);
-
-  const [passengers, setPassengers] = useState(() => {
-    return Number(paxParam) || booking.passengers || 2;
-  });
-
-  // Calculate dynamic price based on chosen passengers and service
-  const totalPrice = useMemo(() => {
-    // 1. If explicit price param is passed and pax didn't change
-    if (priceParam && Number(paxParam) === passengers) {
-      return Number(priceParam).toFixed(2);
-    }
-
-    // 2. Madeira Adventures tier pricing
-    const adv = MADEIRA_ADVENTURES.find((a) => a.id === serviceParam);
-    if (adv) {
-      const p = passengers > 4 ? adv.price8 : adv.price4;
-      return Number(p).toFixed(2);
-    }
-
-    // 3. Tour tiered vehicle pricing (1-4 pax: tour.price4, 5-8 pax: tour.price8)
-    const tour = toursList.find((t) => t.id === serviceParam) || TOURS_DATA.find((t) => t.id === serviceParam);
-    if (tour) {
-      const p4 = tour.price4 || tour.price || 90;
-      const p8 = tour.price8 || (tour.price ? Math.round(tour.price * 1.33) : 120);
-      const p = passengers > 4 ? p8 : p4;
-      return Number(p).toFixed(2);
-    }
-
-    // 4. Airport Transfer pricing
-    if (serviceParam === 'airport-transfer' || fromParam.includes('Airport') || dropoffParam) {
-      const loc = locations.find((l) => l.name === dropoffParam || l.id === dropoffParam) || locations[0];
-      const isRoundTrip = tripTypeParam === 'round-trip';
-      const base = isRoundTrip ? loc.roundTripPrice : loc.oneWayPrice;
-      const finalPrice = passengers > 4 ? Math.round(base * 1.35) : base;
-      return Number(finalPrice).toFixed(2);
-    }
-
-    // Default
-    return (currentService.totalCalculatedPrice || 90).toFixed(2);
-  }, [passengers, serviceParam, priceParam, paxParam, toursList, locations, dropoffParam, fromParam, tripTypeParam, currentService]);
-
-  // Formatting Date for summary badge
+  // Format Dates nicely
   const formattedDepartureDate = useMemo(() => {
+    if (!selectedDate) return '';
     try {
-      const d = new Date(selectedDate);
-      return d.toLocaleDateString('en-US', {
+      const localeMap = { pt: 'pt-PT', en: 'en-GB', de: 'de-DE', fr: 'fr-FR', es: 'es-ES' };
+      const d = new Date(selectedDate + 'T00:00:00');
+      return d.toLocaleDateString(localeMap[currentLang] || 'en-GB', {
         weekday: 'short',
-        month: 'short',
         day: 'numeric',
+        month: 'short',
         year: 'numeric',
       });
     } catch {
       return selectedDate;
     }
-  }, [selectedDate]);
+  }, [selectedDate, currentLang]);
 
   const formattedReturnDate = useMemo(() => {
-    if (!returnDateParam) return null;
+    if (!returnDateParam) return '';
     try {
-      const d = new Date(returnDateParam);
-      return d.toLocaleDateString('en-US', {
+      const localeMap = { pt: 'pt-PT', en: 'en-GB', de: 'de-DE', fr: 'fr-FR', es: 'es-ES' };
+      const d = new Date(returnDateParam + 'T00:00:00');
+      return d.toLocaleDateString(localeMap[currentLang] || 'en-GB', {
         weekday: 'short',
-        month: 'short',
         day: 'numeric',
+        month: 'short',
         year: 'numeric',
       });
     } catch {
       return returnDateParam;
     }
-  }, [returnDateParam]);
+  }, [returnDateParam, currentLang]);
 
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
+  // Price Calculation
+  const totalPrice = useMemo(() => {
+    const adv = MADEIRA_ADVENTURES.find((a) => a.id === serviceParam);
+    if (adv) {
+      if (priceParam) return Number(priceParam);
+      return passengers <= 4 ? adv.price4 : adv.price8;
+    }
+
+    const tour = toursList.find((t) => t.id === serviceParam) || TOURS_DATA.find((t) => t.id === serviceParam);
+    if (tour) {
+      if (tour.price4 && tour.price8) {
+        return passengers <= 4 ? tour.price4 : tour.price8;
+      }
+      if (priceParam) return Number(priceParam);
+      return tour.price;
+    }
+
+    if (currentService.type === SERVICE_TYPE.TRANSFER && !currentService.isAirportTransfer) {
+      const basePerPerson = currentService.totalCalculatedPrice / (Number(paxParam) || 2);
+      return Math.round(basePerPerson * passengers);
+    }
+
+    return currentService.totalCalculatedPrice;
+  }, [currentService, passengers, serviceParam, priceParam, paxParam, toursList]);
+
+  function getDefaultDate() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  }
 
   function validate() {
     const errs = {};
     if (!sanitizeText(fullName)) {
-      errs.fullName = 'Please enter your full name.';
+      errs.fullName = currentLang === 'pt' ? 'Por favor indique o seu nome completo.' : 'Please enter your full name.';
     }
     if (!isValidEmail(email)) {
-      errs.email = 'Please provide a valid email address.';
+      errs.email = currentLang === 'pt' ? 'Por favor indique um email válido.' : 'Please enter a valid email address.';
     }
     if (!isValidPhone(phone)) {
-      errs.phone = 'Please provide a valid phone number (minimum 7 digits).';
+      errs.phone = currentLang === 'pt' ? 'Por favor indique um contacto telefónico válido.' : 'Please enter a valid phone number.';
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -292,13 +453,15 @@ export default function Booking() {
       const customerData = {
         name: sanitizeText(fullName),
         email: email.trim().toLowerCase(),
-        phone: phone.trim(),
+        phone: sanitizeText(phone),
       };
 
-      // Format clean pickup and dropoff description
-      const finalPickup = pickupAddress 
-        ? `${pickupAddress} (${currentService.origin})`
-        : currentService.origin;
+      let finalPickup = pickupAddress.trim();
+      if (!finalPickup) {
+        finalPickup = pickupZoneParam.trim() || currentService.origin;
+      } else if (pickupZoneParam.trim() && !finalPickup.toLowerCase().includes(pickupZoneParam.toLowerCase())) {
+        finalPickup = `${finalPickup}, ${pickupZoneParam.trim()}`;
+      }
 
       const bookingPayload = {
         ref: booking.ref || `MRT-${Date.now()}`,
@@ -314,12 +477,12 @@ export default function Booking() {
         pickup_location: finalPickup,
         flight_number: currentService.isAirportTransfer ? (flightNumber || null) : null,
         total_amount_eur: Number(totalPrice),
-        payment_method: paymentMethod,
+        payment_method: selectedPaymentMethod,
         language: currentLang || 'en',
       };
 
-      if (paymentMethod === PAYMENT_METHOD.PAYPAL) {
-        alert('PayPal integration is initialized. Connecting to PayPal checkout...');
+      if (selectedPaymentMethod === PAYMENT_METHOD.PAYPAL) {
+        alert(currentLang === 'pt' ? 'Integração PayPal iniciada...' : 'PayPal integration is initialized...');
         navigate(ROUTES.BOOKING_SUCCESS + '?ref=' + bookingPayload.ref + '&pm=paypal');
         return;
       }
@@ -330,7 +493,7 @@ export default function Booking() {
         customer: customerData,
       });
     } catch (err) {
-      setErrors({ submit: err.message || 'Payment initiation failed. Please try again.' });
+      setErrors({ submit: err.message || (currentLang === 'pt' ? 'Falha ao iniciar pagamento. Tente novamente.' : 'Payment initiation failed. Please try again.') });
     } finally {
       setLoading(false);
     }
@@ -348,9 +511,9 @@ export default function Booking() {
           <div className="checkout-hero-overlay" />
         </div>
         <div className="checkout-hero-content container-constrained">
-          <h1 className="checkout-hero-title">Checkout</h1>
+          <h1 className="checkout-hero-title">{bT.heroTitle}</h1>
           <p className="checkout-hero-subtitle">
-            Complete your booking securely
+            {bT.heroSubtitle}
           </p>
         </div>
       </section>
@@ -360,7 +523,7 @@ export default function Booking() {
         <div className="checkout-grid">
           {/* Left Column: Booking Summary & Detailed Itinerary */}
           <section className="checkout-summary-card">
-            <h2 className="card-heading">Booking Summary</h2>
+            <h2 className="card-heading">{bT.summaryHeading}</h2>
 
             <div className="summary-item-card">
               <div className="summary-thumb-box">
@@ -376,17 +539,17 @@ export default function Booking() {
                 <h3 className="summary-item-title">{currentService.title}</h3>
                 <div className="summary-meta-line">
                   <span className="summary-icon">📅</span>
-                  <span className="summary-text">{formattedDepartureDate} às {selectedTime}</span>
+                  <span className="summary-text">{formattedDepartureDate} {bT.at} {selectedTime}</span>
                 </div>
                 {formattedReturnDate && (
                   <div className="summary-meta-line">
                     <span className="summary-icon">🔄</span>
-                    <span className="summary-text">Return: {formattedReturnDate} {returnTimeParam ? `às ${returnTimeParam}` : ''}</span>
+                    <span className="summary-text">{bT.return}: {formattedReturnDate} {returnTimeParam ? `${bT.at} ${returnTimeParam}` : ''}</span>
                   </div>
                 )}
                 <div className="checkout-pax-wrapper">
                   <span className="checkout-pax-field-lbl">
-                    {currentLang === 'pt' ? 'Passageiros' : currentLang === 'de' ? 'Passagiere' : currentLang === 'fr' ? 'Passagers' : 'Passengers'}
+                    {bT.passengers}
                   </span>
                   <PassengerPicker
                     value={passengers}
@@ -395,27 +558,20 @@ export default function Booking() {
                     min={1}
                     max={8}
                   />
-                  <div className="checkout-pax-tier-pill">
-                    {passengers <= 4 ? (
-                      <span>Carrinha privada (1 a 4 pax) · <strong>{p4Price}€</strong></span>
-                    ) : (
-                      <span>Carrinha grande (5 a 8 pax) · <strong>{p8Price}€</strong></span>
-                    )}
-                  </div>
                 </div>
               </div>
             </div>
 
             {/* ── Detailed Itinerary Box ── */}
             <div className="checkout-itinerary-box">
-              <h4 className="itinerary-heading">Transfer & Route Itinerary</h4>
+              <h4 className="itinerary-heading">{bT.itineraryHeading}</h4>
               
               <div className="itinerary-timeline">
                 <div className="itinerary-point start">
                   <div className="point-dot" />
                   <div className="point-info">
                     <span className="point-label">
-                      {currentLang === 'pt' ? 'Local de Recolha' : 'Pick-up Location'}
+                      {bT.pickupLocation}
                     </span>
                     <strong className="point-val">
                       {pickupAddress.trim() ? pickupAddress : currentService.origin}
@@ -424,13 +580,13 @@ export default function Booking() {
                 </div>
 
                 <div className="itinerary-line">
-                  <span className="route-duration">Est. duration: ~{currentService.duration || '25 min'}</span>
+                  <span className="route-duration">{bT.estDuration} ~{currentService.duration || '25 min'}</span>
                 </div>
 
                 <div className="itinerary-point end">
                   <div className="point-dot dropoff" />
                   <div className="point-info">
-                    <span className="point-label">Drop-off Destination</span>
+                    <span className="point-label">{bT.dropoffDestination}</span>
                     <strong className="point-val">{currentService.destination}</strong>
                   </div>
                 </div>
@@ -438,33 +594,33 @@ export default function Booking() {
                 {currentService.isRoundTrip && (
                   <div className="itinerary-roundtrip-badge">
                     <span className="rt-icon">⇄</span>
-                    <span>Round Trip Included (Return on {formattedReturnDate || 'selected date'})</span>
+                    <span>{bT.roundTripIncluded(formattedReturnDate)}</span>
                   </div>
                 )}
               </div>
             </div>
 
             <div className="summary-total-row">
-              <span className="total-label">Total</span>
+              <span className="total-label">{bT.total}</span>
               <strong className="total-amount">€{totalPrice}</strong>
             </div>
           </section>
 
           {/* Right Column: Your Details & Payment */}
           <section className="checkout-form-card">
-            <h2 className="card-heading">Your Details</h2>
+            <h2 className="card-heading">{bT.yourDetails}</h2>
 
             <form onSubmit={handleCheckout} className="checkout-form">
               {/* Full Name */}
               <div className="form-group">
                 <label htmlFor="fullName" className="form-label">
-                  Full Name <span className="req">*</span>
+                  {bT.fullName} <span className="req">*</span>
                 </label>
                 <input
                   id="fullName"
                   type="text"
                   required
-                  placeholder="João Silva"
+                  placeholder={bT.namePlaceholder}
                   className={`form-input ${errors.fullName ? 'input-error' : ''}`}
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
@@ -475,13 +631,13 @@ export default function Booking() {
               {/* Email Address */}
               <div className="form-group">
                 <label htmlFor="email" className="form-label">
-                  Email Address <span className="req">*</span>
+                  {bT.email} <span className="req">*</span>
                 </label>
                 <input
                   id="email"
                   type="email"
                   required
-                  placeholder="joao@email.com"
+                  placeholder={bT.emailPlaceholder}
                   className={`form-input ${errors.email ? 'input-error' : ''}`}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -492,13 +648,13 @@ export default function Booking() {
               {/* Phone Number */}
               <div className="form-group">
                 <label htmlFor="phone" className="form-label">
-                  Phone Number <span className="req">*</span>
+                  {bT.phone} <span className="req">*</span>
                 </label>
                 <input
                   id="phone"
                   type="tel"
                   required
-                  placeholder="+351 912 345 678"
+                  placeholder={bT.phonePlaceholder}
                   className={`form-input ${errors.phone ? 'input-error' : ''}`}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -510,13 +666,13 @@ export default function Booking() {
               <div className="form-group">
                 <label htmlFor="pickupAddress" className="form-label">
                   {currentService.isAirportTransfer 
-                    ? 'Hotel / Destination Address' 
-                    : 'Hotel / Pick-up Address'}
+                    ? bT.hotelAirport 
+                    : bT.hotelStandard}
                 </label>
                 <input
                   id="pickupAddress"
                   type="text"
-                  placeholder="e.g. Hotel Savoy Palace, Funchal"
+                  placeholder={bT.hotelPlaceholder}
                   className="form-input"
                   value={pickupAddress}
                   onChange={(e) => setPickupAddress(e.target.value)}
@@ -527,12 +683,12 @@ export default function Booking() {
               {currentService.isAirportTransfer && (
                 <div className="form-group">
                   <label htmlFor="flightNumber" className="form-label">
-                    Flight Number (Optional for airport arrival tracking)
+                    {bT.flightNumber}
                   </label>
                   <input
                     id="flightNumber"
                     type="text"
-                    placeholder="e.g. TP1685 or FR382"
+                    placeholder={bT.flightPlaceholder}
                     className="form-input"
                     value={flightNumber}
                     onChange={(e) => setFlightNumber(e.target.value)}
@@ -542,23 +698,23 @@ export default function Booking() {
 
               {/* Payment Method Selector */}
               <div className="payment-method-section">
-                <h3 className="section-subheading">Payment Method</h3>
+                <h3 className="section-subheading">{bT.paymentMethod}</h3>
 
                 <div className="payment-options">
                   {/* Credit or Debit Card */}
                   <label
-                    className={`payment-option ${paymentMethod === PAYMENT_METHOD.STRIPE_CARD ? 'active' : ''}`}
+                    className={`payment-option ${selectedPaymentMethod === PAYMENT_METHOD.STRIPE_CARD ? 'active' : ''}`}
                   >
                     <div className="option-radio-group">
                       <input
                         type="radio"
                         name="paymentMethod"
                         value={PAYMENT_METHOD.STRIPE_CARD}
-                        checked={paymentMethod === PAYMENT_METHOD.STRIPE_CARD}
+                        checked={selectedPaymentMethod === PAYMENT_METHOD.STRIPE_CARD}
                         onChange={() => setSelectedPaymentMethod(PAYMENT_METHOD.STRIPE_CARD)}
                         className="payment-radio"
                       />
-                      <span className="payment-label-text">Credit or Debit Card</span>
+                      <span className="payment-label-text">{bT.card}</span>
                     </div>
 
                     <div className="card-brands">
@@ -570,18 +726,18 @@ export default function Booking() {
 
                   {/* PayPal */}
                   <label
-                    className={`payment-option ${paymentMethod === PAYMENT_METHOD.PAYPAL ? 'active' : ''}`}
+                    className={`payment-option ${selectedPaymentMethod === PAYMENT_METHOD.PAYPAL ? 'active' : ''}`}
                   >
                     <div className="option-radio-group">
                       <input
                         type="radio"
                         name="paymentMethod"
                         value={PAYMENT_METHOD.PAYPAL}
-                        checked={paymentMethod === PAYMENT_METHOD.PAYPAL}
+                        checked={selectedPaymentMethod === PAYMENT_METHOD.PAYPAL}
                         onChange={() => setSelectedPaymentMethod(PAYMENT_METHOD.PAYPAL)}
                         className="payment-radio"
                       />
-                      <span className="payment-label-text">PayPal</span>
+                      <span className="payment-label-text">{bT.paypal}</span>
                     </div>
 
                     <span className="paypal-logo-text">PayPal</span>
@@ -601,7 +757,7 @@ export default function Booking() {
                 disabled={loading}
                 className="checkout-pay-btn"
               >
-                {loading ? 'Processing...' : `Pay Now (€${totalPrice}) →`}
+                {loading ? bT.processing : bT.payNow(totalPrice)}
               </button>
             </form>
           </section>
