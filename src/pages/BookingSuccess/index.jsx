@@ -252,10 +252,9 @@ export default function BookingSuccess() {
   const vT = voucherTexts[bookingLang] || voucherTexts.en;
 
   // Determine if this booking is actually an airport transfer
-  const isAirportBooking = serviceId === 'airport-transfer' || 
-    (serviceName && serviceName.toLowerCase().includes('airport')) ||
-    (pickup && pickup.toLowerCase().includes('aeroporto')) ||
-    Boolean(flightNumber);
+  // Only flag as airport booking when explicitly booked as airport-transfer service
+  // or when a flight number was provided (never for adventure/tour bookings)
+  const isAirportBooking = serviceId === 'airport-transfer' || Boolean(flightNumber);
 
   // Match adventure or tour to get the full itinerary
   const matchedAdventure = MADEIRA_ADVENTURES.find((a) => a.id === serviceId || a.title === serviceName || a.titlePt === serviceName);

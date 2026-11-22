@@ -393,3 +393,94 @@
     font-size: 0.9rem;
   }
 }
+
+/* ── Quote Request Form ── */
+.quote-request-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.quote-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.quote-form-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.quote-form-input {
+  padding: 9px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #0f172a;
+  background: #f8fafc;
+  transition: border-color 0.2s;
+  font-family: inherit;
+  resize: vertical;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.quote-form-input:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: #fff;
+}
+
+/* Success state */
+.quote-success-box {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 1.5px solid #86efac;
+  border-radius: 14px;
+  padding: 24px 20px;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.quote-success-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: #22c55e;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.quote-success-box h4 {
+  margin: 0 0 10px;
+  font-size: 1.1rem;
+  color: #166534;
+  font-weight: 800;
+}
+
+.quote-success-box p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #15803d;
+  line-height: 1.6;
+}
+
+/* Error message */
+.quote-error-msg {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  color: #b91c1c;
+  margin: 0;
+}

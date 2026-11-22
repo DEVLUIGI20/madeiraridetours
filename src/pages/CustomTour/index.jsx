@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import ImagePlaceholder from '../../components/common/ImagePlaceholder';
+import DatePicker from '../../components/common/DatePicker';
 import { useLanguage } from '../../hooks/useLanguage';
+import { sendCustomTourRequestEmail } from '../../services/emailService';
+import { bookingService } from '../../services/bookingService';
 import './CustomTour.css';
 
 // Coordinates (lat, lng) of the most iconic places in Madeira
@@ -18,8 +20,8 @@ const ISLAND_POINTS = [
 ];
 
 export default function CustomTour() {
-  const navigate = useNavigate();
   const { currentLang } = useLanguage();
+  const todayDateStr = useMemo(() => new Date().toISOString().split('T')[0], []);
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersRef = useRef({});
@@ -29,6 +31,25 @@ export default function CustomTour() {
     ISLAND_POINTS[5], // Santana
     ISLAND_POINTS[0], // Porto Moniz
   ]);
+
+  // Contact form state
+  const [formName, setFormName] = useState('');
+  const [formEmail, setFormEmail] = useState('');
+  const [formPhone, setFormPhone] = useState('');
+  const [formPickup, setFormPickup] = useState('');
+  const [formDate, setFormDate] = useState('');
+  const [formNotes, setFormNotes] = useState('');
+  const [formPax, setFormPax] = useState('4');
+  const [blockedDates, setBlockedDates] = useState([]);
+
+  useEffect(() => {
+    bookingService.getBlockedDates().then((res) => {
+      if (res.success && res.data) setBlockedDates(res.data);
+    });
+  }, []);
+
+  // Submission state
+  const [submitState, setSubmitState] = useState('idle'); // 'idle' | 'sending' | 'success' | 'error'
 
   const togglePoint = (pt) => {
     setSelectedPoints((prev) => {
@@ -41,9 +62,41 @@ export default function CustomTour() {
     setSelectedPoints((prev) => prev.filter((p) => p.id !== id));
   };
 
-  const handleRequestQuote = () => {
-    const pointsList = selectedPoints.map((p) => (currentLang === 'pt' ? p.namePt || p.name : p.name)).join(', ');
-    navigate(`/booking?service=custom&notes=${encodeURIComponent(pointsList)}`);
+  const handleRequestQuote = async (e) => {
+    e.preventDefault();
+    if (selectedPoints.length === 0 || !formName || !formEmail) return;
+
+    setSubmitState('sending');
+
+    const stops = selectedPoints.map((p) => (currentLang === 'pt' ? p.namePt || p.name : p.name));
+
+    const payload = {
+      customer_name: formName,
+      customer_email: formEmail,
+      customer_phone: formPhone,
+      pickup_location: formPickup,
+      selected_points: stops,
+      date: formDate,
+      passengers: formPax,
+      notes: formNotes,
+      language: currentLang,
+    };
+
+    // Save to Supabase + attempt email dispatch in parallel
+    const [emailResult, dbResult] = await Promise.allSettled([
+      sendCustomTourRequestEmail(payload),
+      bookingService.saveCustomTourRequest(payload),
+    ]);
+
+    const emailOk = emailResult.status === 'fulfilled' && emailResult.value?.success;
+    const dbOk = dbResult.status === 'fulfilled' && dbResult.value?.success;
+
+    // Show success if either the email was sent or the request was saved into DB
+    if (emailOk || dbOk) {
+      setSubmitState('success');
+    } else {
+      setSubmitState('error');
+    }
   };
 
   // Initialize interactive Leaflet map
@@ -188,7 +241,7 @@ export default function CustomTour() {
             </div>
           </div>
 
-          {/* Right: Your Plan Summary */}
+          {/* Right: Your Plan Summary + Quote Request Form */}
           <aside className="plan-summary-card">
             <h3>{currentLang === 'pt' ? 'O Seu Roteiro' : 'Your Plan'}</h3>
 
@@ -226,21 +279,137 @@ export default function CustomTour() {
               <div className="stat-line">
                 <span>{currentLang === 'pt' ? 'Duração Estimada:' : 'Estimated Duration:'}</span>
                 <strong>
-                  {selectedPoints.length > 2 
-                    ? (currentLang === 'pt' ? '6–8 Horas' : '6–8 Hours') 
+                  {selectedPoints.length > 2
+                    ? (currentLang === 'pt' ? '6–8 Horas' : '6–8 Hours')
                     : (currentLang === 'pt' ? '4–5 Horas' : '4–5 Hours')}
                 </strong>
               </div>
             </div>
 
-            <button
-              type="button"
-              disabled={selectedPoints.length === 0}
-              onClick={handleRequestQuote}
-              className="request-quote-btn"
-            >
-              {currentLang === 'pt' ? 'Pedir Proposta com Este Roteiro →' : 'Request Quote →'}
-            </button>
+            {/* Success state */}
+            {submitState === 'success' ? (
+              <div className="quote-success-box">
+                <span className="quote-success-icon">✓</span>
+                <h4>{currentLang === 'pt' ? 'Pedido Enviado!' : currentLang === 'de' ? 'Anfrage gesendet!' : currentLang === 'fr' ? 'Demande envoyée !' : currentLang === 'es' ? '¡Solicitud enviada!' : 'Request Sent!'}</h4>
+                <p>
+                  {currentLang === 'pt'
+                    ? 'Obrigado! Irá receber um email com o orçamento para o seu tour personalizado. O nosso condutor entrará em contacto brevemente.'
+                    : currentLang === 'de'
+                    ? 'Vielen Dank! Sie erhalten in Kürze eine E-Mail mit Ihrem individuellen Tour-Angebot.'
+                    : currentLang === 'fr'
+                    ? 'Merci ! Vous recevrez bientôt un e-mail avec le devis pour votre circuit personnalisé.'
+                    : currentLang === 'es'
+                    ? '¡Gracias! Recibirá pronto un email con el presupuesto para su tour personalizado.'
+                    : 'Thank you! You will receive an email with your personalised tour quote shortly. Our driver will contact you soon.'}
+                </p>
+              </div>
+            ) : (
+              /* Contact form */
+              <form className="quote-request-form" onSubmit={handleRequestQuote}>
+                <div className="quote-form-group">
+                  <label className="quote-form-label">
+                    {currentLang === 'pt' ? 'Nome Completo *' : currentLang === 'de' ? 'Vollständiger Name *' : currentLang === 'fr' ? 'Nom complet *' : currentLang === 'es' ? 'Nombre completo *' : 'Full Name *'}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formName}
+                    onChange={(e) => setFormName(e.target.value)}
+                    className="quote-form-input"
+                    placeholder={currentLang === 'pt' ? 'O seu nome' : 'Your name'}
+                  />
+                </div>
+                <div className="quote-form-group">
+                  <label className="quote-form-label">
+                    {currentLang === 'pt' ? 'Email *' : 'Email *'}
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={formEmail}
+                    onChange={(e) => setFormEmail(e.target.value)}
+                    className="quote-form-input"
+                    placeholder="email@example.com"
+                  />
+                </div>
+                <div className="quote-form-group">
+                  <label className="quote-form-label">
+                    {currentLang === 'pt' ? 'Telefone / WhatsApp' : currentLang === 'de' ? 'Telefon / WhatsApp' : currentLang === 'fr' ? 'Téléphone / WhatsApp' : currentLang === 'es' ? 'Teléfono / WhatsApp' : 'Phone / WhatsApp'}
+                  </label>
+                  <input
+                    type="tel"
+                    value={formPhone}
+                    onChange={(e) => setFormPhone(e.target.value)}
+                    className="quote-form-input"
+                    placeholder="+351 ..."
+                  />
+                </div>
+                <div className="quote-form-group">
+                  <label className="quote-form-label">
+                    {currentLang === 'pt' ? 'Local de Recolha (Hotel / Morada) *' : currentLang === 'de' ? 'Abholort (Hotel / Adresse) *' : currentLang === 'fr' ? 'Lieu de prise en charge (Hôtel / Adresse) *' : currentLang === 'es' ? 'Lugar de recogida (Hotel / Dirección) *' : 'Pickup Location (Hotel / Address) *'}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formPickup}
+                    onChange={(e) => setFormPickup(e.target.value)}
+                    className="quote-form-input"
+                    placeholder={currentLang === 'pt' ? 'Ex: Hotel Savoy Palace, Funchal' : 'e.g. Savoy Palace Hotel, Funchal'}
+                  />
+                </div>
+                <div className="quote-form-group">
+                  <label className="quote-form-label">
+                    {currentLang === 'pt' ? 'Data Pretendida' : currentLang === 'de' ? 'Gewünschtes Datum' : currentLang === 'fr' ? 'Date souhaitée' : currentLang === 'es' ? 'Fecha deseada' : 'Preferred Date'}
+                  </label>
+                  <DatePicker
+                    value={formDate}
+                    onChange={(newDate) => setFormDate(newDate)}
+                    blockedDates={blockedDates}
+                    minDate={todayDateStr}
+                    language={currentLang}
+                    placeholder="dd/mm/aaaa"
+                  />
+                </div>
+                <div className="quote-form-group">
+                  <label className="quote-form-label">
+                    {currentLang === 'pt' ? 'Nº de Passageiros' : currentLang === 'de' ? 'Passagieranzahl' : currentLang === 'fr' ? 'Nombre de passagers' : currentLang === 'es' ? 'Nº de pasajeros' : 'Number of Passengers'}
+                  </label>
+                  <select value={formPax} onChange={(e) => setFormPax(e.target.value)} className="quote-form-input">
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                      <option key={n} value={n}>{n} {currentLang === 'pt' ? (n === 1 ? 'passageiro' : 'passageiros') : (n === 1 ? 'passenger' : 'passengers')}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="quote-form-group">
+                  <label className="quote-form-label">
+                    {currentLang === 'pt' ? 'Notas Adicionais' : currentLang === 'de' ? 'Zusätzliche Hinweise' : currentLang === 'fr' ? 'Notes supplémentaires' : currentLang === 'es' ? 'Notas adicionales' : 'Additional Notes'}
+                  </label>
+                  <textarea
+                    value={formNotes}
+                    onChange={(e) => setFormNotes(e.target.value)}
+                    className="quote-form-input"
+                    rows={3}
+                    placeholder={currentLang === 'pt' ? 'Requisitos especiais, horário preferido...' : 'Special requirements, preferred time...'}
+                  />
+                </div>
+
+                {submitState === 'error' && (
+                  <p className="quote-error-msg">
+                    {currentLang === 'pt' ? 'Erro ao enviar. Tente novamente ou contacte-nos via WhatsApp.' : 'Error sending request. Please try again or contact us via WhatsApp.'}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={selectedPoints.length === 0 || submitState === 'sending'}
+                  className="request-quote-btn"
+                >
+                  {submitState === 'sending'
+                    ? (currentLang === 'pt' ? 'A enviar...' : 'Sending...')
+                    : (currentLang === 'pt' ? 'Pedir Orçamento para Este Roteiro →' : currentLang === 'de' ? 'Angebot anfordern →' : currentLang === 'fr' ? 'Demander un devis →' : currentLang === 'es' ? 'Solicitar presupuesto →' : 'Request Quote for This Itinerary →')}
+                </button>
+              </form>
+            )}
           </aside>
         </div>
       </section>

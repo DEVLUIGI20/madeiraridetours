@@ -1,18 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { TOURS_DATA } from '../../constants/toursCatalog';
 import { AIRPORT_TRANSFER_LOCATIONS } from '../../constants/transfersCatalog';
 import { getAirportLocations } from '../../services/catalogService';
+import { bookingService } from '../../services/bookingService';
 import { useLanguage } from '../../hooks/useLanguage';
 import TourCard from '../../components/common/TourCard';
 import ImagePlaceholder from '../../components/common/ImagePlaceholder';
 import DestinationDropdown from '../../components/common/DestinationDropdown';
+import DatePicker from '../../components/common/DatePicker';
+import TimePicker from '../../components/common/TimePicker';
+import PassengerPicker from '../../components/common/PassengerPicker';
 import usePageTitle from '../../hooks/usePageTitle';
 import './Home.css';
 
 export default function Home() {
   const navigate = useNavigate();
   const { t, currentLang } = useLanguage();
+  const todayDateStr = useMemo(() => new Date().toISOString().split('T')[0], []);
   usePageTitle(
     t('hero.slide1Title')?.replace('\n', ' ') || 'Transfers Privados & Passeios na Madeira',
     t('hero.slide1Subtitle') || 'Transfers privados com motoristas profissionais na Ilha da Madeira.'
@@ -28,12 +33,18 @@ export default function Home() {
   const [returnTime, setReturnTime] = useState('14:00');
   const [passengers, setPassengers] = useState(1);
   const [locations, setLocations] = useState(AIRPORT_TRANSFER_LOCATIONS);
+  const [blockedDates, setBlockedDates] = useState([]);
 
   useEffect(() => {
     let isMounted = true;
     getAirportLocations().then((liveLocations) => {
       if (isMounted && liveLocations && liveLocations.length > 0) {
         setLocations(liveLocations);
+      }
+    });
+    bookingService.getBlockedDates().then((res) => {
+      if (isMounted && res.success && res.data) {
+        setBlockedDates(res.data);
       }
     });
     return () => {
@@ -58,6 +69,20 @@ export default function Home() {
 
   const handleBook = (e) => {
     e.preventDefault();
+
+    if (date && blockedDates.includes(date)) {
+      alert(currentLang === 'pt'
+        ? `Lamentamos, mas a data ${date} encontra-se esgotada/indisponível. Por favor selecione outra data.`
+        : `Sorry, date ${date} is fully booked / unavailable. Please choose another date.`);
+      return;
+    }
+    if (tripType === 'round-trip' && returnDate && blockedDates.includes(returnDate)) {
+      alert(currentLang === 'pt'
+        ? `A data de regresso ${returnDate} encontra-se indisponível. Por favor selecione outra data.`
+        : `Return date ${returnDate} is unavailable. Please select another date.`);
+      return;
+    }
+
     const originLabel = getLabel(fromLoc);
     const destLabel = getLabel(destLoc);
 
@@ -176,12 +201,13 @@ export default function Home() {
                   ? (currentLang === 'pt' ? 'Data de Partida (Ida)' : currentLang === 'de' ? 'Hinfahrt-Datum' : currentLang === 'fr' ? 'Date de départ' : 'Departure Date')
                   : (currentLang === 'pt' ? 'Data da Viagem' : currentLang === 'de' ? 'Datum' : currentLang === 'fr' ? 'Date' : 'Date')}
               </span>
-              <input
-                type="date"
-                required
+              <DatePicker
                 value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="search-field__input"
+                onChange={(newVal) => setDate(newVal)}
+                blockedDates={blockedDates}
+                minDate={todayDateStr}
+                language={currentLang}
+                placeholder="dd/mm/aaaa"
               />
             </div>
 
@@ -190,12 +216,11 @@ export default function Home() {
               <span className="search-field__label">
                 {currentLang === 'pt' ? 'Hora de Recolha' : currentLang === 'de' ? 'Abholzeit' : currentLang === 'fr' ? 'Heure de départ' : 'Pick-up Time'}
               </span>
-              <input
-                type="time"
-                required
+              <TimePicker
                 value={pickupTime}
-                onChange={(e) => setPickupTime(e.target.value)}
-                className="search-field__input"
+                onChange={(newTime) => setPickupTime(newTime)}
+                required
+                language={currentLang}
               />
             </div>
 
@@ -206,24 +231,24 @@ export default function Home() {
                   <span className="search-field__label">
                     {currentLang === 'pt' ? 'Data de Regresso (Volta)' : currentLang === 'de' ? 'Rückfahrt-Datum' : currentLang === 'fr' ? 'Date de retour' : 'Return Date'}
                   </span>
-                  <input
-                    type="date"
-                    required
+                  <DatePicker
                     value={returnDate}
-                    onChange={(e) => setReturnDate(e.target.value)}
-                    className="search-field__input"
+                    onChange={(newVal) => setReturnDate(newVal)}
+                    blockedDates={blockedDates}
+                    minDate={date || todayDateStr}
+                    language={currentLang}
+                    placeholder="dd/mm/aaaa"
                   />
                 </div>
                 <div className="search-field search-field--time search-field--return-time">
                   <span className="search-field__label">
                     {currentLang === 'pt' ? 'Hora de Regresso' : currentLang === 'de' ? 'Rückfahrt-Uhrzeit' : currentLang === 'fr' ? 'Heure de retour' : 'Return Time'}
                   </span>
-                  <input
-                    type="time"
-                    required
+                  <TimePicker
                     value={returnTime}
-                    onChange={(e) => setReturnTime(e.target.value)}
-                    className="search-field__input"
+                    onChange={(newTime) => setReturnTime(newTime)}
+                    required
+                    language={currentLang}
                   />
                 </div>
               </>
@@ -234,19 +259,13 @@ export default function Home() {
               <span className="search-field__label">
                 {currentLang === 'pt' ? 'Passageiros' : currentLang === 'de' ? 'Passagiere' : currentLang === 'fr' ? 'Passagers' : 'Passengers'}
               </span>
-              <select
+              <PassengerPicker
                 value={passengers}
-                onChange={(e) => setPassengers(Number(e.target.value))}
-                className="search-field__input search-field__input--pax"
-              >
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                  <option key={n} value={n}>
-                    {n} {n === 1 
-                      ? (currentLang === 'pt' ? 'Passageiro' : currentLang === 'de' ? 'Passagier' : currentLang === 'fr' ? 'Passager' : 'Passenger')
-                      : (currentLang === 'pt' ? 'Passageiros' : currentLang === 'de' ? 'Passagiere' : currentLang === 'fr' ? 'Passagers' : 'Passengers')}
-                  </option>
-                ))}
-              </select>
+                onChange={(n) => setPassengers(n)}
+                language={currentLang}
+                min={1}
+                max={8}
+              />
             </div>
 
             {/* BOOK BUTTON WITH LIVE PRICE */}

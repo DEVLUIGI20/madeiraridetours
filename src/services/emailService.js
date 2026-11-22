@@ -7,6 +7,8 @@ import { MADEIRA_ADVENTURES } from '../constants/transfersCatalog';
 import { TOURS_DATA } from '../constants/toursCatalog';
 
 const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY || '';
+// Use local Vite proxy during development to prevent browser CORS block
+const RESEND_ENDPOINT = import.meta.env.DEV ? '/api/resend/emails' : 'https://api.resend.com/emails';
 
 /**
  * Sends a booking confirmation voucher email to customer
@@ -339,7 +341,7 @@ export async function sendBookingConfirmationEmail(bookingDetails) {
   `;
 
   try {
-    const response = await fetch('https://api.resend.com/emails', {
+    const response = await fetch(RESEND_ENDPOINT, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -361,7 +363,205 @@ export async function sendBookingConfirmationEmail(bookingDetails) {
   }
 }
 
-export default {
-  sendBookingConfirmationEmail,
-};
+/**
+ * Sends a custom tour quote request email to the customer + admin notification
+ */
+export async function sendCustomTourRequestEmail({ customer_name, customer_email, customer_phone, pickup_location, selected_points, notes, language, date, passengers }) {
+  if (!customer_email) {
+    console.warn('[emailService] No customer email provided for custom tour request.');
+    return { success: false, reason: 'missing_email' };
+  }
+
+  if (!RESEND_API_KEY) {
+    console.warn('[emailService] VITE_RESEND_API_KEY not configured – skipping email.');
+    return { success: false, reason: 'missing_api_key' };
+  }
+
+  const lang = ['pt', 'en', 'de', 'fr', 'es'].includes(language) ? language : 'en';
+
+  const i18n = {
+    pt: {
+      subject: 'Pedido de Tour Personalizado – Madeira Ride Tours',
+      title: 'Pedido de Tour Personalizado Recebido!',
+      greeting: 'Olá',
+      thanks: 'Obrigado pelo seu pedido de tour personalizado na <strong>Madeira Ride Tours</strong>! A nossa equipa irá preparar um orçamento personalizado para o seu roteiro.',
+      contactSoon: '📞 O nosso condutor entrará em contacto brevemente com um orçamento detalhado.',
+      stopsTitle: '📍 Locais Selecionados no Seu Roteiro:',
+      pickup: 'Local de Recolha:',
+      name: 'Nome:',
+      email: 'Email:',
+      phone: 'Telefone:',
+      date: 'Data Pretendida:',
+      pax: 'Passageiros:',
+      notes: 'Notas:',
+      footer: 'Madeira Ride Tours · Ilha da Madeira, Portugal<br>Contacto: info@madeiraridetours.com · +351 916 326 716',
+    },
+    en: {
+      subject: 'Custom Tour Request – Madeira Ride Tours',
+      title: 'Custom Tour Request Received!',
+      greeting: 'Hello',
+      thanks: 'Thank you for your custom tour request with <strong>Madeira Ride Tours</strong>! Our team will prepare a personalised quote for your itinerary.',
+      contactSoon: '📞 Our driver will contact you shortly with a detailed quote.',
+      stopsTitle: '📍 Selected Stops in Your Itinerary:',
+      pickup: 'Pickup Location:',
+      name: 'Name:',
+      email: 'Email:',
+      phone: 'Phone:',
+      date: 'Preferred Date:',
+      pax: 'Passengers:',
+      notes: 'Notes:',
+      footer: 'Madeira Ride Tours · Madeira Island, Portugal<br>Contact: info@madeiraridetours.com · +351 916 326 716',
+    },
+    de: {
+      subject: 'Individuelle Tour-Anfrage – Madeira Ride Tours',
+      title: 'Individuelle Tour-Anfrage erhalten!',
+      greeting: 'Hallo',
+      thanks: 'Vielen Dank für Ihre individuelle Tour-Anfrage bei <strong>Madeira Ride Tours</strong>! Unser Team wird Ihnen in Kürze ein persönliches Angebot erstellen.',
+      contactSoon: '📞 Unser Fahrer wird sich bald bei Ihnen melden.',
+      stopsTitle: '📍 Ausgewählte Stopps:',
+      pickup: 'Abholort:',
+      name: 'Name:',
+      email: 'E-Mail:',
+      phone: 'Telefon:',
+      date: 'Gewünschtes Datum:',
+      pax: 'Passagiere:',
+      notes: 'Anmerkungen:',
+      footer: 'Madeira Ride Tours · Madeira Island, Portugal<br>Kontakt: info@madeiraridetours.com · +351 916 326 716',
+    },
+    fr: {
+      subject: 'Demande de Circuit Personnalisé – Madeira Ride Tours',
+      title: 'Demande de Circuit Personnalisé Reçue !',
+      greeting: 'Bonjour',
+      thanks: 'Merci pour votre demande de circuit personnalisé avec <strong>Madeira Ride Tours</strong> ! Notre équipe préparera un devis personnalisé pour votre itinéraire.',
+      contactSoon: '📞 Notre chauffeur vous contactera prochainement avec un devis détaillé.',
+      stopsTitle: '📍 Étapes sélectionnées :',
+      pickup: 'Lieu de prise en charge :',
+      name: 'Nom :',
+      email: 'Email :',
+      phone: 'Téléphone :',
+      date: 'Date souhaitée :',
+      pax: 'Passagers :',
+      notes: 'Notes :',
+      footer: 'Madeira Ride Tours · Île de Madère, Portugal<br>Contact : info@madeiraridetours.com · +351 916 326 716',
+    },
+    es: {
+      subject: 'Solicitud de Tour Personalizado – Madeira Ride Tours',
+      title: '¡Solicitud de Tour Personalizado Recibida!',
+      greeting: 'Hola',
+      thanks: 'Gracias por su solicitud de tour personalizado con <strong>Madeira Ride Tours</strong>. Nuestro equipo preparará un presupuesto personalizado para su itinerario.',
+      contactSoon: '📞 Nuestro conductor se pondrá en contacto pronto con un presupuesto detallado.',
+      stopsTitle: '📍 Paradas seleccionadas:',
+      pickup: 'Lugar de recogida:',
+      name: 'Nombre:',
+      email: 'Email:',
+      phone: 'Teléfono:',
+      date: 'Fecha preferida:',
+      pax: 'Pasajeros:',
+      notes: 'Notas:',
+      footer: 'Madeira Ride Tours · Isla de Madeira, Portugal<br>Contacto: info@madeiraridetours.com · +351 916 326 716',
+    },
+  };
+
+  const t = i18n[lang];
+  const stopsHtml = (selected_points || []).map((stop, idx) => `
+    <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="background:#e0e7ff;color:#4338ca;font-weight:800;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;">${idx + 1}</span>
+      <span style="color:#0f172a;font-size:14px;">${stop}</span>
+    </div>
+  `).join('');
+
+  const customerHtml = `
+    <!DOCTYPE html>
+    <html lang="${lang}">
+    <head><meta charset="UTF-8"><title>${t.title}</title></head>
+    <body style="margin:0;padding:0;background:#f1f5f9;font-family:Arial,sans-serif;">
+      <div style="max-width:600px;margin:0 auto;padding:24px 16px;">
+        <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.1);">
+          <div style="background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:28px 32px;color:#fff;text-align:center;">
+            <h1 style="margin:0;font-size:22px;">🗺️ Madeira Ride Tours</h1>
+            <p style="margin:8px 0 0;opacity:0.9;font-size:14px;">${t.title}</p>
+          </div>
+          <div style="padding:28px 32px;">
+            <p style="font-size:16px;">${t.greeting} <strong>${customer_name}</strong>,</p>
+            <p style="color:#334155;line-height:1.6;">${t.thanks}</p>
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;margin:20px 0;text-align:center;">
+              <p style="margin:0;color:#166534;font-size:15px;font-weight:600;">${t.contactSoon}</p>
+            </div>
+            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:18px;margin-bottom:20px;">
+              <h4 style="margin:0 0 14px;color:#0f172a;font-size:15px;font-weight:800;">${t.stopsTitle}</h4>
+              ${stopsHtml}
+            </div>
+            <table style="width:100%;border-collapse:collapse;font-size:14px;">
+              ${pickup_location ? `<tr><td style="color:#64748b;padding:6px 0;width:40%;">${t.pickup}</td><td style="color:#0f172a;font-weight:600;">${pickup_location}</td></tr>` : ''}
+              ${date ? `<tr><td style="color:#64748b;padding:6px 0;width:40%;">${t.date}</td><td style="color:#0f172a;font-weight:600;">${date}</td></tr>` : ''}
+              ${passengers ? `<tr><td style="color:#64748b;padding:6px 0;">${t.pax}</td><td style="color:#0f172a;font-weight:600;">${passengers}</td></tr>` : ''}
+              ${customer_phone ? `<tr><td style="color:#64748b;padding:6px 0;">${t.phone}</td><td style="color:#0f172a;">${customer_phone}</td></tr>` : ''}
+              ${notes ? `<tr><td style="color:#64748b;padding:6px 0;">${t.notes}</td><td style="color:#0f172a;">${notes}</td></tr>` : ''}
+            </table>
+            <div style="text-align:center;margin-top:24px;">
+              <a href="https://wa.me/351916326716" style="display:inline-block;background:#25d366;color:#fff;padding:12px 28px;border-radius:50px;font-weight:700;text-decoration:none;">💬 WhatsApp</a>
+            </div>
+          </div>
+          <div style="background:#f8fafc;padding:16px 32px;text-align:center;font-size:12px;color:#94a3b8;border-top:1px solid #e2e8f0;">
+            ${t.footer}
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  // Admin notification email (always in English)
+  const adminHtml = `
+    <!DOCTYPE html><html><head><meta charset="UTF-8"></head>
+    <body style="font-family:Arial,sans-serif;padding:20px;">
+      <h2>🗺️ New Custom Tour Request</h2>
+      <table style="border-collapse:collapse;width:100%;font-size:14px;">
+        <tr><td style="padding:6px;color:#555;width:160px;"><strong>Name:</strong></td><td>${customer_name}</td></tr>
+        <tr><td style="padding:6px;color:#555;"><strong>Email:</strong></td><td>${customer_email}</td></tr>
+        <tr><td style="padding:6px;color:#555;"><strong>Phone:</strong></td><td>${customer_phone || '—'}</td></tr>
+        <tr><td style="padding:6px;color:#555;"><strong>Pickup Location:</strong></td><td>${pickup_location || '—'}</td></tr>
+        <tr><td style="padding:6px;color:#555;"><strong>Date:</strong></td><td>${date || '—'}</td></tr>
+        <tr><td style="padding:6px;color:#555;"><strong>Passengers:</strong></td><td>${passengers || '—'}</td></tr>
+        <tr><td style="padding:6px;color:#555;"><strong>Language:</strong></td><td>${lang}</td></tr>
+        <tr><td style="padding:6px;color:#555;"><strong>Notes:</strong></td><td>${notes || '—'}</td></tr>
+        <tr><td style="padding:6px;color:#555;vertical-align:top;"><strong>Stops:</strong></td><td>${(selected_points || []).map((s, i) => `${i + 1}. ${s}`).join('<br>')}</td></tr>
+      </table>
+    </body></html>
+  `;
+
+  try {
+    // Send confirmation to customer
+    const customerRes = await fetch(RESEND_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: 'Madeira Ride Tours <onboarding@resend.dev>',
+        to: [customer_email],
+        subject: t.subject,
+        html: customerHtml,
+      }),
+    });
+
+    // Send notification to admin
+    await fetch(RESEND_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: 'Madeira Ride Tours <onboarding@resend.dev>',
+        to: ['info@madeiraridetours.com'],
+        subject: `[Custom Tour] ${customer_name} – ${(selected_points || []).length} stops`,
+        html: adminHtml,
+      }),
+    });
+
+    const result = await customerRes.json();
+    return { success: customerRes.ok, data: result };
+  } catch (err) {
+    console.error('[emailService] Custom tour request email error:', err);
+    return { success: false, error: err };
+  }
+}
+
+
 

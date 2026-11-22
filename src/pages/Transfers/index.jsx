@@ -1,16 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MADEIRA_ADVENTURES, AIRPORT_TRANSFER_LOCATIONS } from '../../constants/transfersCatalog';
 import { getAirportLocations } from '../../services/catalogService';
+import { bookingService } from '../../services/bookingService';
 import { useLanguage } from '../../hooks/useLanguage';
 import ImagePlaceholder from '../../components/common/ImagePlaceholder';
 import DestinationDropdown from '../../components/common/DestinationDropdown';
+import DatePicker from '../../components/common/DatePicker';
 import usePageTitle from '../../hooks/usePageTitle';
 import './Transfers.css';
 
 export default function Transfers() {
   const navigate = useNavigate();
   const { currentLang } = useLanguage();
+  const todayDateStr = useMemo(() => new Date().toISOString().split('T')[0], []);
 
   usePageTitle(
     currentLang === 'pt'
@@ -37,12 +40,18 @@ export default function Transfers() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState('');
   const [groupSize, setGroupSize] = useState('4');
   const [locations, setLocations] = useState(AIRPORT_TRANSFER_LOCATIONS);
+  const [blockedDates, setBlockedDates] = useState([]);
 
   useEffect(() => {
     let isMounted = true;
     getAirportLocations().then((liveLocations) => {
       if (isMounted && liveLocations && liveLocations.length > 0) {
         setLocations(liveLocations);
+      }
+    });
+    bookingService.getBlockedDates().then((res) => {
+      if (isMounted && res.success && res.data) {
+        setBlockedDates(res.data);
       }
     });
     return () => {
@@ -81,6 +90,13 @@ export default function Transfers() {
   const handleBook = (e) => {
     e.preventDefault();
     if (!selectedAdventure) return;
+
+    if (date && blockedDates.includes(date)) {
+      alert(currentLang === 'pt'
+        ? `Lamentamos, mas a data ${date} encontra-se esgotada/bloqueada para reservas. Por favor escolha outra data.`
+        : `Sorry, date ${date} is unavailable/blocked. Please select another date.`);
+      return;
+    }
 
     const queryParams = new URLSearchParams({
       service: selectedAdventure.id,
@@ -177,18 +193,19 @@ export default function Transfers() {
                   </div>
 
                   {/* Date */}
-                  <label className="transfer-form-group">
+                  <div className="transfer-form-group">
                     <span className="transfer-form-label">
                       {currentLang === 'pt' ? 'Data da Aventura' : currentLang === 'de' ? 'Datum' : currentLang === 'fr' ? 'Date de l’aventure' : 'Date of Adventure'}
                     </span>
-                    <input
-                      type="date"
-                      required
+                    <DatePicker
                       value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                      className="transfer-input"
+                      onChange={(newVal) => setDate(newVal)}
+                      blockedDates={blockedDates}
+                      minDate={todayDateStr}
+                      language={currentLang}
+                      placeholder="dd/mm/aaaa"
                     />
-                  </label>
+                  </div>
 
                   {/* Shift / Pick-up Time Options */}
                   <div className="transfer-form-group">
