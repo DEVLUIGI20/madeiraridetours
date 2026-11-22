@@ -49,7 +49,6 @@ export default function TourDetail() {
             </div>
 
             <div className="tour-header-price-badge">
-              <span className="price-from">{currentLang === 'pt' ? 'Desde' : 'From'}</span>
               <strong className="price-val">€{tour.price}</strong>
               <span className="price-unit">{currentLang === 'pt' ? 'por pessoa' : 'per person'}</span>
             </div>

@@ -51,12 +51,31 @@ html {
     font-size: 14px;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    touch-action: manipulation;
   }
 
   html, body {
     overflow-x: hidden;
     max-width: 100vw;
   }
+
+  /* Prevent automatic mobile zoom on input focus by ensuring minimum 16px font size */
+  input,
+  textarea,
+  select,
+  button {
+    font-size: 16px !important;
+  }
+}
+
+/* Ensure mobile browser tap gestures don't trigger double-tap zoom */
+button,
+a,
+input,
+select,
+textarea,
+[role="button"] {
+  touch-action: manipulation;
 }
 
 body {

@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useBooking } from '../../context/BookingContext';
 import { TOURS_DATA } from '../../constants/toursCatalog';
 import { MOUNTAIN_TRANSFERS_CATALOG, AIRPORT_TRANSFER_LOCATIONS, MADEIRA_ADVENTURES } from '../../constants/transfersCatalog';
-import { getAirportLocations } from '../../services/catalogService';
+import { getAirportLocations, getTours } from '../../services/catalogService';
+import PassengerPicker from '../../components/common/PassengerPicker';
 import { PAYMENT_METHOD, SERVICE_TYPE } from '../../constants/booking';
 import { paymentService } from '../../services/paymentService';
 import { ROUTES } from '../../constants/index';
@@ -32,12 +33,18 @@ export default function Booking() {
 
   const { booking, markPendingPayment } = useBooking();
   const [locations, setLocations] = useState(AIRPORT_TRANSFER_LOCATIONS);
+  const [toursList, setToursList] = useState(TOURS_DATA);
 
   useEffect(() => {
     let isMounted = true;
     getAirportLocations().then((liveLocations) => {
       if (isMounted && liveLocations && liveLocations.length > 0) {
         setLocations(liveLocations);
+      }
+    });
+    getTours().then((liveTours) => {
+      if (isMounted && liveTours && liveTours.length > 0) {
+        setToursList(liveTours);
       }
     });
     return () => {
@@ -56,7 +63,7 @@ export default function Booking() {
         title: adv.title,
         type: SERVICE_TYPE.TOUR,
         isAirportTransfer: false,
-        origin: pickupParam || fromParam || 'Funchal / Accommodation Pickup',
+        origin: pickupParam || fromParam || (currentLang === 'pt' ? 'Onde desejar (Hotel / Alojamento)' : 'Anywhere in Madeira (Hotel / Address)'),
         destination: adv.title,
         duration: adv.duration,
         highlights: adv.highlights,
@@ -108,38 +115,50 @@ export default function Booking() {
       };
     }
 
-    // 3. Tour lookup
-    const tour = TOURS_DATA.find((t) => t.id === serviceParam);
+    // 3. Tour lookup (checked against live database list and static catalog)
+    const tour = toursList.find((t) => t.id === serviceParam) || TOURS_DATA.find((t) => t.id === serviceParam);
     if (tour) {
+      const paxNum = Number(paxParam) || 1;
+      let calculatedPrice = tour.price;
+
+      // Tiered vehicle pricing if configured (e.g. 1-4 pax vs 5-8 pax)
+      if (tour.price4 && tour.price8) {
+        calculatedPrice = paxNum > 4 ? tour.price8 : tour.price4;
+      } else if (priceParam) {
+        calculatedPrice = Number(priceParam);
+      } else if (tour.price) {
+        calculatedPrice = tour.price;
+      }
+
       return {
         id: tour.id,
         title: tour.title,
         type: SERVICE_TYPE.TOUR,
         isAirportTransfer: false,
-        origin: 'Funchal / South Coast Hotels',
+        origin: pickupParam || (currentLang === 'pt' ? 'Onde desejar (Hotel / Alojamento)' : 'Anywhere in Madeira (Hotel / Address)'),
         destination: tour.title,
         duration: tour.duration,
         highlights: tour.highlights,
-        totalCalculatedPrice: tour.price * (Number(paxParam) || 1),
+        totalCalculatedPrice: calculatedPrice,
         image: tour.image,
       };
     }
 
     // Fallback default
-    const defaultTour = TOURS_DATA[0];
+    const defaultTour = toursList[0] || TOURS_DATA[0];
     return {
       id: defaultTour.id,
       title: defaultTour.title,
       type: SERVICE_TYPE.TOUR,
       isAirportTransfer: false,
-      origin: 'Funchal',
+      origin: currentLang === 'pt' ? 'Onde desejar (Hotel / Alojamento)' : 'Anywhere in Madeira (Hotel / Address)',
       destination: defaultTour.title,
       duration: defaultTour.duration,
       highlights: defaultTour.highlights,
-      totalCalculatedPrice: defaultTour.price * (Number(paxParam) || 1),
+      totalCalculatedPrice: defaultTour.price || 90,
       image: defaultTour.image,
     };
-  }, [serviceParam, fromParam, dropoffParam, tripTypeParam, priceParam, paxParam, pickupParam, locations]);
+  }, [serviceParam, fromParam, dropoffParam, tripTypeParam, priceParam, paxParam, pickupParam, locations, toursList]);
 
   // Form State
   const [fullName, setFullName] = useState(booking.customer?.name || '');
@@ -164,8 +183,53 @@ export default function Booking() {
     return '10:00';
   });
 
-  const passengers = Number(paxParam) || booking.passengers || 2;
-  const totalPrice = currentService.totalCalculatedPrice.toFixed(2);
+  // Active tour info for tiered pricing labels
+  const activeTourInfo = useMemo(() => {
+    return toursList.find((t) => t.id === serviceParam) || TOURS_DATA.find((t) => t.id === serviceParam);
+  }, [toursList, serviceParam]);
+
+  const p4Price = activeTourInfo?.price4 || activeTourInfo?.price || 90;
+  const p8Price = activeTourInfo?.price8 || (activeTourInfo?.price ? Math.round(activeTourInfo.price * 1.33) : 120);
+
+  const [passengers, setPassengers] = useState(() => {
+    return Number(paxParam) || booking.passengers || 2;
+  });
+
+  // Calculate dynamic price based on chosen passengers and service
+  const totalPrice = useMemo(() => {
+    // 1. If explicit price param is passed and pax didn't change
+    if (priceParam && Number(paxParam) === passengers) {
+      return Number(priceParam).toFixed(2);
+    }
+
+    // 2. Madeira Adventures tier pricing
+    const adv = MADEIRA_ADVENTURES.find((a) => a.id === serviceParam);
+    if (adv) {
+      const p = passengers > 4 ? adv.price8 : adv.price4;
+      return Number(p).toFixed(2);
+    }
+
+    // 3. Tour tiered vehicle pricing (1-4 pax: tour.price4, 5-8 pax: tour.price8)
+    const tour = toursList.find((t) => t.id === serviceParam) || TOURS_DATA.find((t) => t.id === serviceParam);
+    if (tour) {
+      const p4 = tour.price4 || tour.price || 90;
+      const p8 = tour.price8 || (tour.price ? Math.round(tour.price * 1.33) : 120);
+      const p = passengers > 4 ? p8 : p4;
+      return Number(p).toFixed(2);
+    }
+
+    // 4. Airport Transfer pricing
+    if (serviceParam === 'airport-transfer' || fromParam.includes('Airport') || dropoffParam) {
+      const loc = locations.find((l) => l.name === dropoffParam || l.id === dropoffParam) || locations[0];
+      const isRoundTrip = tripTypeParam === 'round-trip';
+      const base = isRoundTrip ? loc.roundTripPrice : loc.oneWayPrice;
+      const finalPrice = passengers > 4 ? Math.round(base * 1.35) : base;
+      return Number(finalPrice).toFixed(2);
+    }
+
+    // Default
+    return (currentService.totalCalculatedPrice || 90).toFixed(2);
+  }, [passengers, serviceParam, priceParam, paxParam, toursList, locations, dropoffParam, fromParam, tripTypeParam, currentService]);
 
   // Formatting Date for summary badge
   const formattedDepartureDate = useMemo(() => {
@@ -320,11 +384,24 @@ export default function Booking() {
                     <span className="summary-text">Return: {formattedReturnDate} {returnTimeParam ? `às ${returnTimeParam}` : ''}</span>
                   </div>
                 )}
-                <div className="summary-meta-line">
-                  <span className="summary-icon">👤</span>
-                  <span className="summary-text">
-                    {passengers} {passengers === 1 ? 'passenger' : 'passengers'}
+                <div className="checkout-pax-wrapper">
+                  <span className="checkout-pax-field-lbl">
+                    {currentLang === 'pt' ? 'Passageiros' : currentLang === 'de' ? 'Passagiere' : currentLang === 'fr' ? 'Passagers' : 'Passengers'}
                   </span>
+                  <PassengerPicker
+                    value={passengers}
+                    onChange={(n) => setPassengers(n)}
+                    language={currentLang}
+                    min={1}
+                    max={8}
+                  />
+                  <div className="checkout-pax-tier-pill">
+                    {passengers <= 4 ? (
+                      <span>Carrinha privada (1 a 4 pax) · <strong>{p4Price}€</strong></span>
+                    ) : (
+                      <span>Carrinha grande (5 a 8 pax) · <strong>{p8Price}€</strong></span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -337,8 +414,12 @@ export default function Booking() {
                 <div className="itinerary-point start">
                   <div className="point-dot" />
                   <div className="point-info">
-                    <span className="point-label">Pick-up Location</span>
-                    <strong className="point-val">{currentService.origin}</strong>
+                    <span className="point-label">
+                      {currentLang === 'pt' ? 'Local de Recolha' : 'Pick-up Location'}
+                    </span>
+                    <strong className="point-val">
+                      {pickupAddress.trim() ? pickupAddress : currentService.origin}
+                    </strong>
                   </div>
                 </div>
 

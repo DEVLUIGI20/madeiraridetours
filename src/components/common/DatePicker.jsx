@@ -170,11 +170,9 @@ export default function DatePicker({
 
       {/* Hidden input for HTML form requirement validation if needed */}
       <input
-        type="text"
+        type="hidden"
         required={required}
         value={value || ''}
-        readOnly
-        style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: 0, height: 0 }}
       />
 
       {/* Popover Calendar Dropdown */}

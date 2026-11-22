@@ -15,15 +15,22 @@ export default function TourCard({ tour }) {
   const {
     id,
     title,
+    titleEn,
     duration,
     price,
+    price4,
+    price8,
     rating = 5.0,
     reviewsCount = 100,
     image = null,
   } = tour;
 
-  const bookText = currentLang === 'pt' ? 'Reservar' : currentLang === 'de' ? 'Buchen' : currentLang === 'fr' ? 'Réserver' : currentLang === 'es' ? 'Reservar' : 'Book';
+  const displayTitle = currentLang !== 'pt' && titleEn ? titleEn : title;
+  const p4 = price4 || price || 90;
+  const p8 = price8 || (price ? Math.round(price * 1.33) : 120);
+  const lowestPrice = Math.min(p4, p8);
   const fromText = currentLang === 'pt' ? 'desde' : currentLang === 'de' ? 'ab' : currentLang === 'fr' ? 'dès' : currentLang === 'es' ? 'desde' : 'from';
+  const bookText = currentLang === 'pt' ? 'Reservar' : currentLang === 'de' ? 'Buchen' : currentLang === 'fr' ? 'Réserver' : currentLang === 'es' ? 'Reservar' : 'Book';
 
   return (
     <article className="tour-card-mockup">
@@ -31,23 +38,22 @@ export default function TourCard({ tour }) {
       <div className="tour-card-mockup__media">
         <ImagePlaceholder
           src={image}
-          alt={title}
+          alt={displayTitle}
           aspectRatio="16/10"
           className="tour-card-mockup__img"
         />
-
       </div>
 
       {/* Card Info */}
       <div className="tour-card-mockup__body">
         <h3 className="tour-card-mockup__title">
-          <Link to={`/tours/${id}`}>{title}</Link>
+          <Link to={`/tours/${id}`}>{displayTitle}</Link>
         </h3>
 
         <div className="tour-card-mockup__meta">
           <span className="tour-card-mockup__duration">{duration}</span>
           <span className="tour-card-mockup__separator">•</span>
-          <span className="tour-card-mockup__price">{fromText} <strong>€{price}</strong></span>
+          <span className="tour-card-mockup__price">{fromText} <strong>{lowestPrice}€</strong></span>
         </div>
 
         <div className="tour-card-mockup__footer">
