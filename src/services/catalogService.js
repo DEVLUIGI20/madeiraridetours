@@ -53,13 +53,26 @@ const ID_ALIASES = {
 function mergeI18n(supabaseTour) {
   const canonicalId = ID_ALIASES[supabaseTour.id] || supabaseTour.id;
   const staticTour = TOURS_DATA.find((t) => t.id === canonicalId || t.id === supabaseTour.id);
-  if (!staticTour) return supabaseTour;
   const merged = { ...supabaseTour };
+
+  // Map image_url from Supabase to image if present
+  if (supabaseTour.image_url) {
+    merged.image = supabaseTour.image_url;
+  }
+
+  if (!staticTour) return merged;
+
   for (const field of I18N_FIELDS) {
     if (merged[field] === undefined || merged[field] === null) {
       merged[field] = staticTour[field];
     }
   }
+
+  // Fallback to staticTour image if none provided in Supabase
+  if (!merged.image && staticTour.image) {
+    merged.image = staticTour.image;
+  }
+
   return merged;
 }
 
