@@ -29,10 +29,10 @@ export default function Tours() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('popular');
 
-  // Live Sync from Supabase 'tours' table
+  // Live Sync from Supabase 'tours' table with caching
   useEffect(() => {
     let isMounted = true;
-    getTours({ forceRefresh: true }).then((data) => {
+    getTours().then((data) => {
       if (isMounted && data && data.length > 0) {
         setToursList(data);
       }
@@ -87,7 +87,8 @@ export default function Tours() {
       <section className="tours-hero-banner">
         <div className="tours-hero-bg">
           <ImagePlaceholder
-            alt="Scenic Madeira Coast"
+            src="/images/tours-hero-banner.jpg"
+            alt="Scenic Madeira Mountain Peaks"
             height="100%"
           />
           <div className="tours-hero-overlay" />

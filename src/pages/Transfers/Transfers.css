@@ -557,6 +557,8 @@
   padding: 2px 7px;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  z-index: 10;
+  pointer-events: none;
 }
 
 .selected-tag {
@@ -569,6 +571,8 @@
   font-weight: 800;
   padding: 2px 7px;
   border-radius: 4px;
+  z-index: 10;
+  pointer-events: none;
 }
 
 .adventure-body.mini {

@@ -134,6 +134,7 @@ export default function Home() {
       <section className="home-hero">
         <div className="home-hero__bg">
           <ImagePlaceholder
+            src="/images/hero-banner.webp"
             alt="Madeira Panoramic Banner"
             className="home-hero__img"
             height="100%"

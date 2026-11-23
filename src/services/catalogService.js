@@ -43,6 +43,8 @@ const ID_ALIASES = {
   'sunrise-pico-do-areeiro': 'sunrise-pico-areiro',
   'sunset-pico-do-areeiro': 'sunset-pico-areiro',
   'pr9-levada-caldeirao-verde': 'pr9-caldeirao-verde',
+  'transfer-pr1-pico-ruivo': 'pr1-pico-ruivo',
+  'pr1-pico-ruivo': 'pr1-pico-ruivo',
 };
 
 /**
@@ -55,22 +57,20 @@ function mergeI18n(supabaseTour) {
   const staticTour = TOURS_DATA.find((t) => t.id === canonicalId || t.id === supabaseTour.id);
   const merged = { ...supabaseTour };
 
-  // Map image_url from Supabase to image if present
-  if (supabaseTour.image_url) {
-    merged.image = supabaseTour.image_url;
-  }
-
-  if (!staticTour) return merged;
-
-  for (const field of I18N_FIELDS) {
-    if (merged[field] === undefined || merged[field] === null) {
-      merged[field] = staticTour[field];
+  if (staticTour) {
+    for (const field of I18N_FIELDS) {
+      if (merged[field] === undefined || merged[field] === null) {
+        merged[field] = staticTour[field];
+      }
     }
   }
 
-  // Fallback to staticTour image if none provided in Supabase
-  if (!merged.image && staticTour.image) {
+  // Preserve rich curated local slideshow images from static catalog if available,
+  // preventing sudden flash/flicker when Supabase returns single/legacy image_url or null
+  if (staticTour && staticTour.image) {
     merged.image = staticTour.image;
+  } else if (supabaseTour.image_url) {
+    merged.image = supabaseTour.image_url;
   }
 
   return merged;

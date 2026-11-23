@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MADEIRA_ADVENTURES, AIRPORT_TRANSFER_LOCATIONS } from '../../constants/transfersCatalog';
 import { getAirportLocations } from '../../services/catalogService';
@@ -8,7 +8,70 @@ import ImagePlaceholder from '../../components/common/ImagePlaceholder';
 import DestinationDropdown from '../../components/common/DestinationDropdown';
 import DatePicker from '../../components/common/DatePicker';
 import usePageTitle from '../../hooks/usePageTitle';
+import '../../components/common/TourCard.css';
 import './Transfers.css';
+
+/**
+ * Subcomponente para renderizar a mídia da aventura com slideshow autónomo e isolado
+ */
+function AdventureCardMedia({ adv, advTitle, isSelected, selectedLabel, advBadge }) {
+  const images = Array.isArray(adv.image) ? adv.image : (adv.image ? [adv.image] : []);
+  const hasMultipleImages = images.length > 1;
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  useEffect(() => {
+    if (!hasMultipleImages) return;
+    const interval = setInterval(() => {
+      setActiveIdx((prev) => (prev + 1) % images.length);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [hasMultipleImages, images.length]);
+
+  return (
+    <div className="adventure-media mini">
+      {hasMultipleImages ? (
+        <div className="tour-card-mockup__slideshow">
+          {images.map((src, i) => (
+            <img
+              key={src}
+              src={src}
+              alt={`${advTitle} — ${i + 1}`}
+              className={`tour-card-mockup__slide${i === activeIdx ? ' tour-card-mockup__slide--active' : ''}`}
+              loading={i === 0 ? 'eager' : 'lazy'}
+            />
+          ))}
+          <div className="tour-card-mockup__kb-overlay" />
+        </div>
+      ) : (
+        <ImagePlaceholder
+          src={images[0] || null}
+          alt={advTitle}
+          height="140px"
+        />
+      )}
+      <span className="adventure-badge">{advBadge}</span>
+      {isSelected && (
+        <span className="selected-tag">{selectedLabel}</span>
+      )}
+      {hasMultipleImages && (
+        <div className="tour-card-mockup__dots">
+          {images.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              className={`tour-card-mockup__dot${i === activeIdx ? ' tour-card-mockup__dot--active' : ''}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveIdx(i);
+              }}
+              aria-label={`Foto ${i + 1}`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Transfers() {
   const navigate = useNavigate();
@@ -117,7 +180,11 @@ export default function Transfers() {
       {/* ── Sub-Hero Banner ── */}
       <section className="transfers-hero">
         <div className="transfers-hero-bg">
-          <ImagePlaceholder alt="Madeira Roads & Transfers" height="100%" />
+          <ImagePlaceholder
+            src="/images/transfers-adventures-hero.jpg"
+            alt="Madeira Natural Pools & Adventures"
+            height="100%"
+          />
           <div className="transfers-hero-overlay" />
         </div>
         <div className="transfers-hero-content container-constrained">
@@ -383,17 +450,13 @@ export default function Transfers() {
                     key={adv.id}
                     className={`adventure-card mini ${isSelected ? 'active-card' : ''}`}
                   >
-                    <div className="adventure-media mini">
-                      <ImagePlaceholder
-                        src={adv.image}
-                        alt={advTitle}
-                        height="140px"
-                      />
-                      <span className="adventure-badge">{advBadge}</span>
-                      {isSelected && (
-                        <span className="selected-tag">{selectedLabel}</span>
-                      )}
-                    </div>
+                    <AdventureCardMedia
+                      adv={adv}
+                      advTitle={advTitle}
+                      isSelected={isSelected}
+                      selectedLabel={selectedLabel}
+                      advBadge={advBadge}
+                    />
 
                     <div className="adventure-body mini">
                       <h3 className="adventure-name">{advTitle}</h3>

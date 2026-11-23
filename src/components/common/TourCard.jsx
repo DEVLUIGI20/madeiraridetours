@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
 import ImagePlaceholder from './ImagePlaceholder';
 import { useLanguage } from '../../hooks/useLanguage';
 import './TourCard.css';
@@ -61,6 +62,22 @@ export default function TourCard({ tour }) {
     image = null,
   } = tour;
 
+  // ── Slideshow state ───────────────────────────────────
+  const images = Array.isArray(image) ? image : (image ? [image] : []);
+  const hasSlideshow = images.length > 1;
+  const [activeIdx, setActiveIdx] = useState(0);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    if (!hasSlideshow) return;
+    timerRef.current = setInterval(() => {
+      setActiveIdx(prev => (prev + 1) % images.length);
+    }, 10000); // 10 segundos por imagem
+    return () => clearInterval(timerRef.current);
+  }, [hasSlideshow, images.length]);
+
+  const singleImage = images.length > 0 ? images[0] : null;
+
   // Translation object for this section
   const tc = t('tourCard') || {};
 
@@ -112,14 +129,44 @@ export default function TourCard({ tour }) {
     <article className="tour-card-mockup">
       {/* Media */}
       <div className="tour-card-mockup__media">
-        <ImagePlaceholder
-          src={image}
-          alt={displayTitle}
-          aspectRatio="16/10"
-          className="tour-card-mockup__img"
-        />
+        {hasSlideshow ? (
+          /* ── Crossfade slideshow ── */
+          <div className="tour-card-mockup__slideshow">
+            {images.map((src, i) => (
+              <img
+                key={src}
+                src={src}
+                alt={`${displayTitle} — ${i + 1}`}
+                className={`tour-card-mockup__slide${i === activeIdx ? ' tour-card-mockup__slide--active' : ''}`}
+                loading={i === 0 ? 'eager' : 'lazy'}
+              />
+            ))}
+            {/* Ken Burns overlay — subtil movimento de zoom */}
+            <div className="tour-card-mockup__kb-overlay" />
+          </div>
+        ) : (
+          <ImagePlaceholder
+            src={singleImage}
+            alt={displayTitle}
+            aspectRatio="16/10"
+            className="tour-card-mockup__img"
+          />
+        )}
         {categoryLabel && (
           <span className="tour-card-mockup__badge">{categoryLabel}</span>
+        )}
+        {/* Slideshow dots */}
+        {hasSlideshow && (
+          <div className="tour-card-mockup__dots">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                className={`tour-card-mockup__dot${i === activeIdx ? ' tour-card-mockup__dot--active' : ''}`}
+                onClick={() => { setActiveIdx(i); clearInterval(timerRef.current); }}
+                aria-label={`Imagem ${i + 1}`}
+              />
+            ))}
+          </div>
         )}
       </div>
 

@@ -111,6 +111,21 @@
   background: #e2e8f0;
 }
 
+/* Garante que a imagem real preenche o thumbnail */
+.summary-thumb-box .img-placeholder-wrapper {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: unset !important;
+}
+
+.summary-thumb-box .img-placeholder-real {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 8px;
+}
+
 .summary-item-details {
   display: flex;
   flex-direction: column;
@@ -321,6 +336,18 @@
   color: #0f172a;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 640px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
 }
 
 .form-input:focus {

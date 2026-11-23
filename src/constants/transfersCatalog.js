@@ -96,7 +96,11 @@ export const MADEIRA_ADVENTURES = [
     includesDe: ['Privater Mercedes-Van', 'Zertifizierter lokaler Fahrer/Guide', 'Hotel-Abholung & Rückfahrt', 'Insassenversicherung'],
     includesFr: ['Minivan Mercedes privé', 'Chauffeur/guide local certifié', 'Prise en charge et retour à l\'hôtel', 'Assurance passagers'],
     includesEs: ['Furgoneta Mercedes privada', 'Conductor/guía local certificado', 'Recogida y regreso al hotel', 'Seguro de pasajeros'],
-    image: null,
+    image: [
+      '/images/cabo-girao-cliff.jpg',
+      '/images/cabo-girao-camara-lobos.jpg',
+      '/images/cabo-girao-funchal-view.jpg',
+    ],
   },
   {
     id: 'wicker-toboggans-tropical-garden',
@@ -179,7 +183,11 @@ export const MADEIRA_ADVENTURES = [
     includesDe: ['Privater Mercedes-Van', 'Flexibler Guide', 'Hotelabholung und Rückfahrt', 'Panoramaroute'],
     includesFr: ['Minivan Mercedes privé', 'Guide flexible', 'Prise en charge et retour à l\'hôtel', 'Route panoramique'],
     includesEs: ['Furgoneta Mercedes privada', 'Guía flexible', 'Recogida y regreso al hotel', 'Ruta panorámica'],
-    image: null,
+    image: [
+      '/images/monte-toboggan-carreiros.jpg',
+      '/images/monte-palace-tropical-garden.jpg',
+      '/images/cristo-rei-garajau-view.jpg',
+    ],
   },
   {
     id: 'east-pico-areiro-santana',
@@ -272,7 +280,12 @@ export const MADEIRA_ADVENTURES = [
     includesDe: ['Ganztägig exklusiver Minivan', 'Zertifizierter Fahrer/Guide', 'Flexible Fotostopps', 'Vollkaskoversicherung'],
     includesFr: ['Véhicule dédié toute la journée', 'Chauffeur/guide certifié', 'Arrêts photos sur mesure', 'Assurance complète'],
     includesEs: ['Vehículo exclusivo todo el día', 'Conductor/guía certificado', 'Paradas fotográficas flexibles', 'Seguro completo'],
-    image: null,
+    image: [
+      '/images/east-adventure-pico-trail.jpg',
+      '/images/east-adventure-santana-houses.jpg',
+      '/images/east-adventure-balcoes.jpg',
+      '/images/east-adventure-guindaste.jpg',
+    ],
   },
   {
     id: 'wild-north-fanal-seixal-porto-moniz',
@@ -360,7 +373,12 @@ export const MADEIRA_ADVENTURES = [
     includesDe: ['Ganztägig exklusives Fahrzeug', 'Zertifizierter Fahrer/Guide', 'Badezeit in Porto Moniz', 'Vollkaskoversicherung'],
     includesFr: ['Véhicule dédié toute la journée', 'Chauffeur/guide certifié', 'Temps de baignade à Porto Moniz', 'Assurance complète'],
     includesEs: ['Vehículo exclusivo todo el día', 'Conductor/guía certificado', 'Tiempo para baños en Porto Moniz', 'Seguro completo'],
-    image: null,
+    image: [
+      '/images/wild-north-fanal-forest.jpg',
+      '/images/wild-north-seixal-beach.webp',
+      '/images/wild-north-ribeira-janela.webp',
+      '/images/wild-north-paul-da-serra.jpg',
+    ],
   },
 ];
 

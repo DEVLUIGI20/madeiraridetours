@@ -4,7 +4,10 @@ import { useBooking } from '../../context/BookingContext';
 import { TOURS_DATA } from '../../constants/toursCatalog';
 import { MOUNTAIN_TRANSFERS_CATALOG, AIRPORT_TRANSFER_LOCATIONS, MADEIRA_ADVENTURES } from '../../constants/transfersCatalog';
 import { getAirportLocations, getTours } from '../../services/catalogService';
+import { bookingService } from '../../services/bookingService';
 import PassengerPicker from '../../components/common/PassengerPicker';
+import DatePicker from '../../components/common/DatePicker';
+import TimePicker from '../../components/common/TimePicker';
 import { PAYMENT_METHOD, SERVICE_TYPE } from '../../constants/booking';
 import { paymentService } from '../../services/paymentService';
 import { ROUTES } from '../../constants/index';
@@ -46,6 +49,8 @@ const CHECKOUT_I18N = {
     processing: 'A processar...',
     payNow: (amount) => `Pagar Agora (€${amount}) →`,
     airportPrefix: 'Transfer de Aeroporto —',
+    tourDate: 'Data do Tour / Atividade',
+    tourTime: 'Hora de Recolha / Início',
   },
   en: {
     heroTitle: 'Checkout',
@@ -79,6 +84,8 @@ const CHECKOUT_I18N = {
     processing: 'Processing...',
     payNow: (amount) => `Pay Now (€${amount}) →`,
     airportPrefix: 'Airport Transfer —',
+    tourDate: 'Tour / Activity Date',
+    tourTime: 'Pick-up / Start Time',
   },
   de: {
     heroTitle: 'Buchung Abschließen',
@@ -112,6 +119,8 @@ const CHECKOUT_I18N = {
     processing: 'Wird verarbeitet...',
     payNow: (amount) => `Jetzt Bezahlen (€${amount}) →`,
     airportPrefix: 'Flughafentransfer —',
+    tourDate: 'Tour- / Aktivitätsdatum',
+    tourTime: 'Abhol- / Startzeit',
   },
   fr: {
     heroTitle: 'Finaliser la Réservation',
@@ -145,6 +154,8 @@ const CHECKOUT_I18N = {
     processing: 'Traitement en cours...',
     payNow: (amount) => `Payer Maintenant (€${amount}) →`,
     airportPrefix: 'Transfert Aéroport —',
+    tourDate: 'Date du Tour / Activité',
+    tourTime: 'Heure de Prise en Charge / Début',
   },
   es: {
     heroTitle: 'Finalizar Reserva',
@@ -178,6 +189,8 @@ const CHECKOUT_I18N = {
     processing: 'Procesando...',
     payNow: (amount) => `Pagar Ahora (€${amount}) →`,
     airportPrefix: 'Traslado de Aeropuerto —',
+    tourDate: 'Fecha del Tour / Actividad',
+    tourTime: 'Hora de Recogida / Inicio',
   },
 };
 
@@ -203,6 +216,7 @@ export default function Booking() {
   const { booking, markPendingPayment } = useBooking();
   const [locations, setLocations] = useState(AIRPORT_TRANSFER_LOCATIONS);
   const [toursList, setToursList] = useState(TOURS_DATA);
+  const [blockedDates, setBlockedDates] = useState([]);
 
   useEffect(() => {
     let isMounted = true;
@@ -214,6 +228,11 @@ export default function Booking() {
     getTours().then((liveTours) => {
       if (isMounted && liveTours && liveTours.length > 0) {
         setToursList(liveTours);
+      }
+    });
+    bookingService.getBlockedDates().then((res) => {
+      if (isMounted && res && res.success && res.data) {
+        setBlockedDates(res.data);
       }
     });
     return () => {
@@ -230,6 +249,9 @@ export default function Booking() {
     if (currentLang === 'es') return item.titleEs || item.titleEn || item.title;
     return item.titleEn || item.title;
   };
+
+  // Helper: extrai sempre a 1ª imagem (suporta string ou array)
+  const resolveImage = (img) => Array.isArray(img) ? (img[0] || null) : (img || null);
 
   // Find service & itinerary information
   const currentService = useMemo(() => {
@@ -248,7 +270,7 @@ export default function Booking() {
         duration: adv.duration,
         highlights: adv.highlights,
         totalCalculatedPrice: fixedPrice,
-        image: adv.image,
+        image: resolveImage(adv.image),
       };
     }
 
@@ -321,7 +343,7 @@ export default function Booking() {
         duration: tour.duration,
         highlights: tour.highlights,
         totalCalculatedPrice: calculatedPrice,
-        image: tour.image,
+        image: resolveImage(tour.image),
       };
     }
 
@@ -338,7 +360,7 @@ export default function Booking() {
       duration: defaultTour.duration,
       highlights: defaultTour.highlights,
       totalCalculatedPrice: defaultTour.price || 90,
-      image: defaultTour.image,
+      image: resolveImage(defaultTour.image),
     };
   }, [serviceParam, fromParam, dropoffParam, tripTypeParam, priceParam, paxParam, pickupParam, locations, toursList, currentLang, bT]);
 
@@ -358,8 +380,9 @@ export default function Booking() {
 
   // Dynamic values
   const [passengers, setPassengers] = useState(Number(paxParam) || booking.passengers || 2);
-  const selectedDate = dateParam || booking.date || getDefaultDate();
-  const selectedTime = timeParam || booking.timeSlot || '10:00';
+  const [selectedDate, setSelectedDate] = useState(dateParam || booking.date || getDefaultDate());
+  const [selectedTime, setSelectedTime] = useState(timeParam || booking.timeSlot || '10:00');
+  const todayDateStr = useMemo(() => new Date().toISOString().split('T')[0], []);
 
   // Format Dates nicely
   const formattedDepartureDate = useMemo(() => {
@@ -427,6 +450,13 @@ export default function Booking() {
 
   function validate() {
     const errs = {};
+    if (!selectedDate) {
+      errs.selectedDate = currentLang === 'pt' ? 'Por favor selecione a data pretendida.' : 'Please select a date.';
+    } else if (blockedDates.includes(selectedDate)) {
+      errs.selectedDate = currentLang === 'pt' 
+        ? `A data ${selectedDate} encontra-se indisponível/esgotada.` 
+        : `Date ${selectedDate} is unavailable.`;
+    }
     if (!sanitizeText(fullName)) {
       errs.fullName = currentLang === 'pt' ? 'Por favor indique o seu nome completo.' : 'Please enter your full name.';
     }
@@ -611,6 +641,36 @@ export default function Booking() {
             <h2 className="card-heading">{bT.yourDetails}</h2>
 
             <form onSubmit={handleCheckout} className="checkout-form">
+              {/* Date & Time Selection (Styled exactly as in Home page) */}
+              <div className="form-grid-2">
+                <div className="form-group">
+                  <label className="form-label">
+                    {bT.tourDate || 'Data da Viagem'} <span className="req">*</span>
+                  </label>
+                  <DatePicker
+                    value={selectedDate}
+                    onChange={(newVal) => setSelectedDate(newVal)}
+                    blockedDates={blockedDates}
+                    minDate={todayDateStr}
+                    language={currentLang}
+                    placeholder="dd/mm/aaaa"
+                  />
+                  {errors.selectedDate && <p className="field-error">{errors.selectedDate}</p>}
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    {bT.tourTime || 'Hora de Recolha'} <span className="req">*</span>
+                  </label>
+                  <TimePicker
+                    value={selectedTime}
+                    onChange={(newTime) => setSelectedTime(newTime)}
+                    required
+                    language={currentLang}
+                  />
+                </div>
+              </div>
+
               {/* Full Name */}
               <div className="form-group">
                 <label htmlFor="fullName" className="form-label">
