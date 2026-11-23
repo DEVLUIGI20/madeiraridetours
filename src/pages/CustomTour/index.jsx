@@ -186,7 +186,11 @@ export default function CustomTour() {
       {/* ── Sub-Hero ── */}
       <section className="custom-tour-hero">
         <div className="custom-tour-hero-bg">
-          <ImagePlaceholder alt="Madeira Topography" height="100%" />
+          <ImagePlaceholder
+            src="/images/custom-tour-hero-banner.jpg"
+            alt="Ponta de São Lourenço Cliffs — Custom Tour"
+            height="100%"
+          />
           <div className="custom-tour-hero-overlay" />
         </div>
         <div className="custom-tour-hero-content container-constrained">
