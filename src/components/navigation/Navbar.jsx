@@ -17,12 +17,14 @@ export default function Navbar() {
   return (
     <header className="navbar-header">
       <div className="navbar-container">
-        {/* Brand Logo with Mountain Icon matching Mockup */}
+        {/* Brand Logo matching Mockup */}
         <div className="navbar-left">
           <Link to={ROUTES.HOME} className="navbar-brand">
-            <span className="navbar-brand-icon" aria-hidden="true">
-              <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
-            </span>
+            <img
+              src="/images/madeiraridetours-brand-logo.jpg"
+              alt="MadeiraRide Tours Logo"
+              className="navbar-brand-logo-img"
+            />
             <span className="navbar-brand-name">MadeiraRideTours</span>
           </Link>
         </div>
