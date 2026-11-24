@@ -38,17 +38,17 @@
 
 /* Column 1: Brand */
 .m-footer-brand {
-  min-width: 200px;
-  max-width: 230px;
+  min-width: 250px;
+  max-width: 320px;
   justify-content: center;
 }
 
 .m-footer-logo-link {
   display: inline-block;
   text-decoration: none;
-  font-size: 1.45rem;
-  line-height: 1.2;
-  margin-bottom: 8px;
+  font-size: 1.85rem;
+  line-height: 1.15;
+  margin-bottom: 10px;
   color: #ffffff;
   letter-spacing: -0.02em;
 }
@@ -61,14 +61,23 @@
 .m-logo-light {
   font-weight: 300;
   color: #ffffff;
-  margin-left: 2px;
+  margin-left: 3px;
 }
 
 .m-footer-tagline {
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   color: #94a3b8;
   margin: 0;
   letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+
+/* Central Navigation Group: Quick Links & Our Services side-by-side */
+.m-footer-nav-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+  flex: 0 1 auto;
 }
 
 /* Column Headings */
@@ -80,16 +89,14 @@
   letter-spacing: -0.01em;
 }
 
-/* Column 2: Quick Links (2-column subgrid) */
+/* Column 2: Quick Links */
 .m-footer-links-col {
-  flex: 1 1 auto;
-  max-width: 290px;
+  flex: 0 0 auto;
+  min-width: 140px;
 }
 
 .m-footer-links-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.15fr;
-  gap: 16px;
+  display: block;
 }
 
 .m-links-subcol {
@@ -115,7 +122,8 @@
 
 /* Column 3: Our Services */
 .m-footer-services-col {
-  min-width: 170px;
+  flex: 0 0 auto;
+  min-width: 150px;
 }
 
 .m-services-list {
@@ -245,50 +253,32 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* Column 5: Madeira Mountain Graphic Artwork */
+/* Column 5: Madeira Destination Brand */
 .m-footer-artwork-col {
-  min-width: 240px;
-  max-width: 290px;
+  min-width: 220px;
+  max-width: 260px;
   justify-content: center;
   align-items: flex-end;
 }
 
-.m-mountain-graphic {
+.m-destination-brand {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  justify-content: flex-end;
+  align-items: center;
   width: 100%;
 }
 
-.m-mountain-svg {
+.m-madeira-brand-img {
   width: 100%;
-  max-width: 250px;
+  max-width: 195px;
   height: auto;
-  opacity: 0.85;
+  display: block;
+  object-fit: contain;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.m-madeira-tag {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  margin-top: -6px;
-}
-
-.m-madeira-script {
-  font-family: 'Brush Script MT', 'Segoe Script', cursive, sans-serif;
-  font-size: 2.1rem;
-  font-weight: normal;
-  color: #ffffff;
-  line-height: 1;
-  letter-spacing: 0.02em;
-}
-
-.m-madeira-subtitle {
-  font-size: 0.7rem;
-  color: #94a3b8;
-  letter-spacing: 0.08em;
-  margin-top: 2px;
-  text-transform: lowercase;
+.m-madeira-brand-img:hover {
+  transform: scale(1.03);
 }
 
 /* ==========================================================================
@@ -317,6 +307,18 @@
 .m-bottom-copy,
 .m-bottom-powered {
   margin: 0;
+}
+
+.m-partner-link {
+  color: #94a3b8;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.15s ease, text-decoration 0.15s ease;
+}
+
+.m-partner-link:hover {
+  color: #ffffff;
+  text-decoration: underline;
 }
 
 .m-heart {

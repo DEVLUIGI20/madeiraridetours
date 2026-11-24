@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../constants';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -8,17 +7,6 @@ const CURRENT_YEAR = new Date().getFullYear();
 
 export default function Footer() {
   const { currentLang } = useLanguage();
-  const [email, setEmail] = useState('');
-  const [isSubscribed, setIsSubscribed] = useState(false);
-
-  const handleSubscribe = (e) => {
-    e.preventDefault();
-    if (email.trim()) {
-      setIsSubscribed(true);
-      setEmail('');
-      setTimeout(() => setIsSubscribed(false), 4000);
-    }
-  };
 
   return (
     <footer className="mockup-footer">
@@ -27,8 +15,7 @@ export default function Footer() {
         <div className="m-footer-col m-footer-brand">
           <Link to={ROUTES.HOME} className="m-footer-logo-link">
             <span className="m-logo-bold">MadeiraRide</span>
-            <span className="m-logo-light">Tours</span>
-          </Link>
+            <span className="m-logo-light">Tours</span>          </Link>
           <p className="m-footer-tagline">
             {currentLang === 'pt' ? 'Explorar · Descobrir · Viver a Madeira' : 'Explore · Discover · Experience'}
           </p>
@@ -95,31 +82,11 @@ export default function Footer() {
         {/* Column 4: Stay Connected & Socials */}
         <div className="m-footer-col m-footer-subscribe-col">
           <h4 className="m-footer-heading">
-            {currentLang === 'pt' ? 'Fique em Contacto' : currentLang === 'de' ? 'In Kontakt bleiben' : currentLang === 'fr' ? 'Restez Connecté' : 'Stay Connected'}
+            {currentLang === 'pt' ? 'Redes Sociais' : currentLang === 'de' ? 'Social Media' : currentLang === 'fr' ? 'Réseaux Sociaux' : 'Social Media'}
           </h4>
           <p className="m-footer-subtext">
-            {currentLang === 'pt' ? 'Receba novidades e ofertas exclusivas na Madeira.' : 'Get the latest updates and special offers.'}
+            {currentLang === 'pt' ? 'Siga-nos e partilhe a sua aventura na Madeira.' : 'Follow us and share your Madeira adventure.'}
           </p>
-
-          <form className="m-subscribe-form" onSubmit={handleSubscribe}>
-            <input
-              type="email"
-              className="m-subscribe-input"
-              placeholder={currentLang === 'pt' ? 'O seu endereço de email' : 'Your email address'}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <button type="submit" className="m-subscribe-btn">
-              {currentLang === 'pt' ? 'Subscrever →' : 'Subscribe →'}
-            </button>
-          </form>
-
-          {isSubscribed && (
-            <span className="m-subscribe-success">
-              {currentLang === 'pt' ? '✓ Obrigado pela sua subscrição!' : '✓ Thank you for subscribing!'}
-            </span>
-          )}
 
           <div className="m-social-links">
             {/* Facebook */}
@@ -164,44 +131,15 @@ export default function Footer() {
         </div>
 
 
-        {/* Column 5: Madeira Mountain Contour Artwork */}
+        {/* Column 5: Official Madeira Destination Brand */}
         <div className="m-footer-col m-footer-artwork-col">
-          <div className="m-mountain-graphic">
-            <svg
-              className="m-mountain-svg"
-              viewBox="0 0 280 90"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              {/* Back mountain ridge */}
-              <path
-                d="M10 75 L55 52 L95 62 L150 25 L195 48 L240 32 L275 68"
-                stroke="rgba(255, 255, 255, 0.2)"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              {/* Foreground dramatic peak */}
-              <path
-                d="M5 80 L50 60 L85 68 L140 38 L165 12 L195 38 L230 45 L275 75"
-                stroke="rgba(255, 255, 255, 0.6)"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              {/* Ridge highlights */}
-              <path
-                d="M165 12 L172 26 L168 45 L175 70"
-                stroke="rgba(255, 255, 255, 0.28)"
-                strokeWidth="1.2"
-                strokeDasharray="2 3"
-              />
-            </svg>
-            <div className="m-madeira-tag">
-              <span className="m-madeira-script">Madeira</span>
-              <span className="m-madeira-subtitle">more than a destination</span>
-            </div>
+          <div className="m-destination-brand">
+            <img
+              src="/images/madeira-tao-tua-white.png"
+              alt="Madeira . Tão tua"
+              className="m-madeira-brand-img"
+              loading="lazy"
+            />
           </div>
         </div>
       </div>
@@ -213,7 +151,24 @@ export default function Footer() {
             &copy; {CURRENT_YEAR} MadeiraRideTours. All rights reserved.
           </p>
           <p className="m-bottom-powered">
-            Powered by AuroraTech
+            Powered by{' '}
+            <a
+              href="https://www.instagram.com/auroratech.pt?fqnt=MW0yaTM4NzZzZGZucw%3D%3D&utm_source=qr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="m-partner-link"
+            >
+              Aurora Tech
+            </a>
+            {' '}&{' '}
+            <a
+              href="https://www.instagram.com/sidebysidesign?knvt=MXBpcnBjbnN1cTdiag%3D%3D"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="m-partner-link"
+            >
+              SidebySidesign
+            </a>
           </p>
         </div>
       </div>
