@@ -534,9 +534,10 @@ export default function Booking() {
       {/* ── Sub-Hero Banner matching Mockup ── */}
       <section className="checkout-hero">
         <div className="checkout-hero-bg">
-          <ImagePlaceholder
-            alt="Madeira Scenic Ocean View"
-            height="100%"
+          <img
+            src="/images/booking-hero-banner.webp"
+            alt="Vista aérea do Funchal, Madeira"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
           />
           <div className="checkout-hero-overlay" />
         </div>

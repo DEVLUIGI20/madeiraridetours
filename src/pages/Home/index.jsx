@@ -339,15 +339,15 @@ export default function Home() {
           <div className="feature-item">
             <span className="feature-item__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                <path d="M12 2l3 7h7l-5.5 4.5 2 7L12 17l-6.5 3.5 2-7L2 9h7z" />
               </svg>
             </span>
             <div>
               <h3 className="feature-item__title">
-                {currentLang === 'pt' ? 'Passeios de Topo' : currentLang === 'de' ? 'Bestbewertete Touren' : currentLang === 'fr' ? 'Circuits Populaires' : 'Top Rated Tours'}
+                {currentLang === 'pt' ? 'Experiência Premium' : currentLang === 'de' ? 'Premium Erlebnis' : currentLang === 'fr' ? 'Expérience Premium' : 'Premium Experience'}
               </h3>
               <p className="feature-item__desc">
-                {currentLang === 'pt' ? '5.0 de mais de 1.000 avaliações' : currentLang === 'de' ? '5.0 aus 1.000+ Bewertungen' : currentLang === 'fr' ? '5.0 sur 1 000+ avis' : '5.0 from 1,000+ reviews'}
+                {currentLang === 'pt' ? 'Conforto e elegância em cada viagem' : currentLang === 'de' ? 'Komfort und Eleganz auf jeder Reise' : currentLang === 'fr' ? 'Confort et élégance à chaque voyage' : 'Comfort and elegance on every journey'}
               </p>
             </div>
           </div>
