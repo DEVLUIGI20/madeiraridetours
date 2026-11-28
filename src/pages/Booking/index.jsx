@@ -296,7 +296,7 @@ export default function Booking() {
         duration: loc.duration,
         zone: loc.zone,
         totalCalculatedPrice: fixedPrice,
-        image: null,
+        image: '/images/airport-transfer-thumbnail.jpg',
       };
     }
 
